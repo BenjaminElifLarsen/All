@@ -1,0 +1,7 @@
+D:\Skrivebord\Other\Kode\Edabit\bin\Debug\Edabit.exe.config
+D:\Skrivebord\Other\Kode\Edabit\bin\Debug\Edabit.exe
+D:\Skrivebord\Other\Kode\Edabit\bin\Debug\Edabit.pdb
+D:\Skrivebord\Other\Kode\Edabit\obj\Debug\Edabit.csprojAssemblyReference.cache
+D:\Skrivebord\Other\Kode\Edabit\obj\Debug\Edabit.csproj.CoreCompileInputs.cache
+D:\Skrivebord\Other\Kode\Edabit\obj\Debug\Edabit.exe
+D:\Skrivebord\Other\Kode\Edabit\obj\Debug\Edabit.pdb
