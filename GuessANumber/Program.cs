@@ -88,7 +88,6 @@ namespace GuesssANumber
             } while (amountOfTries != currentAmountOfTries);
             Console.Clear();
             Console.WriteLine("You failed!\nNumber to guess = {0}.\nYou guessed {1}.\nScore = {2}.\nPoints = {3}", toGuess, guess, correctAmount, points);
-            Console.ReadLine();
             return points;
         }
 
@@ -156,7 +155,6 @@ namespace GuesssANumber
         private byte[] hoverColour;
         private byte[] otherColour;
         private byte totalGuessAmount;
-        //private Dictionary<ulong, string> highScore = new Dictionary<ulong, string>(6);
         private string[] scores_names;
         private ulong[] scores_scores;
 
@@ -180,16 +178,8 @@ namespace GuesssANumber
             GetConsoleMode(handle, out mode);
             SetConsoleMode(handle, mode | 0x4);
             Console.SetWindowSize(50, 20);
-            //Console.SetCursorPosition(i + offset[0], k + offset[1]);
-            //Console.Write("\x1b[38;2;" + lineColour[0] + ";" + lineColour[1] + ";" + lineColour[2] + "m|" + "\x1b[0m");
-            //highScore.Add(0,"AAA");
-            //highScore.Add(1, "AAB");
-            //highScore.Add(2, "AAC");
-            //highScore.Add(3, "ABA");
-            //highScore.Add(4, "ABB");
-            //highScore.Add(5, "ABC");'
             scores_names = new string[6] { "AAA", "AAB", "AAC", "ABA", "ABB", "ABC" };
-            scores_scores = new ulong[6] { 6, 5, 4, 3, 2, 1 };
+            scores_scores = new ulong[6] { 126, 55, 34, 13, 7, 1 };
             string[] lines = File.ReadAllLines("Highscore.txt");
             if (lines.Length == 0)
                 TextWriter(scores_names, scores_scores);
@@ -202,11 +192,11 @@ namespace GuesssANumber
         /// <summary>
         /// Read the text stored in string array <paramref name="lines"/>. 
         /// </summary>
-        /// <param name="lines"></param>
-        /// <param name="score_text"></param>
-        /// <param name="score_value"></param>
+        /// <param name="lines">Array to seperate.</param>
+        /// <param name="score_text">The string part of <paramref name="lines"/>.</param>
+        /// <param name="score_value">The ulong part of <paramref name="lines"/>.</param>
         public void TextReader(string[] lines, out string[] score_text, out ulong[] score_value)
-        {
+        { //move this and TextWriter into a helper class together with other functions that is not part of the interface
             string[][] scores = new string[6][];
             score_text = new string[6];
             score_value = new ulong[6];
@@ -219,16 +209,18 @@ namespace GuesssANumber
 
         }
 
+        /// <summary>
+        /// Writes <paramref name="values"/> and <paramref name="texts"/> to the file "Highscore.txt".
+        /// <paramref name="texts"/> and <paramref name="values"/> should have the same length.
+        /// </summary>
+        /// <param name="texts">The strings to write.</param>
+        /// <param name="values">The  ulongs to write.</param>
         public void TextWriter(string[] texts, ulong[] values)
         {
             using (StreamWriter file = new StreamWriter("Highscore.txt", false))
             {
-
                 for (int i = 0; i < texts.Length; i++)
-                {
                     file.Write("{0}:{1}\n", texts[i], values[i]);
-                }
-                
             }
         }
 
@@ -283,16 +275,6 @@ namespace GuesssANumber
         private void HighScore()
         {
             Console.Clear();
-            //ulong[] scores = new ulong[6];
-            //sbyte posistion = 5;
-            //string[] names = new string[6];
-            //foreach (KeyValuePair<ulong, string> key in highScore.OrderBy(key => key.Key))
-            //{
-            //    scores[posistion] = key.Key;
-            //    names[posistion] = key.Value;
-            //    posistion--;
-            //}
-
             for (int i = 0; i < scores_scores.Length; i++)
             {
                 Console.WriteLine("{0}'s score: {1}", scores_names[i], scores_scores[i]);
@@ -302,16 +284,7 @@ namespace GuesssANumber
 
         private void Save(ulong score) //decouple these functions by putting scores_names and scores_scores as parameters
         {
-            //ulong[] scores = new ulong[6];
             sbyte posistion = 5;
-            //string[] names = new string[6];
-            //foreach (KeyValuePair<ulong,string> key in highScore.OrderBy(key => key.Key))
-            //{
-            //    scores[posistion] = key.Key;
-            //    names[posistion] = key.Value;
-            //    posistion--;
-            //}
-
             if (score > scores_scores[0])
             {
                 for (int i = scores_names.Length - 1; i > 0; i--)
@@ -319,8 +292,7 @@ namespace GuesssANumber
                     scores_scores[i ] = scores_scores[i-1];
                     scores_names[i ] = scores_names[i-1];
                 }
-                Console.WriteLine("Enter name: ");
-                string newName = Console.ReadLine();
+                string newName = GetName();
                 scores_names[0] = newName;
                 scores_scores[0] = score;
                 TextWriter(scores_names, scores_scores);
@@ -328,7 +300,7 @@ namespace GuesssANumber
             else if (score > scores_scores[5])
             {
                 posistion = 5;
-                while(score > scores_scores[posistion])
+                while(score > scores_scores[posistion-1])
                 {
                     posistion--;
                 }
@@ -337,10 +309,7 @@ namespace GuesssANumber
                     scores_scores[i] = scores_scores[i - 1];
                     scores_names[i] = scores_names[i - 1];
                 }
-                //highScore.Remove(scores[5]);
-                Console.WriteLine("Enter name: ");
-                string newName = Console.ReadLine();
-                //highScore.Add(score, newName); //does not allow multiple scores that are the same
+                string newName = GetName();
                 scores_names[posistion] = newName;
                 scores_scores[posistion] = score;
                 TextWriter(scores_names, scores_scores);
@@ -353,7 +322,19 @@ namespace GuesssANumber
 
         }
 
-
+        private string GetName() //need to catch string with only spaces.
+        {
+            int x = Console.CursorLeft;
+            int y = Console.CursorTop;
+            string name = "";
+            do
+            {
+                Console.SetCursorPosition(x, y);
+                Console.WriteLine("Enter name: ");
+                name = Console.ReadLine();
+            } while (name == "");
+            return name;
+        }
 
 
         /// <summary>
@@ -405,7 +386,7 @@ namespace GuesssANumber
             byte longestestOption = 0;
             byte xLocation;
             byte yLocation;
-            byte cursorTrackerX = 0;
+            byte cursorTrackerX = 0; //at some of the values under 32 and 5 for writtingWidth and maxYLine it broke. One point it could stay on scolling even tough scroll amount stated 0. Another values it would only display 2 options and no scroll. 
             byte cursorTrackterY = 0;
             byte currentAmountOfColls = 0; //rename
             byte maxAmountOfRows = 0;
