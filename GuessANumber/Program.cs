@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Threading;
@@ -189,6 +190,46 @@ namespace GuesssANumber
             //highScore.Add(5, "ABC");'
             scores_names = new string[6] { "AAA", "AAB", "AAC", "ABA", "ABB", "ABC" };
             scores_scores = new ulong[6] { 6, 5, 4, 3, 2, 1 };
+            string[] lines = File.ReadAllLines("Highscore.txt");
+            if (lines.Length == 0)
+                TextWriter(scores_names, scores_scores);
+            else
+            {
+                TextReader(lines, out scores_names, out scores_scores);
+            }
+        }
+
+        /// <summary>
+        /// Read the text stored in string array <paramref name="lines"/>. 
+        /// </summary>
+        /// <param name="lines"></param>
+        /// <param name="score_text"></param>
+        /// <param name="score_value"></param>
+        public void TextReader(string[] lines, out string[] score_text, out ulong[] score_value)
+        {
+            string[][] scores = new string[6][];
+            score_text = new string[6];
+            score_value = new ulong[6];
+            for (int i = 0; i < lines.Length; i++)
+            {
+                scores[i] = lines[i].Split(':');
+                score_text[i] = scores[i][0];
+                ulong.TryParse(scores[i][1], out score_value[i]);
+            }
+
+        }
+
+        public void TextWriter(string[] texts, ulong[] values)
+        {
+            using (StreamWriter file = new StreamWriter("Highscore.txt", false))
+            {
+
+                for (int i = 0; i < texts.Length; i++)
+                {
+                    file.Write("{0}:{1}\n", texts[i], values[i]);
+                }
+                
+            }
         }
 
         /// <summary>
@@ -259,7 +300,7 @@ namespace GuesssANumber
             Console.ReadLine();
         }
 
-        private void Save(ulong score)
+        private void Save(ulong score) //decouple these functions by putting scores_names and scores_scores as parameters
         {
             //ulong[] scores = new ulong[6];
             sbyte posistion = 5;
@@ -282,6 +323,7 @@ namespace GuesssANumber
                 string newName = Console.ReadLine();
                 scores_names[0] = newName;
                 scores_scores[0] = score;
+                TextWriter(scores_names, scores_scores);
             }
             else if (score > scores_scores[5])
             {
@@ -301,6 +343,7 @@ namespace GuesssANumber
                 //highScore.Add(score, newName); //does not allow multiple scores that are the same
                 scores_names[posistion] = newName;
                 scores_scores[posistion] = score;
+                TextWriter(scores_names, scores_scores);
             }
             else
             {
