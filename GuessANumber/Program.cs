@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
 using System.Runtime.InteropServices;
+using System.Threading;
 
 namespace GuesssANumber
 {
@@ -13,7 +15,7 @@ namespace GuesssANumber
 
         public static sbyte GetRandom
         {
-            get => (sbyte)rnd.Next(0, 20);
+            get => (sbyte)rnd.Next(0, 10);
         }
     }
 
@@ -38,39 +40,55 @@ namespace GuesssANumber
         /// </summary>
         /// <param name="amountOfTries">The amount of attemps they have for each guess</param>
         /// <returns></returns>
-        public static uint gameplayLoop(byte amountOfTries)
+        public static ulong gameplayLoop(byte amountOfTries)
         {
             byte currentAmountOfTries = 0;
             uint correctAmount = 0;
             sbyte toGuess = Rnd.GetRandom;
-
+            ulong points = 0;
+            byte guess;
+            Interface.PartlyClear(0, 0, Console.WindowWidth, Console.WindowHeight - 1);
             do
             {
                 currentAmountOfTries++;
-                byte guess = GetNumber();
-                if(guess == toGuess)
+                guess = GetNumber();
+                Console.WriteLine(toGuess);
+                Console.SetCursorPosition(0, 0);
+                if (guess == toGuess)
                 {
                     correctAmount++;
+                    points += (ulong)(4 - currentAmountOfTries)*correctAmount;
                     currentAmountOfTries = 0;
-                    toGuess = Rnd.GetRandom;
+                    do
+                    {
+                        toGuess = Rnd.GetRandom;
+                    } while (toGuess == guess);
+                    Interface.PartlyClear(0, 0, Console.WindowWidth, Console.WindowHeight - 1);
                     Console.WriteLine("Correct. \nTry guess the new number. \nEnter to continue.");
+                    Thread.Sleep(10);
                     Console.ReadLine();
-                    Interface.PartlyClear(0, 0, Console.WindowWidth, Console.WindowHeight);
+                    Console.Clear();
                 }
                 else if (guess > toGuess)
                 {
+                    Interface.PartlyClear(0, 0, Console.WindowWidth, Console.WindowHeight - 1);
+                    Console.CursorTop = 0;
                     Console.WriteLine("To high");
-                    Console.ReadLine();
+
                 }else if (guess < toGuess)
                 {
+                    Interface.PartlyClear(0, 0, Console.WindowWidth, Console.WindowHeight - 1);
+                    Console.CursorTop = 0;
                     Console.WriteLine("To low");
-                    Console.ReadLine();
+
                 }
 
 
             } while (amountOfTries != currentAmountOfTries);
-
-            return 0;
+            Console.Clear();
+            Console.WriteLine("You failed!\nNumber to guess = {0}.\nYou guessed {1}.\nScore = {2}.\nPoints = {3}", toGuess, guess, correctAmount, points);
+            Console.ReadLine();
+            return points;
         }
 
 
@@ -79,11 +97,12 @@ namespace GuesssANumber
             byte? numberNull;
             byte number;
             string writeOut = "Please enter a number and press enter: ";
-            Console.Write("Please enter a number and press enter: ");
+            Console.CursorTop = 1;
             bool isNumber;
             do
             {
-                Interface.PartlyClear(0, 0, Console.WindowWidth, Console.WindowHeight);
+                Interface.PartlyClear(1, 1, Console.WindowWidth, Console.WindowHeight - 1);
+                Console.CursorTop = 1;
                 Console.WriteLine(writeOut);
                 isNumber = IsNumber(Console.ReadLine(), out numberNull);
                 if (!isNumber)
@@ -112,7 +131,6 @@ namespace GuesssANumber
             }
             else
                 return false;
-
         }
 
 
@@ -137,10 +155,12 @@ namespace GuesssANumber
         private byte[] hoverColour;
         private byte[] otherColour;
         private byte totalGuessAmount;
+        private Dictionary<ulong, string> highScore = new Dictionary<ulong, string>(6);
+
 
         public Interface()
         {
-            offset = new byte[] {2,2 };
+            offset = new byte[] {2,1 };
             startLocation = new byte[] {4,2 };
             hoverColour = new byte[] { 255, 0, 0 };
             otherColour = new byte[] { 0, 255, 12 };
@@ -157,10 +177,15 @@ namespace GuesssANumber
             int mode;
             GetConsoleMode(handle, out mode);
             SetConsoleMode(handle, mode | 0x4);
-            Console.SetWindowSize(40, 20);
+            Console.SetWindowSize(50, 20);
             //Console.SetCursorPosition(i + offset[0], k + offset[1]);
             //Console.Write("\x1b[38;2;" + lineColour[0] + ";" + lineColour[1] + ";" + lineColour[2] + "m|" + "\x1b[0m");
-
+            highScore.Add(0,"AAA");
+            highScore.Add(1, "AAB");
+            highScore.Add(2, "AAC");
+            highScore.Add(3, "ABA");
+            highScore.Add(4, "ABB");
+            highScore.Add(5, "ABC");
         }
 
         /// <summary>
@@ -174,23 +199,79 @@ namespace GuesssANumber
                 "High Score",
                 "Shurtdown"
             };
-
-            DrawAndSelect("Select Option", options, 30, 15, startLocation, otherColour, hoverColour, out string answer, out uint _, offset[0], offset[1]);
-            switch (answer)
+            while (true)
             {
-                case "New Game":
-                    Gameplay.gameplayLoop(totalGuessAmount);
-                    break;
+                Console.Clear();
+                DrawAndSelect("Select Option", options, 30, 5, startLocation, otherColour, hoverColour, out string answer, out uint _, offset[0], offset[1]);
+                switch (answer)
+                {
+                    case "New Game":
+                        ulong score = Gameplay.gameplayLoop(totalGuessAmount);
+                        Save(score);
+                        break;
 
-                case "High Score":
+                    case "High Score":
+                        HighScore();
+                        break;
 
-                    break;
-
-                case "Shurtdown":
-                    Environment.Exit(0);
-                    break;
+                    case "Shurtdown":
+                        Environment.Exit(0);
+                        break;
+                }
             }
+
         }
+
+
+        private void HighScore()
+        {
+            Console.Clear();
+            ulong[] scores = new ulong[6];
+            sbyte posistion = 5;
+            string[] names = new string[6];
+            foreach (KeyValuePair<ulong, string> key in highScore.OrderBy(key => key.Key))
+            {
+                scores[posistion] = key.Key;
+                names[posistion] = key.Value;
+                posistion--;
+            }
+            for (int i = 0; i < names.Length; i++)
+            {
+                Console.WriteLine("{0}'s score: {1}", names[i], scores[i]);
+            }
+            Console.ReadLine();
+        }
+
+        private void Save(ulong score)
+        {
+            ulong[] scores = new ulong[6];
+            sbyte posistion = 5;
+            string[] names = new string[6];
+            foreach (KeyValuePair<ulong,string> key in highScore.OrderBy(key => key.Key))
+            {
+                scores[posistion] = key.Key;
+                names[posistion] = key.Value;
+                posistion--;
+            }
+            posistion = 5;
+            if (score > scores[5])
+            {
+                while (score > scores[posistion] && posistion >= 0)
+                {
+                    posistion--;
+                }
+                highScore.Remove(scores[posistion]);
+                Console.WriteLine("Enter name: ");
+                string newName = Console.ReadLine();
+                highScore.Add(score, newName);
+            }
+            else
+            {
+                Console.WriteLine("Did not do good enough.");
+            }
+
+        }
+
 
 
 
@@ -208,7 +289,7 @@ namespace GuesssANumber
         /// <param name="optionalCursorY">An optional placement for the curser, top, after clearing.</param>
         public static void PartlyClear(int xStart, int yStart, int xEnd, int yEnd, int? optionalCursorX = null, int? optionalCursorY = null)
         { //When it jumps to the next line it will erase the first sign
-            xEnd = xEnd == Console.WindowWidth ? xEnd - 1 : xEnd;
+            xEnd = xEnd == Console.WindowWidth ? xEnd - 2 : xEnd;
             int x = optionalCursorX != null ? (int)optionalCursorX : xStart;
             int y = optionalCursorY != null ? (int)optionalCursorY : yStart;
             if (!(xStart >= xEnd))
@@ -258,7 +339,7 @@ namespace GuesssANumber
             Console.CursorLeft = startLocation[0];
             Console.CursorTop = startLocation[1];
 
-            if (options.Length == 0 && options == null)
+            if (options.Length == 0 || options == null)
             {
                 Debug.WriteLine("DrawAndSelect's 'options' were passed as either null or empty.");
             }
