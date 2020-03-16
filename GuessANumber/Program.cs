@@ -88,6 +88,8 @@ namespace GuesssANumber
             } while (amountOfTries != currentAmountOfTries);
             Console.Clear();
             Console.WriteLine("You failed!\nNumber to guess = {0}.\nYou guessed {1}.\nScore = {2}.\nPoints = {3}", toGuess, guess, correctAmount, points);
+
+
             return points;
         }
 
@@ -275,6 +277,8 @@ namespace GuesssANumber
         private void HighScore()
         {
             Console.Clear();
+
+
             for (int i = 0; i < scores_scores.Length; i++)
             {
                 Console.WriteLine("{0}'s score: {1}", scores_names[i], scores_scores[i]);
@@ -284,7 +288,9 @@ namespace GuesssANumber
 
         private void Save(ulong score) //decouple these functions by putting scores_names and scores_scores as parameters
         {
+
             sbyte posistion = 5;
+
             if (score > scores_scores[0])
             {
                 for (int i = scores_names.Length - 1; i > 0; i--)
@@ -292,7 +298,9 @@ namespace GuesssANumber
                     scores_scores[i ] = scores_scores[i-1];
                     scores_names[i ] = scores_names[i-1];
                 }
+
                 string newName = GetName();
+
                 scores_names[0] = newName;
                 scores_scores[0] = score;
                 TextWriter(scores_names, scores_scores);
@@ -300,7 +308,9 @@ namespace GuesssANumber
             else if (score > scores_scores[5])
             {
                 posistion = 5;
+
                 while(score > scores_scores[posistion-1])
+
                 {
                     posistion--;
                 }
@@ -310,6 +320,7 @@ namespace GuesssANumber
                     scores_names[i] = scores_names[i - 1];
                 }
                 string newName = GetName();
+
                 scores_names[posistion] = newName;
                 scores_scores[posistion] = score;
                 TextWriter(scores_names, scores_scores);
@@ -335,6 +346,7 @@ namespace GuesssANumber
             } while (name == "");
             return name;
         }
+
 
 
         /// <summary>
