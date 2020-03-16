@@ -88,7 +88,8 @@ namespace GuesssANumber
             } while (amountOfTries != currentAmountOfTries);
             Console.Clear();
             Console.WriteLine("You failed!\nNumber to guess = {0}.\nYou guessed {1}.\nScore = {2}.\nPoints = {3}", toGuess, guess, correctAmount, points);
-            Console.ReadLine();
+
+
             return points;
         }
 
@@ -276,15 +277,7 @@ namespace GuesssANumber
         private void HighScore()
         {
             Console.Clear();
-            //ulong[] scores = new ulong[6];
-            //sbyte posistion = 5;
-            //string[] names = new string[6];
-            //foreach (KeyValuePair<ulong, string> key in highScore.OrderBy(key => key.Key))
-            //{
-            //    scores[posistion] = key.Key;
-            //    names[posistion] = key.Value;
-            //    posistion--;
-            //}
+
 
             for (int i = 0; i < scores_scores.Length; i++)
             {
@@ -295,15 +288,8 @@ namespace GuesssANumber
 
         private void Save(ulong score) //decouple these functions by putting scores_names and scores_scores as parameters
         {
-            //ulong[] scores = new ulong[6];
+
             sbyte posistion = 5;
-            //string[] names = new string[6];
-            //foreach (KeyValuePair<ulong,string> key in highScore.OrderBy(key => key.Key))
-            //{
-            //    scores[posistion] = key.Key;
-            //    names[posistion] = key.Value;
-            //    posistion--;
-            //}
 
             if (score > scores_scores[0])
             {
@@ -312,8 +298,9 @@ namespace GuesssANumber
                     scores_scores[i ] = scores_scores[i-1];
                     scores_names[i ] = scores_names[i-1];
                 }
-                Console.WriteLine("Enter name: ");
-                string newName = Console.ReadLine();
+
+                string newName = GetName();
+
                 scores_names[0] = newName;
                 scores_scores[0] = score;
                 TextWriter(scores_names, scores_scores);
@@ -321,7 +308,9 @@ namespace GuesssANumber
             else if (score > scores_scores[5])
             {
                 posistion = 5;
-                while(score > scores_scores[posistion])
+
+                while(score > scores_scores[posistion-1])
+
                 {
                     posistion--;
                 }
@@ -330,10 +319,8 @@ namespace GuesssANumber
                     scores_scores[i] = scores_scores[i - 1];
                     scores_names[i] = scores_names[i - 1];
                 }
-                //highScore.Remove(scores[5]);
-                Console.WriteLine("Enter name: ");
-                string newName = Console.ReadLine();
-                //highScore.Add(score, newName); //does not allow multiple scores that are the same
+                string newName = GetName();
+
                 scores_names[posistion] = newName;
                 scores_scores[posistion] = score;
                 TextWriter(scores_names, scores_scores);
@@ -346,6 +333,19 @@ namespace GuesssANumber
 
         }
 
+        private string GetName() //need to catch string with only spaces.
+        {
+            int x = Console.CursorLeft;
+            int y = Console.CursorTop;
+            string name = "";
+            do
+            {
+                Console.SetCursorPosition(x, y);
+                Console.WriteLine("Enter name: ");
+                name = Console.ReadLine();
+            } while (name == "");
+            return name;
+        }
 
 
 
