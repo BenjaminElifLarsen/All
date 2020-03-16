@@ -155,8 +155,9 @@ namespace GuesssANumber
         private byte[] hoverColour;
         private byte[] otherColour;
         private byte totalGuessAmount;
-        private Dictionary<ulong, string> highScore = new Dictionary<ulong, string>(6);
-
+        //private Dictionary<ulong, string> highScore = new Dictionary<ulong, string>(6);
+        private string[] scores_names;
+        private ulong[] scores_scores;
 
         public Interface()
         {
@@ -180,12 +181,14 @@ namespace GuesssANumber
             Console.SetWindowSize(50, 20);
             //Console.SetCursorPosition(i + offset[0], k + offset[1]);
             //Console.Write("\x1b[38;2;" + lineColour[0] + ";" + lineColour[1] + ";" + lineColour[2] + "m|" + "\x1b[0m");
-            highScore.Add(0,"AAA");
-            highScore.Add(1, "AAB");
-            highScore.Add(2, "AAC");
-            highScore.Add(3, "ABA");
-            highScore.Add(4, "ABB");
-            highScore.Add(5, "ABC");
+            //highScore.Add(0,"AAA");
+            //highScore.Add(1, "AAB");
+            //highScore.Add(2, "AAC");
+            //highScore.Add(3, "ABA");
+            //highScore.Add(4, "ABB");
+            //highScore.Add(5, "ABC");'
+            scores_names = new string[6] { "AAA", "AAB", "AAC", "ABA", "ABB", "ABC" };
+            scores_scores = new ulong[6] { 6, 5, 4, 3, 2, 1 };
         }
 
         /// <summary>
@@ -197,12 +200,13 @@ namespace GuesssANumber
             {
                 "New Game",
                 "High Score",
+                "Information",
                 "Shurtdown"
             };
             while (true)
             {
                 Console.Clear();
-                DrawAndSelect("Select Option", options, 30, 5, startLocation, otherColour, hoverColour, out string answer, out uint _, offset[0], offset[1]);
+                DrawAndSelect("Select Option", options, 32, 5, startLocation, otherColour, hoverColour, out string answer, out uint _, offset[0], offset[1]);
                 switch (answer)
                 {
                     case "New Game":
@@ -214,6 +218,10 @@ namespace GuesssANumber
                         HighScore();
                         break;
 
+                    case "Information":
+                        Information();
+                        break;
+
                     case "Shurtdown":
                         Environment.Exit(0);
                         break;
@@ -223,51 +231,81 @@ namespace GuesssANumber
         }
 
 
+        private void Information()
+        {
+            Console.Clear();
+            Console.WriteLine("Purpose: Guess a number between 0 and 9.\nEnter to return.");
+
+            Console.ReadLine();
+        }
+
         private void HighScore()
         {
             Console.Clear();
-            ulong[] scores = new ulong[6];
-            sbyte posistion = 5;
-            string[] names = new string[6];
-            foreach (KeyValuePair<ulong, string> key in highScore.OrderBy(key => key.Key))
+            //ulong[] scores = new ulong[6];
+            //sbyte posistion = 5;
+            //string[] names = new string[6];
+            //foreach (KeyValuePair<ulong, string> key in highScore.OrderBy(key => key.Key))
+            //{
+            //    scores[posistion] = key.Key;
+            //    names[posistion] = key.Value;
+            //    posistion--;
+            //}
+
+            for (int i = 0; i < scores_scores.Length; i++)
             {
-                scores[posistion] = key.Key;
-                names[posistion] = key.Value;
-                posistion--;
-            }
-            for (int i = 0; i < names.Length; i++)
-            {
-                Console.WriteLine("{0}'s score: {1}", names[i], scores[i]);
+                Console.WriteLine("{0}'s score: {1}", scores_names[i], scores_scores[i]);
             }
             Console.ReadLine();
         }
 
         private void Save(ulong score)
         {
-            ulong[] scores = new ulong[6];
+            //ulong[] scores = new ulong[6];
             sbyte posistion = 5;
-            string[] names = new string[6];
-            foreach (KeyValuePair<ulong,string> key in highScore.OrderBy(key => key.Key))
+            //string[] names = new string[6];
+            //foreach (KeyValuePair<ulong,string> key in highScore.OrderBy(key => key.Key))
+            //{
+            //    scores[posistion] = key.Key;
+            //    names[posistion] = key.Value;
+            //    posistion--;
+            //}
+
+            if (score > scores_scores[0])
             {
-                scores[posistion] = key.Key;
-                names[posistion] = key.Value;
-                posistion--;
+                for (int i = scores_names.Length - 1; i > 0; i--)
+                {
+                    scores_scores[i ] = scores_scores[i-1];
+                    scores_names[i ] = scores_names[i-1];
+                }
+                Console.WriteLine("Enter name: ");
+                string newName = Console.ReadLine();
+                scores_names[0] = newName;
+                scores_scores[0] = score;
             }
-            posistion = 5;
-            if (score > scores[5])
+            else if (score > scores_scores[5])
             {
-                while (score > scores[posistion] && posistion >= 0)
+                posistion = 5;
+                while(score > scores_scores[posistion])
                 {
                     posistion--;
                 }
-                highScore.Remove(scores[posistion]);
+                for (int i = scores_names.Length - 1; i > posistion; i--)
+                {
+                    scores_scores[i] = scores_scores[i - 1];
+                    scores_names[i] = scores_names[i - 1];
+                }
+                //highScore.Remove(scores[5]);
                 Console.WriteLine("Enter name: ");
                 string newName = Console.ReadLine();
-                highScore.Add(score, newName);
+                //highScore.Add(score, newName); //does not allow multiple scores that are the same
+                scores_names[posistion] = newName;
+                scores_scores[posistion] = score;
             }
             else
             {
-                Console.WriteLine("Did not do good enough.");
+                Console.WriteLine("Did not do good enough.\nEnter to continue.");
+                Console.ReadLine();
             }
 
         }
