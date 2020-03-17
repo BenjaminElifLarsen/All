@@ -10,3 +10,5 @@ Two ways of doing it.
     which values belong to which operations and the order of calculations. 
       More prone to errors. 
       But more of a challenge. 
+
+Gone with option 1. Addition and subtraction are slightly off. Result - 2.1 will sometimes alter a different decimal.  
