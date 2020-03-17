@@ -11,8 +11,8 @@
         <Button Content="-" HorizontalAlignment="Left" Margin="657,121,0,0" VerticalAlignment="Top" Width="75" Click="Minus"/>
         <Button Content="*" HorizontalAlignment="Left" Margin="657,146,0,0" VerticalAlignment="Top" Width="75" Click="Multiply"/>
         <Button Content="/" HorizontalAlignment="Left" Margin="657,171,0,0" VerticalAlignment="Top" Width="75" Click="Devide"/>
-        <TextBox HorizontalAlignment="Left" Height="23" Name="number" TextWrapping="Wrap" Text="Enter value" VerticalAlignment="Top" Width="120" Margin="518,93,0,0" TextChanged="Number"/>
-        <TextBox HorizontalAlignment="Left" Height="23" Name="number2" TextWrapping="Wrap" Text="Enter value" VerticalAlignment="Top" Width="120" Margin="518,122,0,0"/>
-        <TextBox HorizontalAlignment="Left" Height="23" Name="resultBox" TextWrapping="Wrap" Text="Result" VerticalAlignment="Top" Width="120" Margin="518,152,0,0"/>
+        <TextBox HorizontalAlignment="Left" Height="23" Name="number" TextWrapping="Wrap" Text="Enter value" VerticalAlignment="Top" Width="120" Margin="517,122,0,0" TextChanged="Number"/>
+        <TextBox HorizontalAlignment="Left" Height="23" Name="resultBox" TextWrapping="Wrap" Text="Result" VerticalAlignment="Top" Width="120" Margin="612,202,0,0"/>
+        <TextBox HorizontalAlignment="Left" Height="23" x:Name="numberOld" TextWrapping="Wrap" VerticalAlignment="Top" Width="120" Margin="364,121,0,0" TextChanged="Number"/>
     </Grid>
 </Window>

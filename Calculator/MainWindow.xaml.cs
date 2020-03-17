@@ -25,8 +25,8 @@ namespace Calculator
         bool devide = false;
         bool multiply = false;
         string numberText = "";
-        float oldNumber = 0;
-        float newNumber = 0;
+        float? oldNumber = null;
+        float resultNumber = 0;
 
 
         private void BoolChanger(bool plus_, bool minus_, bool devide_, bool multiply_)
@@ -40,6 +40,7 @@ namespace Calculator
         public MainWindow()
         {
             InitializeComponent();
+            numberOld.Text = "NaN";
         }
 
         private bool GetNumber(string value, out float? num)
@@ -53,69 +54,62 @@ namespace Calculator
 
         }
 
-        private void GetText(out string number1Txt, out string number2Txt)
+        private void GetText(out string number1Txt)
         {
             number1Txt = number.Text;
-            number2Txt = number2.Text;
         }
 
         private void Plus(object sender, RoutedEventArgs e)
         {
             BoolChanger(true, false, false, false);
-            GetText(out string value1str, out string value2str);
-            bool value1bool = GetNumber(value1str, out float? num1);
-            bool value2bool = GetNumber(value2str, out float? num2);
-            if (value1bool && value2bool)
-            {
-                float result = (float)(num1 + num2);
+            Math();
+        }
 
-                resultBox.Text = result.ToString();
+        private void Math()
+        {
+            GetText(out string newNumText);
+            bool isNumber = GetNumber(newNumText, out float? newNum);
+            if (isNumber)
+            {
+                if (oldNumber != null)
+                {
+                    if (plus)
+                        resultNumber = (float)oldNumber + (float)newNum;
+                    else if (minus)
+                        resultNumber = (float)oldNumber - (float)newNum;
+                    else if (multiply)
+                        resultNumber = (float)oldNumber * (float)newNum;
+                    else if (devide)
+                        resultNumber = (float)oldNumber / (float)newNum;
+
+                    resultBox.Text = resultNumber.ToString();
+                    oldNumber = resultNumber;
+                    numberOld.Text = oldNumber.ToString();
+                }
+                else
+                {
+                    oldNumber = newNum;
+                    numberOld.Text = oldNumber.ToString();
+                }
             }
         }
 
         private void Minus(object sender, RoutedEventArgs e)
         {
             BoolChanger(false, true, false, false);
-            BoolChanger(true, false, false, false);
-            GetText(out string value1str, out string value2str);
-            bool value1bool = GetNumber(value1str, out float? num1);
-            bool value2bool = GetNumber(value2str, out float? num2);
-            if (value1bool && value2bool)
-            {
-                float result = (float)(num1 - num2);
-
-                resultBox.Text = result.ToString();
-            }
+            Math();
         }
 
         private void Multiply(object sender, RoutedEventArgs e)
         {
-            BoolChanger(false, false, true, false);
-            BoolChanger(true, false, false, false);
-            GetText(out string value1str, out string value2str);
-            bool value1bool = GetNumber(value1str, out float? num1);
-            bool value2bool = GetNumber(value2str, out float? num2);
-            if (value1bool && value2bool)
-            {
-                float result = (float)(num1 * num2);
-
-                resultBox.Text = result.ToString();
-            }
+            BoolChanger(false, false, false, true);
+            Math();
         }
 
         private void Devide(object sender, RoutedEventArgs e)
         {
-            BoolChanger(false, false, false, true);
-            BoolChanger(true, false, false, false);
-            GetText(out string value1str, out string value2str);
-            bool value1bool = GetNumber(value1str, out float? num1);
-            bool value2bool = GetNumber(value2str, out float? num2);
-            if (value1bool && value2bool)
-            {
-                float result = (float)(num1 / num2);
-
-                resultBox.Text = result.ToString();
-            }
+            BoolChanger(false, false, true, false);
+            Math();
         }
 
         private void Number(object sender, TextChangedEventArgs e)
