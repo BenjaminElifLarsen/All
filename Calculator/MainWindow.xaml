@@ -25,6 +25,6 @@
         <TextBlock HorizontalAlignment="Left" Margin="612,205,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="120"><Run Text="Selected Shape"/><Run Text=":"/></TextBlock>
         <TextBlock HorizontalAlignment="Left" Name="currentVariable" Margin="612,247,0,0" TextWrapping="Wrap" Text="Enter:" VerticalAlignment="Top" Width="120"/>
         <Button Content="Confirm" Name="areaVariableConfirm" HorizontalAlignment="Left" VerticalAlignment="Top" Width="75" Margin="612,296,0,0" Click="AreaVariableConfirm_Click"/>
-        <TextBox HorizontalAlignment="Left" Name="AreaTextBox" Height="23" TextWrapping="Wrap" Text="Sure?" VerticalAlignment="Top" Width="120" Margin="612,268,0,0"/>
+        <TextBox HorizontalAlignment="Left" Name="AreaTextBox" Height="23" TextWrapping="Wrap" Text="Correct shape?" VerticalAlignment="Top" Width="120" Margin="612,268,0,0"/>
     </Grid>
 </Window>

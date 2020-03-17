@@ -188,7 +188,7 @@ namespace Calculator
                     if (gotNumber)
                     {
                         circle.Area((float)num);
-                        areaSelected.Text = "Sure?";
+                        areaSelected.Text = "Correct shape?";
                         AreaBoolChanger(false, false, false, false);
                         areaState = 0;
                     }
@@ -231,7 +231,7 @@ namespace Calculator
                     {
                         trapezoidArray[2] = (float)num;
                         trapezoid.Area(trapezoidArray[0], trapezoidArray[1], trapezoidArray[2]);
-                        areaSelected.Text = "sure?";
+                        areaSelected.Text = "Correct shape?";
                         AreaBoolChanger(false, false, false, false);
                         areaState = 0;
                     }
@@ -263,7 +263,7 @@ namespace Calculator
                     {
                         coneArray[1] = (float)num;
                         cone.Area(coneArray[0], coneArray[1]);
-                        areaSelected.Text = "sure?";
+                        areaSelected.Text = "Correct shape?";
                         AreaBoolChanger(false, false, false, false);
                         areaState = 0;
                     }
@@ -295,7 +295,7 @@ namespace Calculator
                     {
                         polygonSideAmount = (uint)num;
                         polygon.Area(polygonSideAmount, polygonLength);
-                        areaSelected.Text = "sure?";
+                        areaSelected.Text = "Correct shape?";
                         AreaBoolChanger(false, false, false, false);
                         areaState = 0;
                     }
@@ -317,6 +317,12 @@ namespace Calculator
             set => resultBox = value;
         }
 
+        /// <summary>
+        /// Calculates the area of a sqaure. 
+        /// </summary>
+        /// <param name="height">The height of the square.</param>
+        /// <param name="length">The length of the square.</param>
+        /// <returns></returns>
         public virtual double Area(float height, float length)
         {
             float result = height * length;
@@ -344,6 +350,11 @@ namespace Calculator
             SetTextBox(textBox);
         }
 
+        /// <summary>
+        /// Calculates the area of a circle.
+        /// </summary>
+        /// <param name="radius">The radius of the circle.</param>
+        /// <returns></returns>
         public double Area(float radius)
         {
             float result = (float)(Math.PI*Math.Pow(radius,2));
@@ -366,6 +377,13 @@ namespace Calculator
             SetTextBox(textBox);
         }
 
+        /// <summary>
+        /// Calculates the area of a trapezoid.
+        /// </summary>
+        /// <param name="height">The height of the trapezoid.</param>
+        /// <param name="length_small">The smaller length of the trapezoid.</param>
+        /// <param name="length_long">The longer length of the trapezoid.</param>
+        /// <returns></returns>
         public double Area(float height, float length_small, float length_long)
         {
             float result = height / 2f * (length_small + length_long);
@@ -388,6 +406,12 @@ namespace Calculator
             SetTextBox(textBox);
         }
 
+        /// <summary>
+        /// Calculates the area of a polygon.
+        /// </summary>
+        /// <param name="amountOFSides">The amount of sides of the polygon.</param>
+        /// <param name="length">The length of the sides.</param>
+        /// <returns></returns>
         public double Area(uint amountOFSides, float length)
         {
             float result = amountOFSides * (float)Math.Pow(length, 2) * Cot(Math.PI / amountOFSides) / 4f;
@@ -420,6 +444,12 @@ namespace Calculator
             SetTextBox(textBox);
         }
 
+        /// <summary>
+        /// Calculates the area of a cone.
+        /// </summary>
+        /// <param name="radius">The radius of the cone.</param>
+        /// <param name="height">The height of the cone.</param>
+        /// <returns></returns>
         public override double Area(float radius, float height)
         {
             float slantHeight = (float)Math.Sqrt(Math.Pow(radius,2) + Math.Pow(height, 2));
