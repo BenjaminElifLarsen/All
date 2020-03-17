@@ -81,7 +81,6 @@ namespace Calculator
                         resultNumber = (float)oldNumber * (float)newNum;
                     else if (devide)
                         resultNumber = (float)oldNumber / (float)newNum;
-
                     resultBox.Text = resultNumber.ToString();
                     oldNumber = resultNumber;
                     numberOld.Text = oldNumber.ToString();
@@ -112,9 +111,6 @@ namespace Calculator
             Math();
         }
 
-        private void Number(object sender, TextChangedEventArgs e)
-        {
 
-        }
     }
 }
