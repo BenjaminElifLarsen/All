@@ -27,7 +27,7 @@ namespace Calculator
         string numberText = "";
         float? oldNumber = null;
         float resultNumber = 0;
-
+        Circle circle;
 
         private void BoolChanger(bool plus_, bool minus_, bool devide_, bool multiply_)
         {
@@ -41,6 +41,7 @@ namespace Calculator
         {
             InitializeComponent();
             numberOld.Text = "NaN";
+            circle = new Circle(resultBox);
         }
 
         private bool GetNumber(string value, out float? num)
@@ -130,28 +131,91 @@ namespace Calculator
             return result;
         }
 
-        private void ToResultBox(float display)
+        public void ToResultBox(float display)
         {
             resultBox.Text = display.ToString();
+        }
+
+        public virtual void VisualRepresentation()
+        {
+
         }
 
     }
 
     public class Circle : Shape
     {
-        TextBox resultBox;
 
         public Circle(TextBox textBox)
         {
             SetTextBox(textBox);
         }
 
+        public double Area(float radius)
+        {
+            float result = (float)(Math.PI*Math.Pow(radius,2));
+            ToResultBox(result);
+            return result;
+        }
+
         public new void SetTextBox(TextBox textBox)
         {
             base.SetTextBox = textBox;
-            resultBox = textBox;
         }
 
     }
 
+    public class Trapezoid : Shape
+    {
+
+        public Trapezoid(TextBox textBox)
+        {
+            SetTextBox(textBox);
+        }
+
+        public double Area(float height, float length_small, float length_long)
+        {
+            float result = height / 2f * (length_small + length_long);
+            ToResultBox(result);
+            return result;
+        }
+
+        public new void SetTextBox(TextBox textBox)
+        {
+            base.SetTextBox = textBox;
+        }
+
+    }
+
+    public class Polygon : Shape
+    {
+
+        public Polygon(TextBox textBox)
+        {
+            SetTextBox(textBox);
+        }
+
+        public double Area(uint amountOFSides, float length)
+        {
+            float result = amountOFSides * (float)Math.Pow(length, 2) * Cot(Math.PI / amountOFSides) / 4f;
+            ToResultBox(result);
+            return result;
+        }
+
+        public new void SetTextBox(TextBox textBox)
+        {
+            base.SetTextBox = textBox;
+        }
+
+        /// <summary>
+        /// Calculates and returns the Cot of <paramref name="value"/>.
+        /// </summary>
+        /// <param name="value">The value given to Cot.</param>
+        /// <returns>Returns the Cot of <paramref name="value"/>.</returns>
+        public static float Cot(double value) //consider moving this into its own class or liberay
+        {
+            return 1f / (float)Math.Tan(value);
+        }
+
+    }
 }
