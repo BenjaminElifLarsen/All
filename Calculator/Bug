@@ -1,2 +1,11 @@
 Sometimes, when the program subtracts or add a decimal number to another number, the program will not do the calculations correctly. 
 E.g. -85.3 - 1.1 = - 86.39999
+
+
+-86.3999939
+-85.2999954
+
+Test: 1.1 increasement.
+1.1
+2.2
+3.30000019
