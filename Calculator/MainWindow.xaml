@@ -15,5 +15,16 @@
         <TextBox HorizontalAlignment="Left" Height="23" Name="resultBox" TextWrapping="Wrap"  Text="Result" VerticalAlignment="Top" Width="120" Margin="517,150,0,0"/>
         <TextBox HorizontalAlignment="Left" Height="23" Name="numberOld" TextWrapping="Wrap" VerticalAlignment="Top" Width="120" Margin="517,93,0,0"/>
         <Image HorizontalAlignment="Left" Height="309" Name="visual" Margin="49,44,0,0" VerticalAlignment="Top" Width="393"/>
+        <ComboBox HorizontalAlignment="Left" VerticalAlignment="Top" Width="120" Margin="612,204,0,0" >
+            <Button Name="Cicle" Content="Cicle" Click="Cicle_Click"/>
+            <Button Name="Trapezoid" Content="Trapezoid" Click="Trapezoid_Click"/>
+            <Button Name="Polygon" Content="Polygon" Click="Polygon_Click"/>
+            <Button Name="Cone" Content="Cone" Click="Cone_Click"/>
+        </ComboBox>
+        <TextBlock HorizontalAlignment="Left" Name="areaSelected" Margin="612,247,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="120"/>
+        <TextBlock HorizontalAlignment="Left" Margin="612,226,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="120"><Run Text="Selected Shape"/><Run Text=":"/></TextBlock>
+        <TextBlock HorizontalAlignment="Left" Name="currentVariable" Margin="612,271,0,0" TextWrapping="Wrap" Text="Enter:" VerticalAlignment="Top" Width="120"/>
+        <Button Content="Confirm" Name="areaVariableConfirm" HorizontalAlignment="Left" VerticalAlignment="Top" Width="75" Margin="612,320,0,0" Click="AreaVariableConfirm_Click"/>
+        <TextBox HorizontalAlignment="Left" Name="AreaTextBox" Height="23" TextWrapping="Wrap" Text="TextBox" VerticalAlignment="Top" Width="120" Margin="612,292,0,0"/>
     </Grid>
 </Window>

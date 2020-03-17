@@ -24,12 +24,20 @@ namespace Calculator
         bool minus = false;
         bool devide = false;
         bool multiply = false;
+        bool coneBool = false;
+        bool circleBool = false;
+        bool polygonBool = false;
+        bool trapezoidBool = false;
         string numberText = "";
         float? oldNumber = null;
         float resultNumber = 0;
         Circle circle;
+        Polygon polygon;
+        Trapezoid trapezoid;
+        Cone cone;
+        byte areaState = 0;
 
-        private void BoolChanger(bool plus_, bool minus_, bool devide_, bool multiply_)
+        private void MathBoolChanger(bool plus_, bool minus_, bool devide_, bool multiply_)
         {
             plus = plus_;
             minus = minus_;
@@ -37,11 +45,22 @@ namespace Calculator
             multiply = multiply_;
         }
 
+        private void AreaBoolChanger(bool cone_, bool circle_, bool polygon_, bool trapezoid_)
+        {
+            coneBool = cone_;
+            circleBool = circle_;
+            polygonBool = polygon_;
+            trapezoidBool = trapezoid_;
+        }
+
         public MainWindow()
         {
             InitializeComponent();
             numberOld.Text = "NaN";
             circle = new Circle(resultBox);
+            polygon = new Polygon(resultBox);
+            trapezoid = new Trapezoid(resultBox);
+            cone = new Cone(resultBox);
         }
 
         private bool GetNumber(string value, out float? num)
@@ -62,7 +81,7 @@ namespace Calculator
 
         private void Plus(object sender, RoutedEventArgs e)
         {
-            BoolChanger(true, false, false, false);
+            MathBoolChanger(true, false, false, false);
             Math();
         }
 
@@ -94,25 +113,85 @@ namespace Calculator
             }
         }
 
+        private void AreaPreparation()
+        {
+            if (coneBool)
+                areaSelected.Text = "Cone";
+            else if (circleBool)
+                areaSelected.Text = "Circle";
+            else if (trapezoidBool)
+                areaSelected.Text = "Trapezoid";
+            else if (polygonBool)
+                areaSelected.Text = "Polygon";
+        }
+
         private void Minus(object sender, RoutedEventArgs e)
         {
-            BoolChanger(false, true, false, false);
+            MathBoolChanger(false, true, false, false);
             Math();
         }
 
         private void Multiply(object sender, RoutedEventArgs e)
         {
-            BoolChanger(false, false, false, true);
+            MathBoolChanger(false, false, false, true);
             Math();
         }
 
         private void Devide(object sender, RoutedEventArgs e)
         {
-            BoolChanger(false, false, true, false);
+            MathBoolChanger(false, false, true, false);
             Math();
         }
 
+        private void Cicle_Click(object sender, RoutedEventArgs e)
+        {
+            AreaBoolChanger(false, true, false, false);
+            AreaPreparation();
+        }
 
+        private void Trapezoid_Click(object sender, RoutedEventArgs e)
+        {
+            AreaBoolChanger(false, false, false, true);
+            AreaPreparation();
+        }
+
+        private void Polygon_Click(object sender, RoutedEventArgs e)
+        {
+            AreaBoolChanger(false, false, true, false);
+            AreaPreparation();
+        }
+
+        private void Cone_Click(object sender, RoutedEventArgs e)
+        {
+            AreaBoolChanger(true, false, false, false);
+            AreaPreparation();
+        }
+
+        private void AreaVariableConfirm_Click(object sender, RoutedEventArgs e)
+        {
+            //get the variables, do the calculations.
+            if (circleBool)
+            {
+                if(areaState == 0)
+                {
+                    AreaTextBox.Text = "Radius";
+                    areaState++;
+                }
+                else if(areaState == 1)
+                {
+                    string valueTxt = AreaTextBox.Text;
+                    bool gotNumber = GetNumber(valueTxt, out float? num);
+                    if (gotNumber)
+                        circle.Area((float)num);
+
+                    areaSelected.Text = "";
+                    AreaBoolChanger(false, false, false, false);
+                }
+
+            }
+
+
+        }
     }
 
     public class Shape
@@ -217,5 +296,27 @@ namespace Calculator
             return 1f / (float)Math.Tan(value);
         }
 
+    }
+
+    public class Cone : Shape
+    {
+
+        public Cone(TextBox textBox)
+        {
+            SetTextBox(textBox);
+        }
+
+        public override double Area(float radius, float height)
+        {
+            float slantHeight = (float)Math.Sqrt(Math.Pow(radius,2) + Math.Pow(height, 2));
+            float result = (float)Math.PI * radius * slantHeight + (float)Math.PI * (float)Math.Pow(radius,2); 
+            ToResultBox(result);
+            return result;
+        }
+
+        public new void SetTextBox(TextBox textBox)
+        {
+            base.SetTextBox = textBox;
+        }
     }
 }
