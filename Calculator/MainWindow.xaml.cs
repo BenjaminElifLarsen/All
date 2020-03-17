@@ -42,38 +42,80 @@ namespace Calculator
             InitializeComponent();
         }
 
-        private bool GetNumber(out float? num)
+        private bool GetNumber(string value, out float? num)
         {
-            string numText = number.Text;
-            number.Text = "";
             num = 0;
             float num2;
-            bool isText = Single.TryParse(numberText, out num2) ? true : false;
+            bool isText = Single.TryParse(value, out num2) ? true : false;
             if (isText)
                 num = num2;
             return isText;
 
         }
 
+        private void GetText(out string number1Txt, out string number2Txt)
+        {
+            number1Txt = number.Text;
+            number2Txt = number2.Text;
+        }
+
         private void Plus(object sender, RoutedEventArgs e)
         {
             BoolChanger(true, false, false, false);
-            
+            GetText(out string value1str, out string value2str);
+            bool value1bool = GetNumber(value1str, out float? num1);
+            bool value2bool = GetNumber(value2str, out float? num2);
+            if (value1bool && value2bool)
+            {
+                float result = (float)(num1 + num2);
+
+                resultBox.Text = result.ToString();
+            }
         }
 
         private void Minus(object sender, RoutedEventArgs e)
         {
             BoolChanger(false, true, false, false);
+            BoolChanger(true, false, false, false);
+            GetText(out string value1str, out string value2str);
+            bool value1bool = GetNumber(value1str, out float? num1);
+            bool value2bool = GetNumber(value2str, out float? num2);
+            if (value1bool && value2bool)
+            {
+                float result = (float)(num1 - num2);
+
+                resultBox.Text = result.ToString();
+            }
         }
 
         private void Multiply(object sender, RoutedEventArgs e)
         {
             BoolChanger(false, false, true, false);
+            BoolChanger(true, false, false, false);
+            GetText(out string value1str, out string value2str);
+            bool value1bool = GetNumber(value1str, out float? num1);
+            bool value2bool = GetNumber(value2str, out float? num2);
+            if (value1bool && value2bool)
+            {
+                float result = (float)(num1 * num2);
+
+                resultBox.Text = result.ToString();
+            }
         }
 
         private void Devide(object sender, RoutedEventArgs e)
         {
             BoolChanger(false, false, false, true);
+            BoolChanger(true, false, false, false);
+            GetText(out string value1str, out string value2str);
+            bool value1bool = GetNumber(value1str, out float? num1);
+            bool value2bool = GetNumber(value2str, out float? num2);
+            if (value1bool && value2bool)
+            {
+                float result = (float)(num1 / num2);
+
+                resultBox.Text = result.ToString();
+            }
         }
 
         private void Number(object sender, TextChangedEventArgs e)
