@@ -113,4 +113,45 @@ namespace Calculator
 
 
     }
+
+    public class Shape
+    {
+        TextBox resultBox;
+
+        public virtual TextBox SetTextBox
+        {
+            set => resultBox = value;
+        }
+
+        public virtual double Area(float height, float length)
+        {
+            float result = height * length;
+            ToResultBox(result);
+            return result;
+        }
+
+        private void ToResultBox(float display)
+        {
+            resultBox.Text = display.ToString();
+        }
+
+    }
+
+    public class Circle : Shape
+    {
+        TextBox resultBox;
+
+        public Circle(TextBox textBox)
+        {
+            SetTextBox(textBox);
+        }
+
+        public new void SetTextBox(TextBox textBox)
+        {
+            base.SetTextBox = textBox;
+            resultBox = textBox;
+        }
+
+    }
+
 }
