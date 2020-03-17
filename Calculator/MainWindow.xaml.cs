@@ -36,6 +36,10 @@ namespace Calculator
         Trapezoid trapezoid;
         Cone cone;
         byte areaState = 0;
+        float[] trapezoidArray = new float[3];
+        float[] coneArray = new float[2];
+        float polygonLength;
+        uint polygonSideAmount; 
 
         private void MathBoolChanger(bool plus_, bool minus_, bool devide_, bool multiply_)
         {
@@ -143,7 +147,7 @@ namespace Calculator
             Math();
         }
 
-        private void Cicle_Click(object sender, RoutedEventArgs e)
+        private void Circle_Click(object sender, RoutedEventArgs e)
         {
             AreaBoolChanger(false, true, false, false);
             AreaPreparation();
@@ -172,26 +176,136 @@ namespace Calculator
             //get the variables, do the calculations.
             if (circleBool)
             {
-                if(areaState == 0)
+                if (areaState == 0)
                 {
                     AreaTextBox.Text = "Radius";
                     areaState++;
                 }
-                else if(areaState == 1)
+                else if (areaState == 1)
                 {
                     string valueTxt = AreaTextBox.Text;
                     bool gotNumber = GetNumber(valueTxt, out float? num);
                     if (gotNumber)
+                    {
                         circle.Area((float)num);
-
-                    areaSelected.Text = "";
-                    AreaBoolChanger(false, false, false, false);
+                        areaSelected.Text = "Sure?";
+                        AreaBoolChanger(false, false, false, false);
+                        areaState = 0;
+                    }
+                }
+            }
+            else if (trapezoidBool)
+            {
+                if (areaState == 0)
+                {
+                    AreaTextBox.Text = "Height";
+                    areaState++;
+                }
+                else if (areaState == 1)
+                {
+                    string valueTxt = AreaTextBox.Text;
+                    bool gotNumber = GetNumber(valueTxt, out float? num);
+                    if (gotNumber)
+                    {
+                        trapezoidArray[0] = (float)num;
+                        areaSelected.Text = "Small length";
+                        areaState++;
+                    }
+                }
+                else if (areaState == 2)
+                {
+                    string valueTxt = AreaTextBox.Text;
+                    bool gotNumber = GetNumber(valueTxt, out float? num);
+                    if (gotNumber)
+                    {
+                        trapezoidArray[1] = (float)num;
+                        areaSelected.Text = "Long length";
+                        areaState++;
+                    }
+                }
+                else if (areaState == 3)
+                {
+                    string valueTxt = AreaTextBox.Text;
+                    bool gotNumber = GetNumber(valueTxt, out float? num);
+                    if (gotNumber)
+                    {
+                        trapezoidArray[2] = (float)num;
+                        trapezoid.Area(trapezoidArray[0], trapezoidArray[1], trapezoidArray[2]);
+                        areaSelected.Text = "sure?";
+                        AreaBoolChanger(false, false, false, false);
+                        areaState = 0;
+                    }
+                }
+            }
+            else if (coneBool)
+            {
+                if (areaState == 0)
+                {
+                    AreaTextBox.Text = "Radius";
+                    areaState++;
+                }
+                else if (areaState == 1)
+                {
+                    string valueTxt = AreaTextBox.Text;
+                    bool gotNumber = GetNumber(valueTxt, out float? num);
+                    if (gotNumber)
+                    {
+                        coneArray[0] = (float)num;
+                        areaSelected.Text = "Height";
+                        areaState++;
+                    }
+                }
+                else if (areaState == 2)
+                {
+                    string valueTxt = AreaTextBox.Text;
+                    bool gotNumber = GetNumber(valueTxt, out float? num);
+                    if (gotNumber)
+                    {
+                        coneArray[1] = (float)num;
+                        cone.Area(coneArray[0], coneArray[1]);
+                        areaSelected.Text = "sure?";
+                        AreaBoolChanger(false, false, false, false);
+                        areaState = 0;
+                    }
+                }
+            }
+            else if (polygonBool)
+            {
+                if (areaState == 0)
+                {
+                    AreaTextBox.Text = "Length";
+                    areaState++;
+                }
+                else if (areaState == 1)
+                {
+                    string valueTxt = AreaTextBox.Text;
+                    bool gotNumber = GetNumber(valueTxt, out float? num);
+                    if (gotNumber)
+                    {
+                        polygonLength = (float)num;
+                        areaSelected.Text = "Amount of sides";
+                        areaState++;
+                    }
+                }
+                else if (areaState == 2)
+                {
+                    string valueTxt = AreaTextBox.Text;
+                    bool gotNumber = GetNumber(valueTxt, out float? num);
+                    if (gotNumber)
+                    {
+                        polygonSideAmount = (uint)num;
+                        polygon.Area(polygonSideAmount, polygonLength);
+                        areaSelected.Text = "sure?";
+                        AreaBoolChanger(false, false, false, false);
+                        areaState = 0;
+                    }
                 }
 
             }
 
 
-        }
+            }
+
     }
 
     public class Shape
