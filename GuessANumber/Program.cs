@@ -43,10 +43,10 @@ namespace GuesssANumber
     public static class Gameplay
     {
         /// <summary>
-        /// contain the gameplay loop. When the player loose, it will return their score. 
+        /// Contains the gameplay loop. When the player loose, it will return their score. 
         /// </summary>
         /// <param name="amountOfTries">The amount of attemps they have for each guess</param>
-        /// <returns></returns>
+        /// <returns>Returns the score of the user.</returns>
         public static ulong gameplayLoop(byte amountOfTries)
         {
             byte currentAmountOfTries = 0;
@@ -99,7 +99,12 @@ namespace GuesssANumber
             return points;
         }
 
-
+        /// <summary>
+        /// Promps the user to enter a number and returns it. 
+        /// The function calls IsNumber().
+        /// </summary>
+        /// <param name="str">Get printed out if it is not "". Use to give more information.</param>
+        /// <returns>Returns the number the user entered as a byte.</returns>
         private static byte GetNumber(string str = "")
         {
             byte? numberNull;
@@ -168,7 +173,9 @@ namespace GuesssANumber
         private string[] scores_names;
         private ulong[] scores_scores;
 
-
+        /// <summary>
+        /// Basic constructor for the Interface class. 
+        /// </summary>
         public Interface()
         {
             offset = new byte[] {2,1 };
@@ -300,7 +307,7 @@ namespace GuesssANumber
         /// <param name="score">The value to check against <paramref name="scores"/>.</param>
         /// <param name="names">Array of usernames.</param>
         /// <param name="scores">Array of highscores.</param>
-        private void Save(ulong score, string[] names, ulong[] scores)
+        private void Save(ulong score, string[] names, ulong[] scores, string scoreToLow = "Did not do good enough.\nEnter to continue.")
         {
             sbyte posistion = 5;
             if (score > scores[0])
@@ -332,12 +339,15 @@ namespace GuesssANumber
             }
             else
             {
-                Console.WriteLine("Did not do good enough.\nEnter to continue.");
+                Console.WriteLine(scoreToLow);
                 Console.ReadLine();
             }
-
         }
 
+        /// <summary>
+        /// Ask the user for a name and returns it. Empty strings are not allowed. Will also trim for all spaces.
+        /// </summary>
+        /// <returns>Returns the username the user entered.</returns>
         private string GetName()
         {
             Console.CursorVisible = true;
@@ -628,6 +638,7 @@ namespace GuesssANumber
         }
 
     }
+
 
     
 
