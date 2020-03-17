@@ -1,0 +1,10 @@
+
+Circle: 1 variable.
+Trapezoid: 3 variables.
+Polygon: 2 variables.
+Cone: 2 variables. 
+
+Considerations: 
+  1) HAve a single textbox the user can enter values into. Textbox next to it states what the variable is. When a variable 
+    has been entered a button has been clicked, ask for next variable. 
+    Maybe use a dropdown menu for select one of the different kinds of shapes.

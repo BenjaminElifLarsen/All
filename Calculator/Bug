@@ -1,0 +1,26 @@
+Sometimes, when the program subtracts or add a decimal number to another number, the program will not do the calculations correctly. 
+E.g. -85.3 - 1.1 = - 86.39999
+
+
+-86.3999939
+-85.2999954
+
+Test: 1.1 increasement.
+1.1
+2.2
+3.30000019
+4.4
+5.5
+...
+...
+41.8
+42.89999
+43.99999
+45.09999
+46.19999
+47,29999
+48,39999
+49.49998
+50.59998
+
+So far, unable to identify what is causing this problem. 

@@ -1,0 +1,14 @@
+--Simple Math--
+Done
+
+--Complex Math--
+Being able to use more than two numbers.
+Two ways of doing it.
+  1) User enter number. Click an option (+-*/). User Enter Second Number. Result is given. User enter third number. 
+    Clicks an option (+-*/). Result is done on second number and third number. Etc.
+  2) User enter a string of numbers, consiting of numbers and operations. Program seperate into all numiercal values and knows
+    which values belong to which operations and the order of calculations. 
+      More prone to errors. 
+      But more of a challenge. 
+
+Gone with option 1. Addition and subtraction are slightly off. Result - 2.1 will sometimes alter a different decimal.  
