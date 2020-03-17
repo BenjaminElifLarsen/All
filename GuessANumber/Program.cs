@@ -9,11 +9,17 @@ using System.Threading;
 namespace GuesssANumber
 {
 
+    /// <summary>
+    /// Get a random value. 
+    /// </summary>
     public class Rnd
     {
         private static Random rnd = new Random();
         private Rnd(){ }
 
+        /// <summary>
+        /// Get a random value from 0 up to, but excluding, 10. 
+        /// </summary>
         public static sbyte GetRandom
         {
             get => (sbyte)rnd.Next(0, 10);
@@ -21,7 +27,7 @@ namespace GuesssANumber
     }
 
 
-        class Program
+    class Program
     {
         static void Main(string[] args)
         {
@@ -48,15 +54,17 @@ namespace GuesssANumber
             sbyte toGuess = Rnd.GetRandom;
             ulong points = 0;
             byte guess;
+            string feedback = "";
             Interface.PartlyClear(0, 0, Console.WindowWidth, Console.WindowHeight - 1);
             do
             {
                 currentAmountOfTries++;
-                guess = GetNumber();
+                guess = GetNumber(feedback);
                 Console.WriteLine(toGuess);
                 Console.SetCursorPosition(0, 0);
                 if (guess == toGuess)
                 {
+                    feedback = "";
                     correctAmount++;
                     points += (ulong)(4 - currentAmountOfTries)*correctAmount;
                     currentAmountOfTries = 0;
@@ -74,43 +82,43 @@ namespace GuesssANumber
                 {
                     Interface.PartlyClear(0, 0, Console.WindowWidth, Console.WindowHeight - 1);
                     Console.CursorTop = 0;
-                    Console.WriteLine("To high");
+                    feedback = "To high";
 
                 }else if (guess < toGuess)
                 {
                     Interface.PartlyClear(0, 0, Console.WindowWidth, Console.WindowHeight - 1);
                     Console.CursorTop = 0;
-                    Console.WriteLine("To low");
+                    feedback = "To low";
 
                 }
 
 
             } while (amountOfTries != currentAmountOfTries);
             Console.Clear();
-            Console.WriteLine("You failed!\nNumber to guess = {0}.\nYou guessed {1}.\nScore = {2}.\nPoints = {3}", toGuess, guess, correctAmount, points);
-
-
+            Console.WriteLine("You failed!\nNumber to guess = {0}.\nYour last guess = {1}.\nScore = {2}.\nPoints = {3}", toGuess, guess, correctAmount, points);
             return points;
         }
 
 
-        private static byte GetNumber()
+        private static byte GetNumber(string str = "")
         {
             byte? numberNull;
             byte number;
-            string writeOut = "Please enter a number and press enter: ";
-            Console.CursorTop = 1;
+            string writeOut = "Enter a number and press enter: ";
             bool isNumber;
+            Console.CursorVisible = true;
             do
             {
-                Interface.PartlyClear(1, 1, Console.WindowWidth, Console.WindowHeight - 1);
-                Console.CursorTop = 1;
+                Interface.PartlyClear(0, 0, Console.WindowWidth, Console.WindowHeight - 1);
                 Console.WriteLine(writeOut);
+                if (str != "")
+                    Console.WriteLine(str);
                 isNumber = IsNumber(Console.ReadLine(), out numberNull);
                 if (!isNumber)
-                    writeOut = "Not a number. Please Reenter";
+                    writeOut = "Not a number. Reenter";
             } while (!isNumber);
             number = (byte)numberNull;
+            Console.CursorVisible = false;
             return number;
         }
 
@@ -120,7 +128,7 @@ namespace GuesssANumber
         /// </summary>
         /// <param name="toBeNumber"></param>
         /// <param name="result"></param>
-        /// <returns></returns>
+        /// <returns>Returns true if it can, false otherwise. Will also return the result.</returns>
         private static bool IsNumber(string toBeNumber, out byte? result)
         {
             byte result2;
@@ -160,6 +168,7 @@ namespace GuesssANumber
         private string[] scores_names;
         private ulong[] scores_scores;
 
+
         public Interface()
         {
             offset = new byte[] {2,1 };
@@ -186,9 +195,7 @@ namespace GuesssANumber
             if (lines.Length == 0)
                 TextWriter(scores_names, scores_scores);
             else
-            {
                 TextReader(lines, out scores_names, out scores_scores);
-            }
         }
 
         /// <summary>
@@ -246,7 +253,7 @@ namespace GuesssANumber
                 {
                     case "New Game":
                         ulong score = Gameplay.gameplayLoop(totalGuessAmount);
-                        Save(score);
+                        Save(score, scores_names, scores_scores);
                         break;
 
                     case "High Score":
@@ -265,65 +272,63 @@ namespace GuesssANumber
 
         }
 
-
+        /// <summary>
+        /// Writes out needed game information to the console. 
+        /// </summary>
         private void Information()
         {
             Console.Clear();
             Console.WriteLine("Purpose: Guess a number between 0 and 9.\nEnter to return.");
-
             Console.ReadLine();
         }
 
+        /// <summary>
+        /// The highscore menu, writes out the highscores from most to least.
+        /// </summary>
         private void HighScore()
         {
             Console.Clear();
-
-
             for (int i = 0; i < scores_scores.Length; i++)
-            {
                 Console.WriteLine("{0}'s score: {1}", scores_names[i], scores_scores[i]);
-            }
             Console.ReadLine();
         }
 
-        private void Save(ulong score) //decouple these functions by putting scores_names and scores_scores as parameters
+
+        /// <summary>
+        /// Function that overwrite a string array <paramref name="names"/> and a ulong array <paramref name="scores"/>, of same size, if <paramref name="score"/> is bigger than the lowest value in <paramref name="scores"/>.
+        /// </summary>
+        /// <param name="score">The value to check against <paramref name="scores"/>.</param>
+        /// <param name="names">Array of usernames.</param>
+        /// <param name="scores">Array of highscores.</param>
+        private void Save(ulong score, string[] names, ulong[] scores)
         {
-
             sbyte posistion = 5;
-
-            if (score > scores_scores[0])
+            if (score > scores[0])
             {
-                for (int i = scores_names.Length - 1; i > 0; i--)
+                for (int i = names.Length - 1; i > 0; i--)
                 {
-                    scores_scores[i ] = scores_scores[i-1];
-                    scores_names[i ] = scores_names[i-1];
+                    scores[i ] = scores[i-1];
+                    names[i ] = names[i-1];
                 }
-
                 string newName = GetName();
-
-                scores_names[0] = newName;
-                scores_scores[0] = score;
-                TextWriter(scores_names, scores_scores);
+                names[0] = newName;
+                scores[0] = score;
+                TextWriter(names, scores);
             }
-            else if (score > scores_scores[5])
+            else if (score > scores[5])
             {
                 posistion = 5;
-
-                while(score > scores_scores[posistion-1])
-
-                {
+                while(score > scores[posistion-1])
                     posistion--;
-                }
-                for (int i = scores_names.Length - 1; i > posistion; i--)
+                for (int i = scores.Length - 1; i > posistion; i--)
                 {
-                    scores_scores[i] = scores_scores[i - 1];
-                    scores_names[i] = scores_names[i - 1];
+                    scores[i] = scores[i - 1];
+                    names[i] = names[i - 1];
                 }
                 string newName = GetName();
-
-                scores_names[posistion] = newName;
-                scores_scores[posistion] = score;
-                TextWriter(scores_names, scores_scores);
+                names[posistion] = newName;
+                scores[posistion] = score;
+                TextWriter(names, scores);
             }
             else
             {
@@ -333,8 +338,9 @@ namespace GuesssANumber
 
         }
 
-        private string GetName() //need to catch string with only spaces.
+        private string GetName()
         {
+            Console.CursorVisible = true;
             int x = Console.CursorLeft;
             int y = Console.CursorTop;
             string name = "";
@@ -343,10 +349,10 @@ namespace GuesssANumber
                 Console.SetCursorPosition(x, y);
                 Console.WriteLine("Enter name: ");
                 name = Console.ReadLine();
-            } while (name == "");
+            } while (name.Trim() == "");
+            Console.CursorVisible = false;
             return name;
         }
-
 
 
         /// <summary>
