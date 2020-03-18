@@ -1,5 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Drawing;
+using System.Drawing.Imaging;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -12,6 +15,10 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using Color = System.Drawing.Color;
+using Image = System.Windows.Controls.Image;
+using Pen = System.Drawing.Pen;
+using Rectangle = System.Drawing.Rectangle;
 
 namespace Calculator
 {
@@ -61,10 +68,10 @@ namespace Calculator
         {
             InitializeComponent();
             numberOld.Text = "NaN";
-            circle = new Circle(resultBox);
-            polygon = new Polygon(resultBox);
-            trapezoid = new Trapezoid(resultBox);
-            cone = new Cone(resultBox);
+            circle = new Circle(resultBox, visual);
+            polygon = new Polygon(resultBox, visual);
+            trapezoid = new Trapezoid(resultBox, visual);
+            cone = new Cone(resultBox, visual);
         }
 
         private bool GetNumber(string value, out float? num)
@@ -188,6 +195,7 @@ namespace Calculator
                     if (gotNumber)
                     {
                         circle.Area((float)num);
+                        circle.VisualRepresentation();
                         areaSelected.Text = "Correct shape?";
                         AreaBoolChanger(false, false, false, false);
                         areaState = 0;
@@ -231,6 +239,7 @@ namespace Calculator
                     {
                         trapezoidArray[2] = (float)num;
                         trapezoid.Area(trapezoidArray[0], trapezoidArray[1], trapezoidArray[2]);
+                        trapezoid.VisualRepresentation();
                         areaSelected.Text = "Correct shape?";
                         AreaBoolChanger(false, false, false, false);
                         areaState = 0;
@@ -263,6 +272,7 @@ namespace Calculator
                     {
                         coneArray[1] = (float)num;
                         cone.Area(coneArray[0], coneArray[1]);
+                        cone.VisualRepresentation();
                         areaSelected.Text = "Correct shape?";
                         AreaBoolChanger(false, false, false, false);
                         areaState = 0;
@@ -295,6 +305,7 @@ namespace Calculator
                     {
                         polygonSideAmount = (uint)num;
                         polygon.Area(polygonSideAmount, polygonLength);
+                        polygon.VisualRepresentation();
                         areaSelected.Text = "Correct shape?";
                         AreaBoolChanger(false, false, false, false);
                         areaState = 0;
@@ -310,11 +321,17 @@ namespace Calculator
 
     public class Shape
     {
+        uint[,] visualArray;
         TextBox resultBox;
+        System.Windows.Controls.Image imageBox; 
 
         public virtual TextBox SetTextBox
         {
             set => resultBox = value;
+        }
+        public virtual System.Windows.Controls.Image SetImageBox
+        {
+            set => imageBox = value;
         }
 
         /// <summary>
@@ -336,18 +353,46 @@ namespace Calculator
         }
 
         public virtual void VisualRepresentation()
-        {
+        { //takes an 2d array and draws the shape using polygons. Circle might wants it own version. 
+            BitmapImage shapeImage = new BitmapImage();
+            Bitmap shapeBitmap = new Bitmap(400, 300);
+            Graphics g = Graphics.FromImage(shapeBitmap);
+            g.Clear(System.Drawing.Color.FromArgb(15, 93, 16));
 
+
+            imageBox.Source = BitmapTobitmapImage(shapeBitmap);
+        }
+
+        public BitmapImage BitmapTobitmapImage(Bitmap bmp)
+        {
+            BitmapImage bitmapImage = new BitmapImage();
+            using (MemoryStream memory = new MemoryStream()) //opens a memory stream, used to save an image in the stream and then load it into another type
+            {
+                bmp.Save(memory, ImageFormat.Bmp); //saves the bitmap to the stream
+                memory.Position = 0;
+
+                bitmapImage.BeginInit();
+
+                bitmapImage.StreamSource = memory; //loads the bitmap into a bitmapimage
+                bitmapImage.CacheOption = BitmapCacheOption.OnLoad;
+                bitmapImage.EndInit();
+
+                return bitmapImage;
+            }
         }
 
     }
 
     public class Circle : Shape
     {
-
-        public Circle(TextBox textBox)
+        uint[,] visualArray;
+        float diameter;
+        Image imageBox;
+        public Circle(TextBox textBox, Image imageBox)
         {
             SetTextBox(textBox);
+            SetImageBox(imageBox);
+            this.imageBox = imageBox;
         }
 
         /// <summary>
@@ -357,9 +402,34 @@ namespace Calculator
         /// <returns></returns>
         public double Area(float radius)
         {
+            diameter = 2 * radius;
             float result = (float)(Math.PI*Math.Pow(radius,2));
             ToResultBox(result);
             return result;
+        }
+
+        public override void VisualRepresentation()
+        {
+
+            Bitmap shapeBitmap = new Bitmap(400, 300);
+            Graphics g = Graphics.FromImage(shapeBitmap);
+            g.Clear(System.Drawing.Color.FromArgb(15, 93, 16));
+            Pen pen = new Pen(Color.FromArgb(255, 255, 255),2);
+            Rectangle rect = new Rectangle(0, 0, 200, 200);
+            g.DrawEllipse(pen, rect);
+            imageBox.Source = base.BitmapTobitmapImage(shapeBitmap);
+        }
+
+        public uint[,] VisualArrayCalculation()
+        {
+
+
+            return null;
+        }
+
+        public new void SetImageBox(Image imageBox)
+        {
+            base.SetImageBox = imageBox;
         }
 
         public new void SetTextBox(TextBox textBox)
@@ -371,10 +441,16 @@ namespace Calculator
 
     public class Trapezoid : Shape
     {
-
-        public Trapezoid(TextBox textBox)
+        uint[,] visualArray;
+        public Trapezoid(TextBox textBox, Image imageBox)
         {
             SetTextBox(textBox);
+            SetImageBox(imageBox);
+        }
+
+        public new void SetImageBox(Image imageBox)
+        {
+            base.SetImageBox = imageBox;
         }
 
         /// <summary>
@@ -391,6 +467,13 @@ namespace Calculator
             return result;
         }
 
+        public uint[,] VisualArrayCalculation()
+        {
+
+
+            return null;
+        }
+
         public new void SetTextBox(TextBox textBox)
         {
             base.SetTextBox = textBox;
@@ -400,10 +483,13 @@ namespace Calculator
 
     public class Polygon : Shape
     {
+        uint[,] visualArray;
+        uint sideAmount;
 
-        public Polygon(TextBox textBox)
+        public Polygon(TextBox textBox, Image imageBox)
         {
             SetTextBox(textBox);
+            SetImageBox(imageBox);
         }
 
         /// <summary>
@@ -414,9 +500,23 @@ namespace Calculator
         /// <returns></returns>
         public double Area(uint amountOFSides, float length)
         {
+            sideAmount = amountOFSides;
             float result = amountOFSides * (float)Math.Pow(length, 2) * Cot(Math.PI / amountOFSides) / 4f;
             ToResultBox(result);
             return result;
+        }
+
+        public uint[,] VisualArrayCalculation()
+        {
+            float angleBetweenSides = (sideAmount - 2) * 180 / sideAmount;
+
+
+            return null;
+        }
+
+        public new void SetImageBox(Image imageBox)
+        {
+            base.SetImageBox = imageBox;
         }
 
         public new void SetTextBox(TextBox textBox)
@@ -438,10 +538,12 @@ namespace Calculator
 
     public class Cone : Shape
     {
+        uint[,] visualArray;
 
-        public Cone(TextBox textBox)
+        public Cone(TextBox textBox, Image imageBox)
         {
             SetTextBox(textBox);
+            SetImageBox(imageBox);
         }
 
         /// <summary>
@@ -456,6 +558,18 @@ namespace Calculator
             float result = (float)Math.PI * radius * slantHeight + (float)Math.PI * (float)Math.Pow(radius,2); 
             ToResultBox(result);
             return result;
+        }
+
+        public uint[,] VisualArrayCalculation()
+        {
+            
+
+            return null;
+        }
+
+        public new void SetImageBox(Image imageBox)
+        {
+            base.SetImageBox = imageBox;
         }
 
         public new void SetTextBox(TextBox textBox)
