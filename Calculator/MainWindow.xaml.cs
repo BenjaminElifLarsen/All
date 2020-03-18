@@ -196,7 +196,7 @@ namespace Calculator
                     {
                         circle.Area((float)num);
                         circle.VisualRepresentation();
-                        areaSelected.Text = "Correct shape?";
+                        AreaTextBox.Text = "Correct shape?";
                         AreaBoolChanger(false, false, false, false);
                         areaState = 0;
                     }
@@ -216,7 +216,7 @@ namespace Calculator
                     if (gotNumber)
                     {
                         trapezoidArray[0] = (float)num;
-                        areaSelected.Text = "Small length";
+                        AreaTextBox.Text = "Small length";
                         areaState++;
                     }
                 }
@@ -229,7 +229,7 @@ namespace Calculator
                         //maybe ask for length 1 and length 2 and then in code just check which one is longest
                         //in case one of them is going outside the image size
                         trapezoidArray[1] = (float)num;
-                        areaSelected.Text = "Long length";
+                        AreaTextBox.Text = "Long length";
                         areaState++;
                     }
                 }
@@ -243,7 +243,7 @@ namespace Calculator
                         trapezoid.Area(trapezoidArray[0], trapezoidArray[1], trapezoidArray[2]);
                         trapezoid.VisualArrayCalculation();
                         trapezoid.VisualRepresentation();
-                        areaSelected.Text = "Correct shape?";
+                        AreaTextBox.Text = "Correct shape?";
                         AreaBoolChanger(false, false, false, false);
                         areaState = 0;
                     }
@@ -263,7 +263,7 @@ namespace Calculator
                     if (gotNumber)
                     {
                         coneArray[0] = (float)num;
-                        areaSelected.Text = "Height";
+                        AreaTextBox.Text = "Height";
                         areaState++;
                     }
                 }
@@ -277,7 +277,7 @@ namespace Calculator
                         cone.Area(coneArray[0], coneArray[1]);
                         cone.VisualArrayCalculation();
                         cone.VisualRepresentation();
-                        areaSelected.Text = "Correct shape?";
+                        AreaTextBox.Text = "Correct shape?";
                         AreaBoolChanger(false, false, false, false);
                         areaState = 0;
                     }
@@ -297,7 +297,7 @@ namespace Calculator
                     if (gotNumber)
                     {
                         polygonLength = (float)num;
-                        areaSelected.Text = "Amount of sides";
+                        AreaTextBox.Text = "Amount of sides";
                         areaState++;
                     }
                 }
@@ -311,7 +311,7 @@ namespace Calculator
                         polygon.Area(polygonSideAmount, polygonLength);
                         polygon.VisualArrayCalculation();
                         polygon.VisualRepresentation();
-                        areaSelected.Text = "Correct shape?";
+                        AreaTextBox.Text = "Correct shape?";
                         AreaBoolChanger(false, false, false, false);
                         areaState = 0;
                     }
@@ -328,13 +328,13 @@ namespace Calculator
     {
         public PointF[] visualArray;
         TextBox resultBox;
-        System.Windows.Controls.Image imageBox; 
+        Image imageBox; 
 
         public virtual TextBox SetTextBox
         {
             set => resultBox = value;
         }
-        public virtual System.Windows.Controls.Image SetImageBox
+        public virtual Image SetImageBox
         {
             set => imageBox = value;
         }
@@ -362,8 +362,8 @@ namespace Calculator
             BitmapImage shapeImage = new BitmapImage();
             Bitmap shapeBitmap = new Bitmap(400, 300);
             Graphics g = Graphics.FromImage(shapeBitmap);
-            g.Clear(System.Drawing.Color.FromArgb(15, 93, 16));
-            Pen pen = new Pen(Color.FromArgb(255, 255, 255), 2);
+            g.Clear(Color.FromArgb(15, 93, 16));
+            Pen pen = new Pen(Color.FromArgb(0, 0, 0), 2);
             g.DrawPolygon(pen, visualArray);
 
             imageBox.Source = BitmapTobitmapImage(shapeBitmap);
@@ -388,7 +388,6 @@ namespace Calculator
 
     public class Circle : Shape
     {
-        PointF[] visualArray;
         float diameter;
         Image imageBox;
         public Circle(TextBox textBox, Image imageBox)
@@ -419,10 +418,10 @@ namespace Calculator
             Bitmap shapeBitmap = new Bitmap(400, 300);
             Graphics g = Graphics.FromImage(shapeBitmap);
             g.Clear(System.Drawing.Color.FromArgb(15, 93, 16));
-            Pen pen = new Pen(Color.FromArgb(255, 255, 255),2);
+            Pen pen = new Pen(Color.FromArgb(0, 0, 0),2);
             Rectangle rect = new Rectangle(center[0] - (int)Math.Round(diameter / 2), center[1] - (int)Math.Round(diameter / 2), (int)Math.Round(diameter), (int)Math.Round(diameter));
             g.DrawEllipse(pen, rect);
-            imageBox.Source = base.BitmapTobitmapImage(shapeBitmap);
+            imageBox.Source = BitmapTobitmapImage(shapeBitmap);
         }
 
         public new void SetImageBox(Image imageBox)
@@ -442,7 +441,7 @@ namespace Calculator
         float height;
         float lengthSmall;
         float lengthLong;
-        PointF[] visualArray;
+        //PointF[] visualArray;
         public Trapezoid(TextBox textBox, Image imageBox)
         {
             SetTextBox(textBox);
@@ -513,7 +512,7 @@ namespace Calculator
 
     public class Polygon : Shape
     {
-        PointF[] visualArray;
+        //PointF[] visualArray;
         uint sideAmount;
         float length;
         public Polygon(TextBox textBox, Image imageBox)
@@ -540,25 +539,25 @@ namespace Calculator
         public void VisualArrayCalculation()
         {
             float angleBetweenSides = (sideAmount - 2) * 180 / sideAmount;
-            float angleFromCenterPoint = 180 - angleBetweenSides;
+            float angleFromCenterPoint = (180f - angleBetweenSides) * (float)Math.PI/180f; //radians. Remove (float)Math.PI/180f) for degrees
             uint CurrentSide = 0;
             visualArray = new PointF[sideAmount];
             float lastX = 200 - length /2;
             float lastY = 150 - length /2;
-            float startX = length;
+            float lengthEdgeMiddleToCenter = length / (2 * (float)Math.Tan(180*Math.PI/180 / sideAmount));
+            float lengthVertexToCenter = (float)Math.Sqrt(Math.Pow(lengthEdgeMiddleToCenter, 2) + Math.Pow(length/2f, 2));
+            if(lengthVertexToCenter > 300/2)
+            {
+                float scale = 300/2 / lengthVertexToCenter;
+                lengthEdgeMiddleToCenter *= scale;
+                lengthVertexToCenter *= scale;
+            }
+            float startX = lengthVertexToCenter; 
             float startY = 0;
-            visualArray[0] = new PointF(lastX, lastY);
             for (int i = 0; i < visualArray.Length; i++)
-            { //does not end length points away from the start. 
-                //4 sides, length = 40, angle = 90,
-                //it does not go 40,0 -> 0,40 -> -40,0 -> 0,-40  
-                //it goes 40,0 -> -17.92,35.75 -> -23.94,-32.05 -> 39.38,-7.04
-                //lastX += (float)Math.Cos(angleBetweenSides * (i-1)) * length;
-                //lastY += (float)Math.Sin(angleBetweenSides * (i-1)) * length;
+            {  
                 float xRotated = 200+((float)Math.Cos(angleFromCenterPoint * (i)) * startX - (float)Math.Sin(angleFromCenterPoint * (i )) * startY);
                 float yRotated = 150+((float)Math.Sin(angleFromCenterPoint * (i)) * startX + (float)Math.Cos(angleFromCenterPoint * (i )) * startY);
-                //old problem: rotated in the math is given as the angle between the old locatio and new location from a center point
-                //anglesBetweenSides are the angle between two sides.
                 visualArray[i] = new PointF(xRotated, yRotated);
             }
             base.visualArray = this.visualArray;
@@ -588,7 +587,7 @@ namespace Calculator
 
     public class Cone : Shape
     {
-        PointF[] visualArray;
+        //PointF[] visualArray;
         float diameter;
         float height; 
 
