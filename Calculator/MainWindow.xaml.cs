@@ -104,6 +104,7 @@ namespace Calculator
             {
                 if (oldNumber != null)
                 {
+                    numberOld.Text = oldNumber.ToString();
                     if (plus)
                         resultNumber = (float)oldNumber + (float)newNum;
                     else if (minus)
@@ -113,8 +114,7 @@ namespace Calculator
                     else if (devide)
                         resultNumber = (float)oldNumber / (float)newNum;
                     resultBox.Text = resultNumber.ToString();
-                    oldNumber = resultNumber;
-                    numberOld.Text = oldNumber.ToString();
+                    oldNumber = resultNumber;                    
                 }
                 else
                 {
@@ -225,7 +225,9 @@ namespace Calculator
                     string valueTxt = AreaTextBox.Text;
                     bool gotNumber = GetNumber(valueTxt, out float? num);
                     if (gotNumber)
-                    {
+                    { //need to ensure that long length is bigger than small length or does that matter?
+                        //maybe ask for length 1 and length 2 and then in code just check which one is longest
+                        //in case one of them is going outside the image size
                         trapezoidArray[1] = (float)num;
                         areaSelected.Text = "Long length";
                         areaState++;
@@ -239,6 +241,7 @@ namespace Calculator
                     {
                         trapezoidArray[2] = (float)num;
                         trapezoid.Area(trapezoidArray[0], trapezoidArray[1], trapezoidArray[2]);
+                        trapezoid.VisualArrayCalculation();
                         trapezoid.VisualRepresentation();
                         areaSelected.Text = "Correct shape?";
                         AreaBoolChanger(false, false, false, false);
@@ -272,6 +275,7 @@ namespace Calculator
                     {
                         coneArray[1] = (float)num;
                         cone.Area(coneArray[0], coneArray[1]);
+                        cone.VisualArrayCalculation();
                         cone.VisualRepresentation();
                         areaSelected.Text = "Correct shape?";
                         AreaBoolChanger(false, false, false, false);
@@ -321,7 +325,7 @@ namespace Calculator
 
     public class Shape
     {
-        uint[,] visualArray;
+        public PointF[] visualArray;
         TextBox resultBox;
         System.Windows.Controls.Image imageBox; 
 
@@ -358,7 +362,8 @@ namespace Calculator
             Bitmap shapeBitmap = new Bitmap(400, 300);
             Graphics g = Graphics.FromImage(shapeBitmap);
             g.Clear(System.Drawing.Color.FromArgb(15, 93, 16));
-
+            Pen pen = new Pen(Color.FromArgb(255, 255, 255), 2);
+            g.DrawPolygon(pen, visualArray);
 
             imageBox.Source = BitmapTobitmapImage(shapeBitmap);
         }
@@ -370,13 +375,10 @@ namespace Calculator
             {
                 bmp.Save(memory, ImageFormat.Bmp); //saves the bitmap to the stream
                 memory.Position = 0;
-
                 bitmapImage.BeginInit();
-
                 bitmapImage.StreamSource = memory; //loads the bitmap into a bitmapimage
                 bitmapImage.CacheOption = BitmapCacheOption.OnLoad;
                 bitmapImage.EndInit();
-
                 return bitmapImage;
             }
         }
@@ -385,7 +387,7 @@ namespace Calculator
 
     public class Circle : Shape
     {
-        uint[,] visualArray;
+        PointF[] visualArray;
         float diameter;
         Image imageBox;
         public Circle(TextBox textBox, Image imageBox)
@@ -410,21 +412,16 @@ namespace Calculator
 
         public override void VisualRepresentation()
         {
-
+            int[] center = new int[2] { 400 / 2, 300 / 2 };
+            if (diameter > 300)
+                diameter = 300;
             Bitmap shapeBitmap = new Bitmap(400, 300);
             Graphics g = Graphics.FromImage(shapeBitmap);
             g.Clear(System.Drawing.Color.FromArgb(15, 93, 16));
             Pen pen = new Pen(Color.FromArgb(255, 255, 255),2);
-            Rectangle rect = new Rectangle(0, 0, 200, 200);
+            Rectangle rect = new Rectangle(center[0] - (int)Math.Round(diameter / 2), center[1] - (int)Math.Round(diameter / 2), (int)Math.Round(diameter), (int)Math.Round(diameter));
             g.DrawEllipse(pen, rect);
             imageBox.Source = base.BitmapTobitmapImage(shapeBitmap);
-        }
-
-        public uint[,] VisualArrayCalculation()
-        {
-
-
-            return null;
         }
 
         public new void SetImageBox(Image imageBox)
@@ -441,7 +438,10 @@ namespace Calculator
 
     public class Trapezoid : Shape
     {
-        uint[,] visualArray;
+        float height;
+        float lengthSmall;
+        float lengthLong;
+        PointF[] visualArray;
         public Trapezoid(TextBox textBox, Image imageBox)
         {
             SetTextBox(textBox);
@@ -462,16 +462,45 @@ namespace Calculator
         /// <returns></returns>
         public double Area(float height, float length_small, float length_long)
         {
+            this.height = height;
+            lengthSmall = length_small;
+            lengthLong = length_long;
             float result = height / 2f * (length_small + length_long);
             ToResultBox(result);
             return result;
         }
 
-        public uint[,] VisualArrayCalculation()
+        public void VisualArrayCalculation()
         {
 
+            float biggestValue = lengthLong > height ? lengthLong: height;
+            bool heightBiggest = height > lengthLong ? true: false; 
+            biggestValue = biggestValue > lengthSmall ? biggestValue: lengthSmall;
+            if ((biggestValue > 400 && !heightBiggest) || (biggestValue > 300 && heightBiggest))
+            { //should scale the height and lengths as a %. Also, do the same for the cone.
+                float scaleback;
+                if (heightBiggest)
+                    scaleback = 300 / biggestValue;
+                else
+                    scaleback = 400 / biggestValue;
+                lengthLong *= scaleback;
+                lengthSmall *= scaleback;
+                height *= scaleback;
+            }
+            PointF topRight = new PointF(200f + lengthSmall / 2, 150 - height / 2);
+            PointF topLeft = new PointF(200f - lengthSmall / 2, 150 - height / 2);
+            PointF bottomRight = new PointF(200f + lengthLong / 2, 150 + height / 2);
+            PointF bottomLeft = new PointF(200f - lengthLong / 2, 150 + height / 2);
 
-            return null;
+            visualArray = new PointF[]
+            {
+                topLeft,
+                topRight,
+                bottomRight,
+                bottomLeft
+            };
+            base.visualArray = this.visualArray;
+
         }
 
         public new void SetTextBox(TextBox textBox)
@@ -483,7 +512,7 @@ namespace Calculator
 
     public class Polygon : Shape
     {
-        uint[,] visualArray;
+        PointF[] visualArray;
         uint sideAmount;
 
         public Polygon(TextBox textBox, Image imageBox)
@@ -538,7 +567,9 @@ namespace Calculator
 
     public class Cone : Shape
     {
-        uint[,] visualArray;
+        PointF[] visualArray;
+        float diameter;
+        float height; 
 
         public Cone(TextBox textBox, Image imageBox)
         {
@@ -554,17 +585,26 @@ namespace Calculator
         /// <returns></returns>
         public override double Area(float radius, float height)
         {
+            this.height = height;
+            diameter = 2 * radius;
             float slantHeight = (float)Math.Sqrt(Math.Pow(radius,2) + Math.Pow(height, 2));
             float result = (float)Math.PI * radius * slantHeight + (float)Math.PI * (float)Math.Pow(radius,2); 
             ToResultBox(result);
             return result;
         }
 
-        public uint[,] VisualArrayCalculation()
+        public void VisualArrayCalculation()
         {
-            
-
-            return null;
+            PointF top = new PointF(200f, 150 - height / 2);
+            PointF bottomLeft = new PointF(200 - diameter / 2, 150 + height / 2);
+            PointF bottomRight = new PointF(200 + diameter / 2, 150 + height / 2);
+            visualArray = new PointF[3]
+            {
+                top,
+                bottomLeft,
+                bottomRight
+            };
+            base.visualArray = this.visualArray;
         }
 
         public new void SetImageBox(Image imageBox)
