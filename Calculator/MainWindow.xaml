@@ -14,7 +14,7 @@
         <TextBox HorizontalAlignment="Left" Height="23" Name="number" TextWrapping="Wrap" Text="Enter value" VerticalAlignment="Top" Width="120" Margin="517,122,0,0"/>
         <TextBox HorizontalAlignment="Left" Height="23" Name="resultBox" TextWrapping="Wrap"  Text="Result" VerticalAlignment="Top" Width="120" Margin="517,150,0,0"/>
         <TextBox HorizontalAlignment="Left" Height="23" Name="numberOld" TextWrapping="Wrap" VerticalAlignment="Top" Width="120" Margin="517,93,0,0"/>
-        <Image HorizontalAlignment="Left" Height="309" Name="visual" Margin="49,44,0,0" VerticalAlignment="Top" Width="393"/>
+        <Image HorizontalAlignment="Left" Height="300" Name="visual" Margin="49,44,0,0" VerticalAlignment="Top" Width="393"/>
         <ComboBox HorizontalAlignment="Left" VerticalAlignment="Top" Width="120" Margin="612,321,0,0" >
             <Button Name="Circle" Content="Circle" Click="Circle_Click" Width="110"/>
             <Button Name="Trapezoid" Content="Trapezoid" Click="Trapezoid_Click" Width="110"/>

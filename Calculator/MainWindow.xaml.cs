@@ -1,5 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Drawing;
+using System.Drawing.Imaging;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -12,6 +15,10 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using Color = System.Drawing.Color;
+using Image = System.Windows.Controls.Image;
+using Pen = System.Drawing.Pen;
+using Rectangle = System.Drawing.Rectangle;
 
 namespace Calculator
 {
@@ -61,10 +68,10 @@ namespace Calculator
         {
             InitializeComponent();
             numberOld.Text = "NaN";
-            circle = new Circle(resultBox);
-            polygon = new Polygon(resultBox);
-            trapezoid = new Trapezoid(resultBox);
-            cone = new Cone(resultBox);
+            circle = new Circle(resultBox, visual);
+            polygon = new Polygon(resultBox, visual);
+            trapezoid = new Trapezoid(resultBox, visual);
+            cone = new Cone(resultBox, visual);
         }
 
         private bool GetNumber(string value, out float? num)
@@ -97,6 +104,7 @@ namespace Calculator
             {
                 if (oldNumber != null)
                 {
+                    numberOld.Text = oldNumber.ToString();
                     if (plus)
                         resultNumber = (float)oldNumber + (float)newNum;
                     else if (minus)
@@ -106,8 +114,7 @@ namespace Calculator
                     else if (devide)
                         resultNumber = (float)oldNumber / (float)newNum;
                     resultBox.Text = resultNumber.ToString();
-                    oldNumber = resultNumber;
-                    numberOld.Text = oldNumber.ToString();
+                    oldNumber = resultNumber;                    
                 }
                 else
                 {
@@ -188,7 +195,8 @@ namespace Calculator
                     if (gotNumber)
                     {
                         circle.Area((float)num);
-                        areaSelected.Text = "Correct shape?";
+                        circle.VisualRepresentation();
+                        AreaTextBox.Text = "Correct shape?";
                         AreaBoolChanger(false, false, false, false);
                         areaState = 0;
                     }
@@ -208,7 +216,7 @@ namespace Calculator
                     if (gotNumber)
                     {
                         trapezoidArray[0] = (float)num;
-                        areaSelected.Text = "Small length";
+                        AreaTextBox.Text = "Small length";
                         areaState++;
                     }
                 }
@@ -217,9 +225,11 @@ namespace Calculator
                     string valueTxt = AreaTextBox.Text;
                     bool gotNumber = GetNumber(valueTxt, out float? num);
                     if (gotNumber)
-                    {
+                    { //need to ensure that long length is bigger than small length or does that matter?
+                        //maybe ask for length 1 and length 2 and then in code just check which one is longest
+                        //in case one of them is going outside the image size
                         trapezoidArray[1] = (float)num;
-                        areaSelected.Text = "Long length";
+                        AreaTextBox.Text = "Long length";
                         areaState++;
                     }
                 }
@@ -231,7 +241,9 @@ namespace Calculator
                     {
                         trapezoidArray[2] = (float)num;
                         trapezoid.Area(trapezoidArray[0], trapezoidArray[1], trapezoidArray[2]);
-                        areaSelected.Text = "Correct shape?";
+                        trapezoid.VisualArrayCalculation();
+                        trapezoid.VisualRepresentation();
+                        AreaTextBox.Text = "Correct shape?";
                         AreaBoolChanger(false, false, false, false);
                         areaState = 0;
                     }
@@ -251,7 +263,7 @@ namespace Calculator
                     if (gotNumber)
                     {
                         coneArray[0] = (float)num;
-                        areaSelected.Text = "Height";
+                        AreaTextBox.Text = "Height";
                         areaState++;
                     }
                 }
@@ -263,7 +275,9 @@ namespace Calculator
                     {
                         coneArray[1] = (float)num;
                         cone.Area(coneArray[0], coneArray[1]);
-                        areaSelected.Text = "Correct shape?";
+                        cone.VisualArrayCalculation();
+                        cone.VisualRepresentation();
+                        AreaTextBox.Text = "Correct shape?";
                         AreaBoolChanger(false, false, false, false);
                         areaState = 0;
                     }
@@ -283,7 +297,7 @@ namespace Calculator
                     if (gotNumber)
                     {
                         polygonLength = (float)num;
-                        areaSelected.Text = "Amount of sides";
+                        AreaTextBox.Text = "Amount of sides";
                         areaState++;
                     }
                 }
@@ -295,7 +309,9 @@ namespace Calculator
                     {
                         polygonSideAmount = (uint)num;
                         polygon.Area(polygonSideAmount, polygonLength);
-                        areaSelected.Text = "Correct shape?";
+                        polygon.VisualArrayCalculation();
+                        polygon.VisualRepresentation();
+                        AreaTextBox.Text = "Correct shape?";
                         AreaBoolChanger(false, false, false, false);
                         areaState = 0;
                     }
@@ -310,11 +326,17 @@ namespace Calculator
 
     public class Shape
     {
+        public PointF[] visualArray;
         TextBox resultBox;
+        Image imageBox; 
 
         public virtual TextBox SetTextBox
         {
             set => resultBox = value;
+        }
+        public virtual Image SetImageBox
+        {
+            set => imageBox = value;
         }
 
         /// <summary>
@@ -336,18 +358,43 @@ namespace Calculator
         }
 
         public virtual void VisualRepresentation()
-        {
+        { //takes an 2d array and draws the shape using polygons. Circle might wants it own version. 
+            BitmapImage shapeImage = new BitmapImage();
+            Bitmap shapeBitmap = new Bitmap(400, 300);
+            Graphics g = Graphics.FromImage(shapeBitmap);
+            g.Clear(Color.FromArgb(15, 93, 16));
+            Pen pen = new Pen(Color.FromArgb(0, 0, 0), 2);
+            g.DrawPolygon(pen, visualArray);
 
+            imageBox.Source = BitmapTobitmapImage(shapeBitmap);
+        }
+
+        public BitmapImage BitmapTobitmapImage(Bitmap bmp)
+        {
+            BitmapImage bitmapImage = new BitmapImage();
+            using (MemoryStream memory = new MemoryStream()) //opens a memory stream, used to save an image in the stream and then load it into another type
+            {
+                bmp.Save(memory, ImageFormat.Bmp); //saves the bitmap to the stream
+                memory.Position = 0;
+                bitmapImage.BeginInit();
+                bitmapImage.StreamSource = memory; //loads the bitmap into a bitmapimage
+                bitmapImage.CacheOption = BitmapCacheOption.OnLoad;
+                bitmapImage.EndInit();
+                return bitmapImage;
+            }
         }
 
     }
 
     public class Circle : Shape
     {
-
-        public Circle(TextBox textBox)
+        float diameter;
+        Image imageBox;
+        public Circle(TextBox textBox, Image imageBox)
         {
             SetTextBox(textBox);
+            SetImageBox(imageBox);
+            this.imageBox = imageBox;
         }
 
         /// <summary>
@@ -357,9 +404,29 @@ namespace Calculator
         /// <returns></returns>
         public double Area(float radius)
         {
+            diameter = 2 * radius;
             float result = (float)(Math.PI*Math.Pow(radius,2));
             ToResultBox(result);
             return result;
+        }
+
+        public override void VisualRepresentation()
+        {
+            int[] center = new int[2] { 400 / 2, 300 / 2 };
+            if (diameter > 300)
+                diameter = 300;
+            Bitmap shapeBitmap = new Bitmap(400, 300);
+            Graphics g = Graphics.FromImage(shapeBitmap);
+            g.Clear(System.Drawing.Color.FromArgb(15, 93, 16));
+            Pen pen = new Pen(Color.FromArgb(0, 0, 0),2);
+            Rectangle rect = new Rectangle(center[0] - (int)Math.Round(diameter / 2), center[1] - (int)Math.Round(diameter / 2), (int)Math.Round(diameter), (int)Math.Round(diameter));
+            g.DrawEllipse(pen, rect);
+            imageBox.Source = BitmapTobitmapImage(shapeBitmap);
+        }
+
+        public new void SetImageBox(Image imageBox)
+        {
+            base.SetImageBox = imageBox;
         }
 
         public new void SetTextBox(TextBox textBox)
@@ -371,10 +438,19 @@ namespace Calculator
 
     public class Trapezoid : Shape
     {
-
-        public Trapezoid(TextBox textBox)
+        float height;
+        float lengthSmall;
+        float lengthLong;
+        //PointF[] visualArray;
+        public Trapezoid(TextBox textBox, Image imageBox)
         {
             SetTextBox(textBox);
+            SetImageBox(imageBox);
+        }
+
+        public new void SetImageBox(Image imageBox)
+        {
+            base.SetImageBox = imageBox;
         }
 
         /// <summary>
@@ -386,9 +462,45 @@ namespace Calculator
         /// <returns></returns>
         public double Area(float height, float length_small, float length_long)
         {
+            this.height = height;
+            lengthSmall = length_small;
+            lengthLong = length_long;
             float result = height / 2f * (length_small + length_long);
             ToResultBox(result);
             return result;
+        }
+
+        public void VisualArrayCalculation()
+        {
+
+            float biggestValue = lengthLong > height ? lengthLong: height;
+            bool heightBiggest = height > lengthLong ? true: false; 
+            biggestValue = biggestValue > lengthSmall ? biggestValue: lengthSmall;
+            if ((biggestValue > 400 && !heightBiggest) || (biggestValue > 300 && heightBiggest))
+            { //should scale the height and lengths as a %. Also, do the same for the cone.
+                float scaleback;
+                if (heightBiggest)
+                    scaleback = 300 / biggestValue;
+                else
+                    scaleback = 400 / biggestValue;
+                lengthLong *= scaleback;
+                lengthSmall *= scaleback;
+                height *= scaleback;
+            }
+            PointF topRight = new PointF(200f + lengthSmall / 2, 150 - height / 2);
+            PointF topLeft = new PointF(200f - lengthSmall / 2, 150 - height / 2);
+            PointF bottomRight = new PointF(200f + lengthLong / 2, 150 + height / 2);
+            PointF bottomLeft = new PointF(200f - lengthLong / 2, 150 + height / 2);
+
+            visualArray = new PointF[]
+            {
+                topLeft,
+                topRight,
+                bottomRight,
+                bottomLeft
+            };
+            base.visualArray = this.visualArray;
+
         }
 
         public new void SetTextBox(TextBox textBox)
@@ -400,10 +512,13 @@ namespace Calculator
 
     public class Polygon : Shape
     {
-
-        public Polygon(TextBox textBox)
+        //PointF[] visualArray;
+        uint sideAmount;
+        float length;
+        public Polygon(TextBox textBox, Image imageBox)
         {
             SetTextBox(textBox);
+            SetImageBox(imageBox);
         }
 
         /// <summary>
@@ -414,9 +529,43 @@ namespace Calculator
         /// <returns></returns>
         public double Area(uint amountOFSides, float length)
         {
+            this.length = length;
+            sideAmount = amountOFSides;
             float result = amountOFSides * (float)Math.Pow(length, 2) * Cot(Math.PI / amountOFSides) / 4f;
             ToResultBox(result);
             return result;
+        }
+
+        public void VisualArrayCalculation()
+        {
+            float angleBetweenSides = (sideAmount - 2) * 180 / sideAmount;
+            float angleFromCenterPoint = (180f - angleBetweenSides) * (float)Math.PI/180f; //radians. Remove (float)Math.PI/180f) for degrees
+            uint CurrentSide = 0;
+            visualArray = new PointF[sideAmount];
+            float lastX = 200 - length /2;
+            float lastY = 150 - length /2;
+            float lengthEdgeMiddleToCenter = length / (2 * (float)Math.Tan(180*Math.PI/180 / sideAmount));
+            float lengthVertexToCenter = (float)Math.Sqrt(Math.Pow(lengthEdgeMiddleToCenter, 2) + Math.Pow(length/2f, 2));
+            if(lengthVertexToCenter > 300/2)
+            {
+                float scale = 300/2 / lengthVertexToCenter;
+                lengthEdgeMiddleToCenter *= scale;
+                lengthVertexToCenter *= scale;
+            }
+            float startX = lengthVertexToCenter; 
+            float startY = 0;
+            for (int i = 0; i < visualArray.Length; i++)
+            {  
+                float xRotated = 200+((float)Math.Cos(angleFromCenterPoint * (i)) * startX - (float)Math.Sin(angleFromCenterPoint * (i )) * startY);
+                float yRotated = 150+((float)Math.Sin(angleFromCenterPoint * (i)) * startX + (float)Math.Cos(angleFromCenterPoint * (i )) * startY);
+                visualArray[i] = new PointF(xRotated, yRotated);
+            }
+            base.visualArray = this.visualArray;
+        }
+
+        public new void SetImageBox(Image imageBox)
+        {
+            base.SetImageBox = imageBox;
         }
 
         public new void SetTextBox(TextBox textBox)
@@ -438,10 +587,14 @@ namespace Calculator
 
     public class Cone : Shape
     {
+        //PointF[] visualArray;
+        float diameter;
+        float height; 
 
-        public Cone(TextBox textBox)
+        public Cone(TextBox textBox, Image imageBox)
         {
             SetTextBox(textBox);
+            SetImageBox(imageBox);
         }
 
         /// <summary>
@@ -452,10 +605,52 @@ namespace Calculator
         /// <returns></returns>
         public override double Area(float radius, float height)
         {
+            this.height = height;
+            diameter = 2 * radius;
             float slantHeight = (float)Math.Sqrt(Math.Pow(radius,2) + Math.Pow(height, 2));
             float result = (float)Math.PI * radius * slantHeight + (float)Math.PI * (float)Math.Pow(radius,2); 
             ToResultBox(result);
             return result;
+        }
+
+        public void VisualArrayCalculation()
+        {
+            bool biggestValueHeight = height > diameter? true: false;
+
+            if (biggestValueHeight)
+            {
+                if (height > 300)
+                {
+                    float scaleBack = 300 / height;
+                    height *= scaleBack;
+                    diameter *= scaleBack;
+                }
+            }
+            else
+            {
+                if (diameter > 400)
+                {
+                    float scaleBack = 400 / diameter;
+                    height *= scaleBack;
+                    diameter *= scaleBack;
+                }
+            }
+
+            PointF top = new PointF(200f, 150 - height / 2);
+            PointF bottomLeft = new PointF(200 - diameter / 2, 150 + height / 2);
+            PointF bottomRight = new PointF(200 + diameter / 2, 150 + height / 2);
+            visualArray = new PointF[3]
+            {
+                top,
+                bottomLeft,
+                bottomRight
+            };
+            base.visualArray = this.visualArray;
+        }
+
+        public new void SetImageBox(Image imageBox)
+        {
+            base.SetImageBox = imageBox;
         }
 
         public new void SetTextBox(TextBox textBox)
