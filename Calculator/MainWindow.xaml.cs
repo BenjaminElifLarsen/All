@@ -309,6 +309,7 @@ namespace Calculator
                     {
                         polygonSideAmount = (uint)num;
                         polygon.Area(polygonSideAmount, polygonLength);
+                        polygon.VisualArrayCalculation();
                         polygon.VisualRepresentation();
                         areaSelected.Text = "Correct shape?";
                         AreaBoolChanger(false, false, false, false);
@@ -514,7 +515,7 @@ namespace Calculator
     {
         PointF[] visualArray;
         uint sideAmount;
-
+        float length;
         public Polygon(TextBox textBox, Image imageBox)
         {
             SetTextBox(textBox);
@@ -529,18 +530,38 @@ namespace Calculator
         /// <returns></returns>
         public double Area(uint amountOFSides, float length)
         {
+            this.length = length;
             sideAmount = amountOFSides;
             float result = amountOFSides * (float)Math.Pow(length, 2) * Cot(Math.PI / amountOFSides) / 4f;
             ToResultBox(result);
             return result;
         }
 
-        public uint[,] VisualArrayCalculation()
+        public void VisualArrayCalculation()
         {
             float angleBetweenSides = (sideAmount - 2) * 180 / sideAmount;
-
-
-            return null;
+            float angleFromCenterPoint = 180 - angleBetweenSides;
+            uint CurrentSide = 0;
+            visualArray = new PointF[sideAmount];
+            float lastX = 200 - length /2;
+            float lastY = 150 - length /2;
+            float startX = length;
+            float startY = 0;
+            visualArray[0] = new PointF(lastX, lastY);
+            for (int i = 0; i < visualArray.Length; i++)
+            { //does not end length points away from the start. 
+                //4 sides, length = 40, angle = 90,
+                //it does not go 40,0 -> 0,40 -> -40,0 -> 0,-40  
+                //it goes 40,0 -> -17.92,35.75 -> -23.94,-32.05 -> 39.38,-7.04
+                //lastX += (float)Math.Cos(angleBetweenSides * (i-1)) * length;
+                //lastY += (float)Math.Sin(angleBetweenSides * (i-1)) * length;
+                float xRotated = 200+((float)Math.Cos(angleFromCenterPoint * (i)) * startX - (float)Math.Sin(angleFromCenterPoint * (i )) * startY);
+                float yRotated = 150+((float)Math.Sin(angleFromCenterPoint * (i)) * startX + (float)Math.Cos(angleFromCenterPoint * (i )) * startY);
+                //old problem: rotated in the math is given as the angle between the old locatio and new location from a center point
+                //anglesBetweenSides are the angle between two sides.
+                visualArray[i] = new PointF(xRotated, yRotated);
+            }
+            base.visualArray = this.visualArray;
         }
 
         public new void SetImageBox(Image imageBox)
@@ -595,6 +616,27 @@ namespace Calculator
 
         public void VisualArrayCalculation()
         {
+            bool biggestValueHeight = height > diameter? true: false;
+
+            if (biggestValueHeight)
+            {
+                if (height > 300)
+                {
+                    float scaleBack = 300 / height;
+                    height *= scaleBack;
+                    diameter *= scaleBack;
+                }
+            }
+            else
+            {
+                if (diameter > 400)
+                {
+                    float scaleBack = 400 / diameter;
+                    height *= scaleBack;
+                    diameter *= scaleBack;
+                }
+            }
+
             PointF top = new PointF(200f, 150 - height / 2);
             PointF bottomLeft = new PointF(200 - diameter / 2, 150 + height / 2);
             PointF bottomRight = new PointF(200 + diameter / 2, 150 + height / 2);
