@@ -10,11 +10,11 @@
         <Button Content="+" HorizontalAlignment="Left" Margin="657,96,0,0" VerticalAlignment="Top" Width="75" Click="Plus"/>
         <Button Content="-" HorizontalAlignment="Left" Margin="657,121,0,0" VerticalAlignment="Top" Width="75" Click="Minus"/>
         <Button Content="*" HorizontalAlignment="Left" Margin="657,146,0,0" VerticalAlignment="Top" Width="75" Click="Multiply"/>
-        <Button Content="/" HorizontalAlignment="Left" Margin="657,171,0,0" VerticalAlignment="Top" Width="75" Click="Devide"/>
+        <Button Content="/" HorizontalAlignment="Left" Margin="657,171,0,0" VerticalAlignment="Top" Width="75" Click="Divide"/>
         <TextBox HorizontalAlignment="Left" Height="23" Name="number" TextWrapping="Wrap" Text="Enter value" VerticalAlignment="Top" Width="120" Margin="517,122,0,0"/>
         <TextBox HorizontalAlignment="Left" Height="23" Name="resultBox" TextWrapping="Wrap"  Text="Result" VerticalAlignment="Top" Width="120" Margin="517,150,0,0"/>
         <TextBox HorizontalAlignment="Left" Height="23" Name="numberOld" TextWrapping="Wrap" VerticalAlignment="Top" Width="120" Margin="517,93,0,0"/>
-        <Image HorizontalAlignment="Left" Height="300" Name="visual" Margin="49,44,0,0" VerticalAlignment="Top" Width="393"/>
+        <Image HorizontalAlignment="Left" Height="300" Name="visual" Margin="32,96,0,0" VerticalAlignment="Top" Width="400"/>
         <ComboBox HorizontalAlignment="Left" VerticalAlignment="Top" Width="120" Margin="612,321,0,0" >
             <Button Name="Circle" Content="Circle" Click="Circle_Click" Width="110"/>
             <Button Name="Trapezoid" Content="Trapezoid" Click="Trapezoid_Click" Width="110"/>
@@ -26,5 +26,11 @@
         <TextBlock HorizontalAlignment="Left" Name="currentVariable" Margin="612,247,0,0" TextWrapping="Wrap" Text="Enter:" VerticalAlignment="Top" Width="120"/>
         <Button Content="Confirm" Name="areaVariableConfirm" HorizontalAlignment="Left" VerticalAlignment="Top" Width="75" Margin="612,296,0,0" Click="AreaVariableConfirm_Click"/>
         <TextBox HorizontalAlignment="Left" Name="AreaTextBox" Height="23" TextWrapping="Wrap" Text="Correct shape?" VerticalAlignment="Top" Width="120" Margin="612,268,0,0"/>
+        <TextBox HorizontalAlignment="Left" Name="MathLongTextBox" Height="23" Margin="32,51,0,0" TextWrapping="Wrap" Text="New Math Function" VerticalAlignment="Top" Width="605" />
+        <Button Content="Button" Name="LongMathDone" HorizontalAlignment="Left" VerticalAlignment="Top" Width="75" Margin="657,54,0,0" Click="LongMathDone_Click"/>
+        <TextBlock HorizontalAlignment="Left" TextWrapping="Wrap" Text="Old Number" VerticalAlignment="Top" Margin="436,93,0,0" Width="82"/>
+        <TextBlock HorizontalAlignment="Left" TextWrapping="Wrap" Text="New Number" VerticalAlignment="Top" Margin="436,122,0,0" Width="82"/>
+        <TextBlock HorizontalAlignment="Left" TextWrapping="Wrap" Text="Result" VerticalAlignment="Top" Margin="436,150,0,0" Width="82"/>
+        <TextBlock HorizontalAlignment="Left" TextWrapping="Wrap" Text="Full math equation" VerticalAlignment="Top" Margin="32,30,0,0" Width="322"/>
     </Grid>
 </Window>

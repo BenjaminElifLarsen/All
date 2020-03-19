@@ -29,13 +29,13 @@ namespace Calculator
     {
         bool plus = false;
         bool minus = false;
-        bool devide = false;
+        bool divide = false;
         bool multiply = false;
         bool coneBool = false;
         bool circleBool = false;
         bool polygonBool = false;
         bool trapezoidBool = false;
-        string numberText = "";
+        string numberText;
         float? oldNumber = null;
         float resultNumber = 0;
         Circle circle;
@@ -55,11 +55,11 @@ namespace Calculator
         /// <param name="minus_"></param>
         /// <param name="devide_"></param>
         /// <param name="multiply_"></param>
-        private void MathBoolChanger(bool plus_, bool minus_, bool devide_, bool multiply_)
+        private void MathBoolChanger(bool plus_, bool minus_, bool divide_, bool multiply_)
         {
             plus = plus_;
             minus = minus_;
-            devide = devide_;
+            divide = divide_;
             multiply = multiply_;
         }
 
@@ -135,7 +135,7 @@ namespace Calculator
                         resultNumber = (float)oldNumber - (float)newNum;
                     else if (multiply)
                         resultNumber = (float)oldNumber * (float)newNum;
-                    else if (devide)
+                    else if (divide)
                         resultNumber = (float)oldNumber / (float)newNum;
                     resultBox.Text = resultNumber.ToString();
                     oldNumber = resultNumber;                    
@@ -163,26 +163,45 @@ namespace Calculator
                 areaSelected.Text = "Polygon";
         }
 
-
+        /// <summary>
+        /// Sets plus to true, rest to false.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void Plus(object sender, RoutedEventArgs e)
         {
             MathBoolChanger(true, false, false, false);
             Math();
         }
 
+        /// <summary>
+        /// Sets Minus to true, rest to false.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void Minus(object sender, RoutedEventArgs e)
         {
             MathBoolChanger(false, true, false, false);
             Math();
         }
 
+        /// <summary>
+        /// Set multiplier to true, rest to false.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void Multiply(object sender, RoutedEventArgs e)
         {
             MathBoolChanger(false, false, false, true);
             Math();
         }
 
-        private void Devide(object sender, RoutedEventArgs e)
+        /// <summary>
+        /// Set divide to true, rest to false.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void Divide(object sender, RoutedEventArgs e)
         {
             MathBoolChanger(false, false, true, false);
             Math();
@@ -376,7 +395,98 @@ namespace Calculator
             }
 
 
+        }
+
+        /*
+         * start with simple, seperating a single higher order operations, e.g. *. 
+         * Then acquire the numbers next to each and multiple them together. Need to keep track of + and - locations.
+         * The othermost strings should be multiplied with the string before/after, except for the first and last value.
+         * Should ensure that the string does not end of begin with an operator
+         */
+        private void LongMathDone_Click(object sender, RoutedEventArgs e)
+        {
+            float result = 0;
+            string mathFullString = MathLongTextBox.Text;
+            string mathWithSpaces = AddSpaceToOperators(mathFullString).Replace('.',',');
+            string[] mathSplitted = mathWithSpaces.Split(' ');
+            uint posistion = 0;
+            string[] highestPriorotyOperatorr = {"*","/" };
+            List<string> goneThrough = new List<string>();
+
+            foreach (string str in mathSplitted)
+            { //need to add the results to a list at the correct location so addition and subtraction can be done. 
+                //List: When encounting a sign, remove last added entry. Add the result and increase posistion with 1 to skip the right side value.
+                //this might cause a problem with multiple *s and/or /s in a row... maybe instead of pulling left value from the string array, pull it from the list<string>
+                //if posistion != 0 or mathSplitted.length-1;
+                if(str == highestPriorotyOperatorr[0])
+                {
+                    float leftValue = Single.Parse(mathSplitted[posistion - 1]);
+                    float rightValue = Single.Parse(mathSplitted[posistion + 1]);
+                    result += leftValue * rightValue;
+
+                    posistion++;
+                }
+                else if(str == highestPriorotyOperatorr[1])
+                {
+                    float leftValue = Single.Parse(mathSplitted[posistion - 1]);
+                    float rightValue = Single.Parse(mathSplitted[posistion + 1]);
+                    result += leftValue / rightValue;
+
+                    posistion++;
+                }
+                posistion++;
             }
+            //string[] mathMultiplierSplitted = mathFullString.Split('*');
+            //int amountOfStrings = mathMultiplierSplitted.Length;
+            //foreach(string noMulti in mathMultiplierSplitted) //consider better way of doing the seperation. 
+            //{ //how to storage the values and the operations to make this easier.
+            //    //maybe start with lower priorities, add the numbers, expect those at the edges of a string. 
+            //    //Maybe seperate using ' ' first. Would persist the order of numbers and operations that way. Easier to know which numbers should be multiplied (or divided for that matter) first. 
+            //    //might not be ' ' between numbers and operators. Find operators, add ' ' around them first and then split - done.
+            //    //Can look for '*' and '/', conduct the operations on the values on either side.
+            //    //Still need to ensure the string only contains numbers and operators.
+            //    //Replace all '.' with ','.
+            //    string[] mathPlusSplitted = noMulti.Split('+');
+            //    foreach (string noPlus in mathPlusSplitted)
+            //    {
+            //
+            //    }
+            //}
+
+        }
+
+        /// <summary>
+        /// Ensures that there are spaces before and after all operators. 
+        /// </summary>
+        /// <param name="str">The string to add spaces to.</param>
+        /// <returns>Returns a version of <paramref name="str"/> with spaces before and 
+        /// after any operator.</returns>
+        private string AddSpaceToOperators(string str)
+        {
+            //uint posistion = 0;
+            //uint lastChar = '\0';
+            List<char> newStringList = new List<char>(str.Length);
+            char[] operatorList = { '+', '-', '*', '/', '%' };
+            foreach (char chr in str)
+            {
+                foreach (char chrOper in operatorList)
+                {
+                    if(chrOper == chr)
+                    {
+                        newStringList.Add(' ');
+                        newStringList.Add(chr);
+                        newStringList.Add(' ');
+                    }
+                    else
+                    {
+                        newStringList.Add(chr);
+                    }
+                }
+            }
+            return new string(newStringList.ToArray());
+        }
+
+
 
     }
 
@@ -717,7 +827,7 @@ namespace Calculator
         {
             float angleBetweenSides = (sideAmount - 2) * 180 / sideAmount;
             float angleFromCenterPoint = (180f - angleBetweenSides) * (float)Math.PI/180f; //radians. Remove (float)Math.PI/180f) for degrees
-            uint CurrentSide = 0;
+            //uint CurrentSide = 0;
             visualArray = new PointF[sideAmount];
             float lastX = 200 - length /2;
             float lastY = 150 - length /2;
