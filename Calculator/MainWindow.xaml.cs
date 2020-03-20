@@ -397,62 +397,115 @@ namespace Calculator
 
         }
 
-        /*
-         * start with simple, seperating a single higher order operations, e.g. *. 
-         * Then acquire the numbers next to each and multiple them together. Need to keep track of + and - locations.
-         * The othermost strings should be multiplied with the string before/after, except for the first and last value.
-         * Should ensure that the string does not end of begin with an operator
-         */
+
         private void LongMathDone_Click(object sender, RoutedEventArgs e)
         {
             float result = 0;
-            string mathFullString = MathLongTextBox.Text;
+            string mathFullString = MathLongTextBox.Text.Trim();
+            bool validEquation = IsMathEquationProper(mathFullString);
             string mathWithSpaces = AddSpaceToOperators(mathFullString).Replace('.',',');
             string[] mathSplitted = mathWithSpaces.Split(' ');
-            uint posistion = 0;
-            string[] highestPriorotyOperatorr = {"*","/" };
-            List<string> goneThrough = new List<string>();
 
-            foreach (string str in mathSplitted)
-            { //need to add the results to a list at the correct location so addition and subtraction can be done. 
-                //List: When encounting a sign, remove last added entry. Add the result and increase posistion with 1 to skip the right side value.
-                //this might cause a problem with multiple *s and/or /s in a row... maybe instead of pulling left value from the string array, pull it from the list<string>
-                //if posistion != 0 or mathSplitted.length-1;
-                if(str == highestPriorotyOperatorr[0])
-                {
-                    float leftValue = Single.Parse(mathSplitted[posistion - 1]);
-                    float rightValue = Single.Parse(mathSplitted[posistion + 1]);
-                    result += leftValue * rightValue;
+            //consider (), ^, ^() and ^-
+            if (validEquation)
+            {
 
-                    posistion++;
+                string[] highestPriorotyOperatorr = {"*","/" };
+                List<string> goneThrough = new List<string>();
+                for(int posistion = 0; posistion < mathSplitted.Length; posistion++)
+                { 
+                    string str = mathSplitted[posistion];
+                    if(str == highestPriorotyOperatorr[0])
+                    {
+                        float leftValue = Single.Parse(goneThrough[(int)goneThrough.Count - 1]);
+                        float rightValue = Single.Parse(mathSplitted[posistion + 1]);
+                        result = leftValue * rightValue;
+                        goneThrough.RemoveAt(goneThrough.Count - 1);
+                        goneThrough.Add(result.ToString());
+                        posistion++;
+                    }
+                    else if(str == highestPriorotyOperatorr[1])
+                    {
+                        float leftValue = Single.Parse(goneThrough[(int)goneThrough.Count - 1]);
+                        float rightValue = Single.Parse(mathSplitted[posistion + 1]);
+                        result = leftValue / rightValue;
+                        goneThrough.RemoveAt(goneThrough.Count - 1);
+                        goneThrough.Add(result.ToString());
+                        posistion++;
+                    }
+                    else
+                        goneThrough.Add(str);
                 }
-                else if(str == highestPriorotyOperatorr[1])
-                {
-                    float leftValue = Single.Parse(mathSplitted[posistion - 1]);
-                    float rightValue = Single.Parse(mathSplitted[posistion + 1]);
-                    result += leftValue / rightValue;
 
-                    posistion++;
+                string[] lowestPriorotyOperatorr = { "+", "-" };
+                List<string> goneThrough2 = new List<string>();
+                for (int posistion = 0; posistion < goneThrough.Count; posistion++)
+                {
+                    string str = goneThrough[posistion];
+                    if(str == lowestPriorotyOperatorr[0])
+                    {
+                        float leftValue = Single.Parse(goneThrough2[(int)goneThrough2.Count - 1]);
+                        float rightValue = Single.Parse(goneThrough[posistion + 1]);
+                        result = leftValue + rightValue;
+                        goneThrough2.RemoveAt(goneThrough2.Count - 1);
+                        goneThrough2.Add(result.ToString());
+                        posistion++;
+                    }
+                    else if(str == lowestPriorotyOperatorr[1])
+                    {
+                        float leftValue = Single.Parse(goneThrough2[(int)goneThrough2.Count - 1]);
+                        float rightValue = Single.Parse(goneThrough[posistion + 1]);
+                        result = leftValue - rightValue;
+                        goneThrough2.RemoveAt(goneThrough2.Count - 1);
+                        goneThrough2.Add(result.ToString());
+                        posistion++;
+                    }
+                    else
+                        goneThrough2.Add(str);
                 }
+                result = Single.Parse(goneThrough2[0]);
+                resultBox.Text = result.ToString();
+            }
+            else
+            {
+                resultBox.Text = "Equation is not valid";
+            }
+
+        }
+
+        /// <summary>
+        /// Checks if a string is a valid equation. 
+        /// That is, no multiple operators in row, there is a value before and after an operator and no non-numercial chars. 
+        /// </summary>
+        /// <param name="toCheck"></param>
+        /// <returns></returns>
+        private bool IsMathEquationProper(string toCheck)
+        { 
+            //need to check if there are two numbers after eachother without any operators in between.  is 'value' ' ' 'value' 
+            char lastChar = '\0';
+            int posistion = 0;
+            toCheck = toCheck.TrimEnd(' ');
+            //char[] invalidWithOutNumbers = {'+', '-', '*', '/'};
+            if (toCheck.Length == 0)
+                return false;
+            foreach (char chr in toCheck)
+            { //maybe use a chararray and a for loop
+                if (chr == '+' || chr == '-' || chr == '*' || chr == '/')
+                {
+                    if (lastChar == '+' || lastChar == '-' || lastChar == '*' || lastChar == '/' || lastChar == '\0')
+                        return false;
+                    else if (posistion == toCheck.Length - 1)
+                        return false;
+                }
+                else if (((int)chr < 48 || (int)chr > 57) && (int)chr != 32)
+                {
+                    return false;
+                }
+                else if (chr != ' ')
+                    lastChar = chr;
                 posistion++;
             }
-            //string[] mathMultiplierSplitted = mathFullString.Split('*');
-            //int amountOfStrings = mathMultiplierSplitted.Length;
-            //foreach(string noMulti in mathMultiplierSplitted) //consider better way of doing the seperation. 
-            //{ //how to storage the values and the operations to make this easier.
-            //    //maybe start with lower priorities, add the numbers, expect those at the edges of a string. 
-            //    //Maybe seperate using ' ' first. Would persist the order of numbers and operations that way. Easier to know which numbers should be multiplied (or divided for that matter) first. 
-            //    //might not be ' ' between numbers and operators. Find operators, add ' ' around them first and then split - done.
-            //    //Can look for '*' and '/', conduct the operations on the values on either side.
-            //    //Still need to ensure the string only contains numbers and operators.
-            //    //Replace all '.' with ','.
-            //    string[] mathPlusSplitted = noMulti.Split('+');
-            //    foreach (string noPlus in mathPlusSplitted)
-            //    {
-            //
-            //    }
-            //}
-
+            return true;
         }
 
         /// <summary>
@@ -463,24 +516,37 @@ namespace Calculator
         /// after any operator.</returns>
         private string AddSpaceToOperators(string str)
         {
-            //uint posistion = 0;
-            //uint lastChar = '\0';
+            uint posistion = 0;
+            uint lastChar = '\0';
             List<char> newStringList = new List<char>(str.Length);
             char[] operatorList = { '+', '-', '*', '/', '%' };
-            foreach (char chr in str)
+            foreach (char chr in str) //does not always work. At one time "5 *5" 
             {
+                bool isOperator = false;
                 foreach (char chrOper in operatorList)
                 {
-                    if(chrOper == chr)
+                    if(chrOper == chr) //if the string starts or ends with an operator, it will add spaces around them. Need to check the string is a realistic equation of math. Do it in another function 
                     {
-                        newStringList.Add(' ');
+                        if(lastChar != ' ')
+                            newStringList.Add(' ');
                         newStringList.Add(chr);
                         newStringList.Add(' ');
+                        isOperator = true;
+                        lastChar = ' ';
+                        break;
                     }
-                    else
+                }
+                if (!isOperator)
+                {
+                    if (chr != lastChar)
                     {
                         newStringList.Add(chr);
+                        lastChar = '\0';
+                        if(chr == ' ')
+                            lastChar = ' ';
+                        
                     }
+
                 }
             }
             return new string(newStringList.ToArray());

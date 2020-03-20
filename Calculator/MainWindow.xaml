@@ -27,7 +27,7 @@
         <Button Content="Confirm" Name="areaVariableConfirm" HorizontalAlignment="Left" VerticalAlignment="Top" Width="75" Margin="612,296,0,0" Click="AreaVariableConfirm_Click"/>
         <TextBox HorizontalAlignment="Left" Name="AreaTextBox" Height="23" TextWrapping="Wrap" Text="Correct shape?" VerticalAlignment="Top" Width="120" Margin="612,268,0,0"/>
         <TextBox HorizontalAlignment="Left" Name="MathLongTextBox" Height="23" Margin="32,51,0,0" TextWrapping="Wrap" Text="New Math Function" VerticalAlignment="Top" Width="605" />
-        <Button Content="Button" Name="LongMathDone" HorizontalAlignment="Left" VerticalAlignment="Top" Width="75" Margin="657,54,0,0" Click="LongMathDone_Click"/>
+        <Button Content="In progress" Name="LongMathDone" HorizontalAlignment="Left" VerticalAlignment="Top" Width="75" Margin="657,54,0,0" Click="LongMathDone_Click"/>
         <TextBlock HorizontalAlignment="Left" TextWrapping="Wrap" Text="Old Number" VerticalAlignment="Top" Margin="436,93,0,0" Width="82"/>
         <TextBlock HorizontalAlignment="Left" TextWrapping="Wrap" Text="New Number" VerticalAlignment="Top" Margin="436,122,0,0" Width="82"/>
         <TextBlock HorizontalAlignment="Left" TextWrapping="Wrap" Text="Result" VerticalAlignment="Top" Margin="436,150,0,0" Width="82"/>
