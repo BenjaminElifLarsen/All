@@ -29,13 +29,13 @@ namespace Calculator
     {
         bool plus = false;
         bool minus = false;
-        bool devide = false;
+        bool divide = false;
         bool multiply = false;
         bool coneBool = false;
         bool circleBool = false;
         bool polygonBool = false;
         bool trapezoidBool = false;
-        string numberText = "";
+        string numberText;
         float? oldNumber = null;
         float resultNumber = 0;
         Circle circle;
@@ -46,16 +46,30 @@ namespace Calculator
         float[] trapezoidArray = new float[3];
         float[] coneArray = new float[2];
         float polygonLength;
-        uint polygonSideAmount; 
+        uint polygonSideAmount;
 
-        private void MathBoolChanger(bool plus_, bool minus_, bool devide_, bool multiply_)
+        /// <summary>
+        /// Sets the states of the differnet bools.
+        /// </summary>
+        /// <param name="plus_"></param>
+        /// <param name="minus_"></param>
+        /// <param name="devide_"></param>
+        /// <param name="multiply_"></param>
+        private void MathBoolChanger(bool plus_, bool minus_, bool divide_, bool multiply_)
         {
             plus = plus_;
             minus = minus_;
-            devide = devide_;
+            divide = divide_;
             multiply = multiply_;
         }
 
+        /// <summary>
+        /// Sets the states of the differnet bools.
+        /// </summary>
+        /// <param name="cone_"></param>
+        /// <param name="circle_"></param>
+        /// <param name="polygon_"></param>
+        /// <param name="trapezoid_"></param>
         private void AreaBoolChanger(bool cone_, bool circle_, bool polygon_, bool trapezoid_)
         {
             coneBool = cone_;
@@ -74,28 +88,38 @@ namespace Calculator
             cone = new Cone(resultBox, visual);
         }
 
+        /// <summary>
+        /// Tries to parse string <paramref name="value"/> and gives it as <paramref name="num"/>.
+        /// It will also return a bool depending if the string could be parsed. 
+        /// If <paramref name="value"/> could not be parsed, <paramref name="num"/> will be null. 
+        /// </summary>
+        /// <param name="value">The string to convert.</param>
+        /// <param name="num">The numerical value of <paramref name="value"/></param>
+        /// <returns>Returns a bool, true if <paramref name="value"/> could be parsed, else false.</returns>
         private bool GetNumber(string value, out float? num)
         {
-            num = 0;
+            num = null;
             float num2;
             bool isText = Single.TryParse(value, out num2) ? true : false;
             if (isText)
                 num = num2;
             return isText;
-
         }
 
-        private void GetText(out string number1Txt)
+        /// <summary>
+        /// Gets the string from the textbox number. 
+        /// </summary>
+        /// <param name="numberTxt">The string from textbox number.</param>
+        private void GetText(out string numberTxt)
         {
-            number1Txt = number.Text;
+            numberTxt = number.Text;
         }
 
-        private void Plus(object sender, RoutedEventArgs e)
-        {
-            MathBoolChanger(true, false, false, false);
-            Math();
-        }
-
+        /// <summary>
+        /// Calculates the result of the new number and the old number and writes it out. 
+        /// If there is no old number, new number is written as the result. 
+        /// Old number becomes the result. 
+        /// </summary>
         private void Math()
         {
             GetText(out string newNumText);
@@ -111,7 +135,7 @@ namespace Calculator
                         resultNumber = (float)oldNumber - (float)newNum;
                     else if (multiply)
                         resultNumber = (float)oldNumber * (float)newNum;
-                    else if (devide)
+                    else if (divide)
                         resultNumber = (float)oldNumber / (float)newNum;
                     resultBox.Text = resultNumber.ToString();
                     oldNumber = resultNumber;                    
@@ -124,6 +148,9 @@ namespace Calculator
             }
         }
 
+        /// <summary>
+        /// Set the text of the areaSelected textbox, text depending on the selected shape.  
+        /// </summary>
         private void AreaPreparation()
         {
             if (coneBool)
@@ -136,51 +163,101 @@ namespace Calculator
                 areaSelected.Text = "Polygon";
         }
 
+        /// <summary>
+        /// Sets plus to true, rest to false.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void Plus(object sender, RoutedEventArgs e)
+        {
+            MathBoolChanger(true, false, false, false);
+            Math();
+        }
+
+        /// <summary>
+        /// Sets Minus to true, rest to false.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void Minus(object sender, RoutedEventArgs e)
         {
             MathBoolChanger(false, true, false, false);
             Math();
         }
 
+        /// <summary>
+        /// Set multiplier to true, rest to false.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void Multiply(object sender, RoutedEventArgs e)
         {
             MathBoolChanger(false, false, false, true);
             Math();
         }
 
-        private void Devide(object sender, RoutedEventArgs e)
+        /// <summary>
+        /// Set divide to true, rest to false.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void Divide(object sender, RoutedEventArgs e)
         {
             MathBoolChanger(false, false, true, false);
             Math();
         }
 
+        /// <summary>
+        /// Enables further progress for circle calculations. 
+        /// </summary>
+        /// <param name="sender">What to write...</param>
+        /// <param name="e">What to write...</param>
         private void Circle_Click(object sender, RoutedEventArgs e)
         {
             AreaBoolChanger(false, true, false, false);
             AreaPreparation();
         }
 
+        /// <summary>
+        /// Enables further progress for trapezoid calculations. 
+        /// </summary>
+        /// <param name="sender">What to write...</param>
+        /// <param name="e">What to write...</param>
         private void Trapezoid_Click(object sender, RoutedEventArgs e)
         {
             AreaBoolChanger(false, false, false, true);
             AreaPreparation();
         }
 
+        /// <summary>
+        /// Enables further progress for polygon calculations. 
+        /// </summary>
+        /// <param name="sender">What to write...</param>
+        /// <param name="e">What to write...</param>
         private void Polygon_Click(object sender, RoutedEventArgs e)
         {
             AreaBoolChanger(false, false, true, false);
             AreaPreparation();
         }
 
+        /// <summary>
+        /// Enables further progress for cone calculations. 
+        /// </summary>
+        /// <param name="sender">What to write...</param>
+        /// <param name="e">What to write...</param>
         private void Cone_Click(object sender, RoutedEventArgs e)
         {
             AreaBoolChanger(true, false, false, false);
             AreaPreparation();
         }
 
+        /// <summary>
+        /// If a shape have been selected, ask for information for it and gather it. Make it sound better
+        /// </summary>
+        /// <param name="sender">What to write...</param>
+        /// <param name="e">What to write...</param>
         private void AreaVariableConfirm_Click(object sender, RoutedEventArgs e)
         {
-            //get the variables, do the calculations.
             if (circleBool)
             {
                 if (areaState == 0)
@@ -216,7 +293,7 @@ namespace Calculator
                     if (gotNumber)
                     {
                         trapezoidArray[0] = (float)num;
-                        AreaTextBox.Text = "Small length";
+                        AreaTextBox.Text = "First length";
                         areaState++;
                     }
                 }
@@ -225,11 +302,9 @@ namespace Calculator
                     string valueTxt = AreaTextBox.Text;
                     bool gotNumber = GetNumber(valueTxt, out float? num);
                     if (gotNumber)
-                    { //need to ensure that long length is bigger than small length or does that matter?
-                        //maybe ask for length 1 and length 2 and then in code just check which one is longest
-                        //in case one of them is going outside the image size
+                    { 
                         trapezoidArray[1] = (float)num;
-                        AreaTextBox.Text = "Long length";
+                        AreaTextBox.Text = "Second length";
                         areaState++;
                     }
                 }
@@ -320,20 +395,189 @@ namespace Calculator
             }
 
 
+        }
+
+
+        private void LongMathDone_Click(object sender, RoutedEventArgs e)
+        {
+            float result = 0;
+            string mathFullString = MathLongTextBox.Text.Trim();
+            bool validEquation = IsMathEquationProper(mathFullString);
+            string mathWithSpaces = AddSpaceToOperators(mathFullString).Replace('.',',');
+            string[] mathSplitted = mathWithSpaces.Split(' ');
+
+            //consider (), ^, ^() and ^-
+            if (validEquation)
+            {
+
+                string[] highestPriorotyOperatorr = {"*","/" };
+                List<string> goneThrough = new List<string>();
+                for(int posistion = 0; posistion < mathSplitted.Length; posistion++)
+                { 
+                    string str = mathSplitted[posistion];
+                    if(str == highestPriorotyOperatorr[0])
+                    {
+                        float leftValue = Single.Parse(goneThrough[(int)goneThrough.Count - 1]);
+                        float rightValue = Single.Parse(mathSplitted[posistion + 1]);
+                        result = leftValue * rightValue;
+                        goneThrough.RemoveAt(goneThrough.Count - 1);
+                        goneThrough.Add(result.ToString());
+                        posistion++;
+                    }
+                    else if(str == highestPriorotyOperatorr[1])
+                    {
+                        float leftValue = Single.Parse(goneThrough[(int)goneThrough.Count - 1]);
+                        float rightValue = Single.Parse(mathSplitted[posistion + 1]);
+                        result = leftValue / rightValue;
+                        goneThrough.RemoveAt(goneThrough.Count - 1);
+                        goneThrough.Add(result.ToString());
+                        posistion++;
+                    }
+                    else
+                        goneThrough.Add(str);
+                }
+
+                string[] lowestPriorotyOperatorr = { "+", "-" };
+                List<string> goneThrough2 = new List<string>();
+                for (int posistion = 0; posistion < goneThrough.Count; posistion++)
+                {
+                    string str = goneThrough[posistion];
+                    if(str == lowestPriorotyOperatorr[0])
+                    {
+                        float leftValue = Single.Parse(goneThrough2[(int)goneThrough2.Count - 1]);
+                        float rightValue = Single.Parse(goneThrough[posistion + 1]);
+                        result = leftValue + rightValue;
+                        goneThrough2.RemoveAt(goneThrough2.Count - 1);
+                        goneThrough2.Add(result.ToString());
+                        posistion++;
+                    }
+                    else if(str == lowestPriorotyOperatorr[1])
+                    {
+                        float leftValue = Single.Parse(goneThrough2[(int)goneThrough2.Count - 1]);
+                        float rightValue = Single.Parse(goneThrough[posistion + 1]);
+                        result = leftValue - rightValue;
+                        goneThrough2.RemoveAt(goneThrough2.Count - 1);
+                        goneThrough2.Add(result.ToString());
+                        posistion++;
+                    }
+                    else
+                        goneThrough2.Add(str);
+                }
+                result = Single.Parse(goneThrough2[0]);
+                resultBox.Text = result.ToString();
             }
+            else
+            {
+                resultBox.Text = "Equation is not valid";
+            }
+
+        }
+
+        /// <summary>
+        /// Checks if a string is a valid equation. 
+        /// That is, no multiple operators in row, there is a value before and after an operator and no non-numercial chars. 
+        /// </summary>
+        /// <param name="toCheck"></param>
+        /// <returns></returns>
+        private bool IsMathEquationProper(string toCheck)
+        { 
+            //need to check if there are two numbers after eachother without any operators in between.  is 'value' ' ' 'value' 
+            char lastChar = '\0';
+            int posistion = 0;
+            toCheck = toCheck.TrimEnd(' ');
+            //char[] invalidWithOutNumbers = {'+', '-', '*', '/'};
+            if (toCheck.Length == 0)
+                return false;
+            foreach (char chr in toCheck)
+            { //maybe use a chararray and a for loop
+                if (chr == '+' || chr == '-' || chr == '*' || chr == '/')
+                {
+                    if (lastChar == '+' || lastChar == '-' || lastChar == '*' || lastChar == '/' || lastChar == '\0')
+                        return false;
+                    else if (posistion == toCheck.Length - 1)
+                        return false;
+                }
+                else if (((int)chr < 48 || (int)chr > 57) && (int)chr != 32)
+                {
+                    return false;
+                }
+                else if (chr != ' ')
+                    lastChar = chr;
+                posistion++;
+            }
+            return true;
+        }
+
+        /// <summary>
+        /// Ensures that there are spaces before and after all operators. 
+        /// </summary>
+        /// <param name="str">The string to add spaces to.</param>
+        /// <returns>Returns a version of <paramref name="str"/> with spaces before and 
+        /// after any operator.</returns>
+        private string AddSpaceToOperators(string str)
+        {
+            uint posistion = 0;
+            uint lastChar = '\0';
+            List<char> newStringList = new List<char>(str.Length);
+            char[] operatorList = { '+', '-', '*', '/', '%' };
+            foreach (char chr in str) //does not always work. At one time "5 *5" 
+            {
+                bool isOperator = false;
+                foreach (char chrOper in operatorList)
+                {
+                    if(chrOper == chr) //if the string starts or ends with an operator, it will add spaces around them. Need to check the string is a realistic equation of math. Do it in another function 
+                    {
+                        if(lastChar != ' ')
+                            newStringList.Add(' ');
+                        newStringList.Add(chr);
+                        newStringList.Add(' ');
+                        isOperator = true;
+                        lastChar = ' ';
+                        break;
+                    }
+                }
+                if (!isOperator)
+                {
+                    if (chr != lastChar)
+                    {
+                        newStringList.Add(chr);
+                        lastChar = '\0';
+                        if(chr == ' ')
+                            lastChar = ' ';
+                        
+                    }
+
+                }
+            }
+            return new string(newStringList.ToArray());
+        }
+
+
 
     }
 
+    /// <summary>
+    /// Class related to shapes. Should be used to inherient from.  
+    /// </summary>
     public class Shape
     {
         public PointF[] visualArray;
         TextBox resultBox;
-        Image imageBox; 
+        Image imageBox;
 
+        /// <summary>
+        /// Sets the textbox the results of the calculations should be written too. 
+        /// </summary>
+        /// <param name="textBox">The textbox.</param>
         public virtual TextBox SetTextBox
         {
             set => resultBox = value;
         }
+
+        /// <summary>
+        /// Sets the imagebox the graphic should be written too. 
+        /// </summary>
+        /// <param name="textBox">The imagebox.</param>
         public virtual Image SetImageBox
         {
             set => imageBox = value;
@@ -352,23 +596,58 @@ namespace Calculator
             return result;
         }
 
+        /// <summary>
+        /// Writes the result to the textbox <paramref name="display"/>.
+        /// </summary>
+        /// <param name="display">The value to display</param>
         public void ToResultBox(float display)
         {
             resultBox.Text = display.ToString();
         }
 
+
+        /// <summary>
+        /// Draws the visual representation to a bitmapImage and displays it.
+        /// </summary>
         public virtual void VisualRepresentation()
         { //takes an 2d array and draws the shape using polygons. Circle might wants it own version. 
             BitmapImage shapeImage = new BitmapImage();
             Bitmap shapeBitmap = new Bitmap(400, 300);
             Graphics g = Graphics.FromImage(shapeBitmap);
-            g.Clear(Color.FromArgb(15, 93, 16));
-            Pen pen = new Pen(Color.FromArgb(0, 0, 0), 2);
+            g.Clear(Color.FromArgb(0, 0, 0));
+            Pen pen = new Pen(Color.FromArgb(255, 255, 255), 2);
+            GridDraw(g);
             g.DrawPolygon(pen, visualArray);
 
             imageBox.Source = BitmapTobitmapImage(shapeBitmap);
         }
 
+        /// <summary>
+        /// Draws a grid. A line is draw at each 10s pixel.
+        /// </summary>
+        /// <param name="g">The graphic to draw on.</param>
+        public void GridDraw(Graphics g)
+        {
+            Pen pen = new Pen(Color.FromArgb(122, 122, 122), 1);
+            for (int i = 0; i < 400; i++)
+            {
+                bool draw = i % 10 == 0 ? true : false ;
+                if (draw)
+                    g.DrawLine(pen, i, 0, i, 299);
+            }
+            for (int i = 0; i < 300; i++)
+            {
+                bool draw = i % 10 == 0 ? true : false;
+                if (draw)
+                    g.DrawLine(pen, 0, i, 399, i);
+            }
+        }
+
+        /// <summary>
+        /// Converts a bitmap to a bitmapIamge. 
+        /// </summary>
+        /// <param name="bmp">Bitmap to convert.</param>
+        /// <returns>Returns the bitmapImage.</returns>
         public BitmapImage BitmapTobitmapImage(Bitmap bmp)
         {
             BitmapImage bitmapImage = new BitmapImage();
@@ -386,10 +665,19 @@ namespace Calculator
 
     }
 
+    /// <summary>
+    /// Class related to circles 
+    /// </summary>
     public class Circle : Shape
     {
         float diameter;
         Image imageBox;
+
+        /// <summary>
+        /// Constructor for the circle <c>class</c>. Takes <paramref name="imageBox"/> and <paramref name="textBox"/> and sets them. 
+        /// </summary>
+        /// <param name="textBox">The textbox the class should write results too.</param>
+        /// <param name="imageBox">The imagebox the class should display images too.</param>
         public Circle(TextBox textBox, Image imageBox)
         {
             SetTextBox(textBox);
@@ -410,6 +698,9 @@ namespace Calculator
             return result;
         }
 
+        /// <summary>
+        /// Draws the visual representation to a bitmapImage and displays it.
+        /// </summary>
         public override void VisualRepresentation()
         {
             int[] center = new int[2] { 400 / 2, 300 / 2 };
@@ -417,18 +708,48 @@ namespace Calculator
                 diameter = 300;
             Bitmap shapeBitmap = new Bitmap(400, 300);
             Graphics g = Graphics.FromImage(shapeBitmap);
-            g.Clear(System.Drawing.Color.FromArgb(15, 93, 16));
-            Pen pen = new Pen(Color.FromArgb(0, 0, 0),2);
+            g.Clear(System.Drawing.Color.FromArgb(0, 0, 0));
+            Pen pen = new Pen(Color.FromArgb(255, 255, 255),2);
             Rectangle rect = new Rectangle(center[0] - (int)Math.Round(diameter / 2), center[1] - (int)Math.Round(diameter / 2), (int)Math.Round(diameter), (int)Math.Round(diameter));
+            GridDraw(g);
             g.DrawEllipse(pen, rect);
             imageBox.Source = BitmapTobitmapImage(shapeBitmap);
         }
 
+        /// <summary>
+        /// Draws a grid. A line is draw at each 10s pixel.
+        /// </summary>
+        /// <param name="g">The graphic to draw on.</param>
+        public new void GridDraw(Graphics g)
+        {
+            Pen pen = new Pen(Color.FromArgb(122, 122, 122), 1);
+            for (int i = 0; i < 400; i++)
+            {
+                bool draw = i % 10 == 0 ? true : false;
+                if (draw)
+                    g.DrawLine(pen, i, 0, i, 299);
+            }
+            for (int i = 0; i < 300; i++)
+            {
+                bool draw = i % 10 == 0 ? true : false;
+                if (draw)
+                    g.DrawLine(pen, 0, i, 399, i);
+            }
+        }
+
+        /// <summary>
+        /// Sets the imagebox the graphic should be written too. 
+        /// </summary>
+        /// <param name="textBox">The imagebox.</param>
         public new void SetImageBox(Image imageBox)
         {
             base.SetImageBox = imageBox;
         }
 
+        /// <summary>
+        /// Sets the textbox the results of the calculations should be written too. 
+        /// </summary>
+        /// <param name="textBox">The textbox.</param>
         public new void SetTextBox(TextBox textBox)
         {
             base.SetTextBox = textBox;
@@ -436,18 +757,31 @@ namespace Calculator
 
     }
 
+    /// <summary>
+    /// Class related to trapezoids 
+    /// </summary>
     public class Trapezoid : Shape
     {
         float height;
-        float lengthSmall;
-        float lengthLong;
+        float lengthSecond;
+        float lengthFirst;
         //PointF[] visualArray;
+
+        /// <summary>
+        /// Constructor for the trapezoid <c>class</c>. Takes <paramref name="imageBox"/> and <paramref name="textBox"/> and sets them. 
+        /// </summary>
+        /// <param name="textBox">The textbox the class should write results too.</param>
+        /// <param name="imageBox">The imagebox the class should display images too.</param>
         public Trapezoid(TextBox textBox, Image imageBox)
         {
             SetTextBox(textBox);
             SetImageBox(imageBox);
         }
 
+        /// <summary>
+        /// Sets the imagebox the graphic should be written too. 
+        /// </summary>
+        /// <param name="textBox">The imagebox.</param>
         public new void SetImageBox(Image imageBox)
         {
             base.SetImageBox = imageBox;
@@ -463,34 +797,37 @@ namespace Calculator
         public double Area(float height, float length_small, float length_long)
         {
             this.height = height;
-            lengthSmall = length_small;
-            lengthLong = length_long;
+            lengthSecond = length_small;
+            lengthFirst = length_long;
             float result = height / 2f * (length_small + length_long);
             ToResultBox(result);
             return result;
         }
 
+        /// <summary>
+        /// Calculates the visual design of the object.
+        /// </summary>
         public void VisualArrayCalculation()
         {
 
-            float biggestValue = lengthLong > height ? lengthLong: height;
-            bool heightBiggest = height > lengthLong ? true: false; 
-            biggestValue = biggestValue > lengthSmall ? biggestValue: lengthSmall;
+            float biggestValue = lengthFirst > height ? lengthFirst: height;
+            bool heightBiggest = height > lengthFirst ? true: false; 
+            biggestValue = biggestValue > lengthSecond ? biggestValue: lengthSecond;
             if ((biggestValue > 400 && !heightBiggest) || (biggestValue > 300 && heightBiggest))
-            { //should scale the height and lengths as a %. Also, do the same for the cone.
+            {
                 float scaleback;
                 if (heightBiggest)
                     scaleback = 300 / biggestValue;
                 else
                     scaleback = 400 / biggestValue;
-                lengthLong *= scaleback;
-                lengthSmall *= scaleback;
+                lengthFirst *= scaleback;
+                lengthSecond *= scaleback;
                 height *= scaleback;
             }
-            PointF topRight = new PointF(200f + lengthSmall / 2, 150 - height / 2);
-            PointF topLeft = new PointF(200f - lengthSmall / 2, 150 - height / 2);
-            PointF bottomRight = new PointF(200f + lengthLong / 2, 150 + height / 2);
-            PointF bottomLeft = new PointF(200f - lengthLong / 2, 150 + height / 2);
+            PointF topRight = new PointF(200f + lengthSecond / 2, 150 - height / 2);
+            PointF topLeft = new PointF(200f - lengthSecond / 2, 150 - height / 2);
+            PointF bottomRight = new PointF(200f + lengthFirst / 2, 150 + height / 2);
+            PointF bottomLeft = new PointF(200f - lengthFirst / 2, 150 + height / 2);
 
             visualArray = new PointF[]
             {
@@ -503,6 +840,10 @@ namespace Calculator
 
         }
 
+        /// <summary>
+        /// Sets the textbox the results of the calculations should be written too. 
+        /// </summary>
+        /// <param name="textBox">The textbox.</param>
         public new void SetTextBox(TextBox textBox)
         {
             base.SetTextBox = textBox;
@@ -510,11 +851,20 @@ namespace Calculator
 
     }
 
+    /// <summary>
+    /// Class related to polygons.
+    /// </summary>
     public class Polygon : Shape
     {
         //PointF[] visualArray;
         uint sideAmount;
         float length;
+
+        /// <summary>
+        /// Constructor for the polygon <c>class</c>. Takes <paramref name="imageBox"/> and <paramref name="textBox"/> and sets them. 
+        /// </summary>
+        /// <param name="textBox">The textbox the class should write results too.</param>
+        /// <param name="imageBox">The imagebox the class should display images too.</param>
         public Polygon(TextBox textBox, Image imageBox)
         {
             SetTextBox(textBox);
@@ -526,7 +876,7 @@ namespace Calculator
         /// </summary>
         /// <param name="amountOFSides">The amount of sides of the polygon.</param>
         /// <param name="length">The length of the sides.</param>
-        /// <returns></returns>
+        /// <returns>Returns the area of the polygon.</returns>
         public double Area(uint amountOFSides, float length)
         {
             this.length = length;
@@ -536,11 +886,14 @@ namespace Calculator
             return result;
         }
 
+        /// <summary>
+        /// Calculates the visual design of the object.
+        /// </summary>
         public void VisualArrayCalculation()
         {
             float angleBetweenSides = (sideAmount - 2) * 180 / sideAmount;
             float angleFromCenterPoint = (180f - angleBetweenSides) * (float)Math.PI/180f; //radians. Remove (float)Math.PI/180f) for degrees
-            uint CurrentSide = 0;
+            //uint CurrentSide = 0;
             visualArray = new PointF[sideAmount];
             float lastX = 200 - length /2;
             float lastY = 150 - length /2;
@@ -563,11 +916,19 @@ namespace Calculator
             base.visualArray = this.visualArray;
         }
 
+        /// <summary>
+        /// Sets the imagebox the graphic should be written too. 
+        /// </summary>
+        /// <param name="textBox">The imagebox.</param>
         public new void SetImageBox(Image imageBox)
         {
             base.SetImageBox = imageBox;
         }
 
+        /// <summary>
+        /// Sets the textbox the results of the calculations should be written too. 
+        /// </summary>
+        /// <param name="textBox">The textbox.</param>
         public new void SetTextBox(TextBox textBox)
         {
             base.SetTextBox = textBox;
@@ -585,12 +946,20 @@ namespace Calculator
 
     }
 
+    /// <summary>
+    /// Class related to cones
+    /// </summary>
     public class Cone : Shape
     {
         //PointF[] visualArray;
         float diameter;
-        float height; 
+        float height;
 
+        /// <summary>
+        /// Constructor for the cone <c>class</c>. Takes <paramref name="imageBox"/> and <paramref name="textBox"/> and sets them. 
+        /// </summary>
+        /// <param name="textBox">The textbox the class should write results too.</param>
+        /// <param name="imageBox">The imagebox the class should display images too.</param>
         public Cone(TextBox textBox, Image imageBox)
         {
             SetTextBox(textBox);
@@ -613,8 +982,11 @@ namespace Calculator
             return result;
         }
 
+        /// <summary>
+        /// Calculates the visual design of the object.
+        /// </summary>
         public void VisualArrayCalculation()
-        {
+        { //all of these should catch if Area has not been called yet or just have parameters
             bool biggestValueHeight = height > diameter? true: false;
 
             if (biggestValueHeight)
@@ -648,11 +1020,19 @@ namespace Calculator
             base.visualArray = this.visualArray;
         }
 
+        /// <summary>
+        /// Sets the imagebox the graphic should be written too. 
+        /// </summary>
+        /// <param name="textBox">The imagebox.</param>
         public new void SetImageBox(Image imageBox)
         {
             base.SetImageBox = imageBox;
         }
 
+        /// <summary>
+        /// Sets the textbox the results of the calculations should be written too. 
+        /// </summary>
+        /// <param name="textBox">The textbox.</param>
         public new void SetTextBox(TextBox textBox)
         {
             base.SetTextBox = textBox;
