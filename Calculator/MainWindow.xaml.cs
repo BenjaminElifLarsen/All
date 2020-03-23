@@ -398,20 +398,20 @@ namespace Calculator
         }
 
         /// <summary>
-        /// 
+        /// Calculates the result of a math equation, <paramref name="mathString"/> and returns it.
+        /// Designed to be used with <c>AddSpaceToOperators</c> and <c>IsMathEquationProper</c>. The result of these can be used as the string.
         /// </summary>
-        /// <param name="mathString"></param>
-        /// <returns></returns>
+        /// <param name="mathString">The string containing the math to calculate.</param>
+        /// <returns>Returns the result of <paramref name="mathString"/>.</returns>
         private float MathComplex(string mathString)
         {
             float result = 0;
-            string[] mathSplitted = mathString.Split(' ');
+            string[] mathSplitted = mathString.Trim(' ').Split(' ');
             List<string> startList = mathSplitted.ToList();
             string[] toDoFirstOperators = { "^" };
             List<string> goneThrough0 = new List<string>();
-            for (int posistion = 0; posistion < mathSplitted.Length; posistion++) //instead of mathSplitted, it should find all ( ) sections first and run them through, then the rest 
-            { //Maybe use recursive where the string, move code to a function that accept a string first, consist of everything between ( and ), which are returned and put into the array at the correct location 
-              //and (, ) and everything between are removed. 
+            for (int posistion = 0; posistion < mathSplitted.Length; posistion++) 
+            { 
                 string str = mathSplitted[posistion];
                 if (str == toDoFirstOperators[0])
                 {
@@ -431,7 +431,6 @@ namespace Calculator
                 else
                     goneThrough0.Add(str);
             }
-
             string[] highestPriorotyOperators = { "*", "/" };
             List<string> goneThrough1 = new List<string>();
             for (int posistion = 0; posistion < goneThrough0.Count; posistion++)
@@ -466,19 +465,31 @@ namespace Calculator
                 string str = goneThrough1[posistion];
                 if (str == lowestPriorotyOperatorr[0])
                 {
-                    float leftValue = Single.Parse(goneThrough2[(int)goneThrough2.Count - 1]);
-                    float rightValue = Single.Parse(goneThrough1[posistion + 1]);
+                    float leftValue;
+                    if (posistion == 0)
+                        leftValue = 0;
+                    else
+                        leftValue = Single.Parse(goneThrough2[(int)goneThrough2.Count - 1]);
+                    float rightValue;
+                    rightValue = Single.Parse(goneThrough1[posistion + 1]);
                     result = leftValue + rightValue;
-                    goneThrough2.RemoveAt(goneThrough2.Count - 1);
+                    if (posistion != 0)
+                        goneThrough2.RemoveAt(goneThrough2.Count - 1);
                     goneThrough2.Add(result.ToString());
                     posistion++;
                 }
                 else if (str == lowestPriorotyOperatorr[1])
                 {
-                    float leftValue = Single.Parse(goneThrough2[(int)goneThrough2.Count - 1]);
-                    float rightValue = Single.Parse(goneThrough1[posistion + 1]);
+                    float leftValue;
+                    if (posistion == 0)
+                        leftValue = 0;
+                    else
+                        leftValue = Single.Parse(goneThrough2[(int)goneThrough2.Count - 1]);
+                    float rightValue;
+                    rightValue = Single.Parse(goneThrough1[posistion + 1]);
                     result = leftValue - rightValue;
-                    goneThrough2.RemoveAt(goneThrough2.Count - 1);
+                    if(posistion != 0)
+                        goneThrough2.RemoveAt(goneThrough2.Count - 1);
                     goneThrough2.Add(result.ToString());
                     posistion++;
                 }
@@ -489,6 +500,11 @@ namespace Calculator
             return result;
         }
 
+        /// <summary>
+        /// Gets the string in the MathLongTextBox and furhter processes it and display its result, if it is a valid equation, or display it is not a valid equation, if it is invalid. //rewrite
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void LongMathDone_Click(object sender, RoutedEventArgs e)
         {
             float result = 0;
@@ -505,33 +521,39 @@ namespace Calculator
                 {
                     List<string> finalMathString = new List<string>();
                     List<char> newMathString = new List<char>();
-                    for (int i = 0; i < totalParenthesesPairs; i++) //maybe drop this for loop, move the new string, newmathString.Clear and MahtComplex into the last else if statement 
-                    { 
-                        bool hasEncounteredParanthesis = false;
-                        for (int k = posistion; k < mathWithSpaces.Length; k++)
-                        { //still need to get strings of the values and operators on the outside of the ( and ) 
-                            if (mathChar[posistion] == '(')
-                                hasEncounteredParanthesis = true;
-                            else if (hasEncounteredParanthesis && mathChar[posistion] != ')')
-                                newMathString.Add(mathChar[posistion]);
-                            else if (mathChar[posistion] == ')')
-                            {
-                                hasEncounteredParanthesis = false;
-                                break;
-                            }
-                            posistion++;
-                        }
-                        string shortMath = new string(newMathString.ToArray());
-                        newMathString.Clear();
-                        result = MathComplex(shortMath);
 
+                    bool hasEncounteredParanthesis = false;
+                    for (int k = posistion; k < mathWithSpaces.Length; k++)
+                    { 
+                        if (mathChar[posistion] == '(')
+                            hasEncounteredParanthesis = true;
+                        else if (hasEncounteredParanthesis && mathChar[posistion] != ')')
+                            newMathString.Add(mathChar[posistion]);
+                        else if (mathChar[posistion] == ')')
+                        {
+                            hasEncounteredParanthesis = false;
+                            string shortMath = new string(newMathString.ToArray());
+                            newMathString.Clear();
+                            result = MathComplex(shortMath);
+                            finalMathString.Add(result.ToString());
+                        }
+                        else
+                        {
+                            finalMathString.Add(mathChar[posistion].ToString());
+                        }
+                        posistion++;
+                    }
+                    foreach (string str in finalMathString)
+                    {
+                        mathCalculatations += str;
                     }
                 }
                 else
                     mathCalculatations = mathWithSpaces;
                 result = MathComplex(mathCalculatations);
                 resultBox.Text = result.ToString();
-
+                oldNumber = result;
+                numberOld.Text = oldNumber.ToString();
             }
             else
             {
@@ -545,69 +567,89 @@ namespace Calculator
         /// That is, no multiple operators in row, there is a value before and after an operator and no non-numercial chars. 
         /// </summary>
         /// <param name="toCheck">The string to check</param>
+        /// <param name="totalParenthesesPairs">The total amount of parenthese pairs</param>
         /// <returns></returns>
         private bool IsMathEquationProper(string toCheck, out int totalParenthesesPairs)
         {
             //how to do (). Just count the amount of (s and )s, subtract them and see if it is zero or not? Also need to check if ( are after and ) before an operator. How to deal with ' ' after a ). Also if the equation ends with a ) there is no need for
             //operator after it. The same goes for ( and the start.
+            //currently, equation will be considered invalid if the string starts with a '-', solved 
+            //need to work with nested (), e.g. ((5+2)+2). It will also require changes to the LongMathDone_Click code
             char lastChar = '\0';
             int posistion = 0;
             int parenthesesCheck = 0;
             totalParenthesesPairs = 0;
             toCheck = toCheck.Trim(' ');
+            bool parenthesesFound = false; //consider a bool list. Each time it encounter a ( it adds a true. Each time it encounter a ), it removes the last entry. If it encounter a ) before a (  the equation is invalid
+            //If the list is not zero at the end, the equation is invalid
             //char[] invalidWithOutNumbers = {'+', '-', '*', '/'};
             if (toCheck.Length == 0)
                 return false;
             char[] toCheckCharArray = toCheck.ToArray();
             foreach (char chr in toCheck) //does not work with '.' and ',' anymore, solved 
             { //maybe use a chararray and a for loop
-                if (chr == '(')
+                if (chr == '(') //find a way to make all of this look cleaner and easier to understand
                 {
+                    if (!parenthesesFound)
+                        parenthesesFound = true;
                     parenthesesCheck++;
-                    if (!(lastChar == '+' || lastChar == '-' || lastChar == '*' || lastChar == '/' || lastChar == '^' || lastChar == '\0'))
-                    {
+                    if (!(lastChar == '+' || lastChar == '-' || lastChar == '*' || lastChar == '/' || lastChar == '^' || lastChar == '\0' || lastChar == '('))
+                    { //if there are no operator or nothing in front of the '(', the equation is invalid
                         return false;
                     }
                 }
                 else if (chr == ')')
                 {
                     parenthesesCheck--;
-                    if (lastChar == '+' || lastChar == '-' || lastChar == '*' || lastChar == '/' || lastChar == '^' || lastChar == '(')
+                    if (parenthesesFound)
+                        parenthesesFound = false;
+                    else
                         return false;
+                    if (lastChar == '+' || lastChar == '-' || lastChar == '*' || lastChar == '/' || lastChar == '^' || lastChar == '(')
+                        return false; //if there is not a number before the ')', the equation is invalid.  
                     else if (posistion != toCheckCharArray.Length - 1)
                     {
-                        char nextChar = toCheckCharArray[posistion + 1];
-                        if (!(lastChar == '+' || lastChar == '-' || lastChar == '*' || lastChar == '/' || lastChar == '^'))
-                            return false;
+                        char nextChar;
+                        uint n = 1;
+                        do //ensure the nextChar is not a space. 
+                        {
+                            nextChar = toCheckCharArray[posistion + n];
+                            n++;
+                        } while (nextChar == ' ' && posistion + n != toCheckCharArray.Length);
+                        if (!(nextChar == '+' || nextChar == '-' || nextChar == '*' || nextChar == '/' || nextChar == '^' || nextChar == ')'))
+                            return false; //if there are no operator after ')' and it is not the end of the equation, the equation is invalid. 
                     }
-                    totalParenthesesPairs++;
+                    totalParenthesesPairs++; //do this in a better way as )...( would be considered valid
                 }
                 else if (chr == '^')
                 {
                     if (lastChar == '*' || lastChar == '/' || lastChar == '\0' || lastChar == '^')
-                    {
+                    {//any of these signs cannot be present before a ^ in an equation and thus the equation is invalid.
                         return false;
                     }
                 }
                 else if (chr == '+' || chr == '-' || chr == '*' || chr == '/')
                 {
-                    if (lastChar == '+' || lastChar == '-' || lastChar == '*' || lastChar == '/' || lastChar == '\0' || lastChar == '^' || lastChar == '(')
-                        return false;
+                    if (posistion == 0 && (chr == '+' || chr == '-')) //ensures that an equation can start with - or + and not considered invalid 
+                    {
+                    }
+                    else if (lastChar == '+' || lastChar == '-' || lastChar == '*' || lastChar == '/' || lastChar == '\0' || lastChar == '^' || lastChar == '(')
+                        return false; //checks if there are multiple operators in a row or signs that would invalid an equation. 
                     else if (posistion == toCheck.Length - 1)
-                        return false;
+                        return false; //a value needs to be placed after an operator and if not, equation is invalid
                 }
-                else if (((int)chr < 48 || (int)chr > 57) && (int)chr != 32 && chr != '.' && chr != ',') 
-                {
+                else if (((int)chr < 48 || (int)chr > 57) && (int)chr != 32 && chr != '.' && chr != ',')
+                { //if there are any signs that are not numbers, '.' or ',', the equation is invalid. 
                     return false;
                 }
                 if (chr != ' ')
-                {
+                { //update the last character if the current character is not a spcace
                     lastChar = chr;
                 }
                 else if (chr == ' ')
                 {
                     if (posistion != toCheckCharArray.Length - 1 && (((int)lastChar > 48 && (int)lastChar < 57)))
-                    {
+                    { //if there are no operator between values, the equation is invalid.
                         char nextChar = toCheckCharArray[posistion + 1];
                         if (((int)nextChar > 48 && (int)nextChar < 57) && (int)nextChar != 32)
                         {
@@ -617,7 +659,7 @@ namespace Calculator
                 }
                 posistion++;
             }
-            if (parenthesesCheck != 0)
+            if (parenthesesCheck != 0) //if there is an uneven amount of parentheses, the equation is invalid
                 return false;
             return true;
         }
