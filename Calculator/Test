@@ -1,1 +1,3 @@
+If a number becomes to small it will be displayed as 0.
+If a number becoems to big (+-) it will display (-)∞.
 

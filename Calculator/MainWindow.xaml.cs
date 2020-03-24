@@ -125,7 +125,7 @@ namespace Calculator
             GetText(out string newNumText);
             bool isNumber = GetNumber(newNumText, out float? newNum);
             if (isNumber)
-            {
+            { //needs a reset button in case of NaN or infinity. 
                 if (oldNumber != null)
                 {
                     numberOld.Text = oldNumber.ToString();
@@ -403,15 +403,16 @@ namespace Calculator
         /// </summary>
         /// <param name="mathString">The string containing the math to calculate.</param>
         /// <returns>Returns the result of <paramref name="mathString"/>.</returns>
-        private float MathComplex(string mathString)
+        private float MathComplex(string[] mathString)
         {
             float result = 0;
-            string[] mathSplitted = mathString.Trim(' ').Split(' ');
+            //string[] mathSplitted = mathString.Trim(' ').Split(' ');
+            string[] mathSplitted = mathString;
             List<string> startList = mathSplitted.ToList();
             string[] toDoFirstOperators = { "^" };
             List<string> goneThrough0 = new List<string>();
-            for (int posistion = 0; posistion < mathSplitted.Length; posistion++) 
-            { 
+            for (int posistion = 0; posistion < mathSplitted.Length; posistion++)
+            {
                 string str = mathSplitted[posistion];
                 if (str == toDoFirstOperators[0])
                 {
@@ -457,7 +458,6 @@ namespace Calculator
                 else
                     goneThrough1.Add(str);
             }
-
             string[] lowestPriorotyOperatorr = { "+", "-" };
             List<string> goneThrough2 = new List<string>();
             for (int posistion = 0; posistion < goneThrough1.Count; posistion++)
@@ -488,7 +488,7 @@ namespace Calculator
                     float rightValue;
                     rightValue = Single.Parse(goneThrough1[posistion + 1]);
                     result = leftValue - rightValue;
-                    if(posistion != 0)
+                    if (posistion != 0)
                         goneThrough2.RemoveAt(goneThrough2.Count - 1);
                     goneThrough2.Add(result.ToString());
                     posistion++;
@@ -500,6 +500,63 @@ namespace Calculator
             return result;
         }
 
+
+        /// <summary>
+        /// Splits an equation in its subparts, each subpart being a parentheses pair. 
+        /// </summary>
+        /// <param name="mathWithSpaces">The string containing the equation. Each part of the equation should be seperated using a space.</param>
+        /// <param name="totalParenthesesPairs">The total amount of parentheses pairs.</param>
+        /// <returns></returns>
+        private float MathCalculationsLong(string mathWithSpaces)
+        {
+            float result;
+            string[] mathSplitted = mathWithSpaces.Trim(' ').Split(' ');
+            //string toDoMathOn;
+            string[] toDoMathOn;
+            
+            List<string> parenthesesStrings = new List<string>();
+            List<List<string>> parenthesesStringsList = new List<List<string>>(); //consider this approach. How would this work and be done to allow the MathComplex take a(n) array/list...
+            //parenthesesStrings.Add("");
+            parenthesesStringsList.Add(new List<string>()); //if just given parenthesesStrings each time a new entry is addded it will cause problems, since List implements array and arrays points to the same place in memory.
+            int currentString = 0;
+            for (int n = 0; n < mathSplitted.Length; n++)
+            { // 2+(5+(2*(5+3*2)/3*3)+2)*0.3 gives 10,7 after Wolfram:Alpha and this program gives 10,7. 2+(5+(2*(5+3*2)/3*3)+2)*0,3+((5+((9)))+2) gives 26,7, this program gives 26,7
+                if (mathSplitted[n] == "(")
+                {
+                    //currentString++;
+                    //parenthesesStrings.Add("");
+                    parenthesesStringsList.Add(new List<string>());
+                    //parenthesesStringsList[currentString].Add("");
+                    currentString++;
+                }
+                else if (mathSplitted[n] == ")")
+                {
+                    //toDoMathOn = parenthesesStrings[currentString];
+                    toDoMathOn = parenthesesStringsList[currentString].ToArray();
+                    currentString--;
+                    if (toDoMathOn.Length != 0)
+                    {
+                        result = MathComplex(toDoMathOn); 
+                        //parenthesesStrings.RemoveAt(parenthesesStrings.Count - 1);
+                        parenthesesStringsList.RemoveAt(parenthesesStringsList.Count - 1);
+                        //parenthesesStrings[currentString] += result.ToString() + " ";  //spaces needs to be added after a new string since the MathComplex splits a string based upon spaces. 
+                        parenthesesStringsList[currentString].Add(result.ToString());
+                    }
+                }
+                else
+                { //spaces needs to be added after a new string since the MathComplex splits a string based upon spaces. 
+                    //parenthesesStrings[currentString] += mathSplitted[n] + " ";
+                    if(mathSplitted[n] != " ")
+                        parenthesesStringsList[currentString].Add(mathSplitted[n]);
+                }
+            }
+            //toDoMathOn = parenthesesStrings[0];
+            toDoMathOn = parenthesesStringsList[0].ToArray();
+            result = MathComplex(toDoMathOn);
+            return result;
+        }
+
+
         /// <summary>
         /// Gets the string in the MathLongTextBox and furhter processes it and display its result, if it is a valid equation, or display it is not a valid equation, if it is invalid. //rewrite
         /// </summary>
@@ -510,47 +567,10 @@ namespace Calculator
             float result = 0;
             string mathFullString = MathLongTextBox.Text.Trim();
             string mathWithSpaces = AddSpaceToOperators(mathFullString);
-            bool validEquation = IsMathEquationProper(mathWithSpaces, out int totalParenthesesPairs);
-            //consider (), ^, ^() and ^-
-            char[] mathChar = mathWithSpaces.ToCharArray();
+            bool validEquation = IsMathEquationProper(mathWithSpaces);
             if (validEquation)
             {
-                string mathCalculatations = "";
-                int posistion = 0;
-                if (totalParenthesesPairs != 0)
-                {
-                    List<string> finalMathString = new List<string>();
-                    List<char> newMathString = new List<char>();
-
-                    bool hasEncounteredParanthesis = false;
-                    for (int k = posistion; k < mathWithSpaces.Length; k++)
-                    { 
-                        if (mathChar[posistion] == '(')
-                            hasEncounteredParanthesis = true;
-                        else if (hasEncounteredParanthesis && mathChar[posistion] != ')')
-                            newMathString.Add(mathChar[posistion]);
-                        else if (mathChar[posistion] == ')')
-                        {
-                            hasEncounteredParanthesis = false;
-                            string shortMath = new string(newMathString.ToArray());
-                            newMathString.Clear();
-                            result = MathComplex(shortMath);
-                            finalMathString.Add(result.ToString());
-                        }
-                        else
-                        {
-                            finalMathString.Add(mathChar[posistion].ToString());
-                        }
-                        posistion++;
-                    }
-                    foreach (string str in finalMathString)
-                    {
-                        mathCalculatations += str;
-                    }
-                }
-                else
-                    mathCalculatations = mathWithSpaces;
-                result = MathComplex(mathCalculatations);
+                result = MathCalculationsLong(mathWithSpaces);
                 resultBox.Text = result.ToString();
                 oldNumber = result;
                 numberOld.Text = oldNumber.ToString();
@@ -564,35 +584,28 @@ namespace Calculator
 
         /// <summary>
         /// Checks if a string is a valid equation. 
-        /// That is, no multiple operators in row, there is a value before and after an operator and no non-numercial chars. 
         /// </summary>
         /// <param name="toCheck">The string to check</param>
-        /// <param name="totalParenthesesPairs">The total amount of parenthese pairs</param>
         /// <returns></returns>
-        private bool IsMathEquationProper(string toCheck, out int totalParenthesesPairs)
+        private bool IsMathEquationProper(string toCheck)
         {
-            //how to do (). Just count the amount of (s and )s, subtract them and see if it is zero or not? Also need to check if ( are after and ) before an operator. How to deal with ' ' after a ). Also if the equation ends with a ) there is no need for
-            //operator after it. The same goes for ( and the start.
-            //currently, equation will be considered invalid if the string starts with a '-', solved 
-            //need to work with nested (), e.g. ((5+2)+2). It will also require changes to the LongMathDone_Click code
             char lastChar = '\0';
             int posistion = 0;
-            int parenthesesCheck = 0;
-            totalParenthesesPairs = 0;
+            //int parenthesesCheck = 0;
+            int totalParenthesesPairs = 0;
             toCheck = toCheck.Trim(' ');
-            bool parenthesesFound = false; //consider a bool list. Each time it encounter a ( it adds a true. Each time it encounter a ), it removes the last entry. If it encounter a ) before a (  the equation is invalid
-            //If the list is not zero at the end, the equation is invalid
-            //char[] invalidWithOutNumbers = {'+', '-', '*', '/'};
+            List<uint> parenthesesFound = new List<uint>();
+            uint nestedLevel = 0;
             if (toCheck.Length == 0)
                 return false;
             char[] toCheckCharArray = toCheck.ToArray();
-            foreach (char chr in toCheck) //does not work with '.' and ',' anymore, solved 
-            { //maybe use a chararray and a for loop
+            foreach (char chr in toCheck)
+            {
                 if (chr == '(') //find a way to make all of this look cleaner and easier to understand
                 {
-                    if (!parenthesesFound)
-                        parenthesesFound = true;
-                    parenthesesCheck++;
+                    //parenthesesCheck++;
+                    parenthesesFound.Add(nestedLevel);
+                    nestedLevel++;
                     if (!(lastChar == '+' || lastChar == '-' || lastChar == '*' || lastChar == '/' || lastChar == '^' || lastChar == '\0' || lastChar == '('))
                     { //if there are no operator or nothing in front of the '(', the equation is invalid
                         return false;
@@ -600,11 +613,13 @@ namespace Calculator
                 }
                 else if (chr == ')')
                 {
-                    parenthesesCheck--;
-                    if (parenthesesFound)
-                        parenthesesFound = false;
-                    else
+                    if (parenthesesFound.Count == 0)
                         return false;
+                    else
+                    {
+                        parenthesesFound.RemoveAt(parenthesesFound.Count - 1);
+                    }
+                    nestedLevel--;
                     if (lastChar == '+' || lastChar == '-' || lastChar == '*' || lastChar == '/' || lastChar == '^' || lastChar == '(')
                         return false; //if there is not a number before the ')', the equation is invalid.  
                     else if (posistion != toCheckCharArray.Length - 1)
@@ -659,7 +674,7 @@ namespace Calculator
                 }
                 posistion++;
             }
-            if (parenthesesCheck != 0) //if there is an uneven amount of parentheses, the equation is invalid
+            if (nestedLevel != 0) //if there is an uneven amount of parentheses, the equation is invalid
                 return false;
             return true;
         }
@@ -711,8 +726,12 @@ namespace Calculator
             return new string(newStringList.ToArray());
         }
 
-
-
+        private void ResetButton_Click(object sender, RoutedEventArgs e)
+        {
+            oldNumber = 0;
+            resultBox.Text = oldNumber.ToString();
+            numberOld.Text = oldNumber.ToString();
+        }
     }
 
     /// <summary>
