@@ -1,0 +1,13 @@
+D:\Skrivebord\Other\Kode\Chess\bin\Debug\netcoreapp2.1\Chess.deps.json
+D:\Skrivebord\Other\Kode\Chess\bin\Debug\netcoreapp2.1\Chess.runtimeconfig.json
+D:\Skrivebord\Other\Kode\Chess\bin\Debug\netcoreapp2.1\Chess.runtimeconfig.dev.json
+D:\Skrivebord\Other\Kode\Chess\bin\Debug\netcoreapp2.1\Chess.dll
+D:\Skrivebord\Other\Kode\Chess\bin\Debug\netcoreapp2.1\Chess.pdb
+D:\Skrivebord\Other\Kode\Chess\obj\Debug\netcoreapp2.1\Chess.csprojAssemblyReference.cache
+D:\Skrivebord\Other\Kode\Chess\obj\Debug\netcoreapp2.1\Chess.AssemblyInfoInputs.cache
+D:\Skrivebord\Other\Kode\Chess\obj\Debug\netcoreapp2.1\Chess.AssemblyInfo.cs
+D:\Skrivebord\Other\Kode\Chess\obj\Debug\netcoreapp2.1\Chess.dll
+D:\Skrivebord\Other\Kode\Chess\obj\Debug\netcoreapp2.1\Chess.pdb
+D:\Skrivebord\Other\Kode\Chess\bin\Debug\netcoreapp2.1\Ideas.txt
+D:\Skrivebord\Other\Kode\Chess\bin\Debug\netcoreapp2.1\board.png
+D:\Skrivebord\Other\Kode\Chess\bin\Debug\netcoreapp2.1\Chess.png
