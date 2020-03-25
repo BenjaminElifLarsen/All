@@ -39,35 +39,26 @@ namespace Chess
 
         public ChessTable()
         {
-            squareSize = 5;
-            lineColour = new byte[] {122,122,122 };
-            squareColour1 = new byte[] {255,255,0 };
-            squareColour2 = new byte[] {0,255,255 };
-            offset = new byte[] {2,2 };
-            BoardSetup();
-        }
-
-        private void BoardSetup()
-        {
             var handle = GetStdHandle(-11);
             int mode;
             GetConsoleMode(handle, out mode);
             SetConsoleMode(handle, mode | 0x4);
 
             squareSize = 5;
-            lineColour = new byte[] {122,122,122 };
+            lineColour = new byte[] { 122, 122, 122 };
             lineColourBase = new byte[] { 87, 65, 47 };
-            squareColour1 = new byte[] {182,123,91 };
-            squareColour2 = new byte[] {135,68,31 };
-            offset = new byte[] {2,2 };
+            squareColour1 = new byte[] { 182, 123, 91 };
+            squareColour2 = new byte[] { 135, 68, 31 };
+            offset = new byte[] { 2, 2 };
 
             windowsSize[0] = (byte)(9 + 8 * squareSize + 10);
             windowsSize[1] = (byte)(9 + 8 * squareSize + 10);
             Console.SetWindowSize(windowsSize[0], windowsSize[1]);
-            BoardDraw();
+            BoardSetup();
         }
 
-        private void BoardDraw()
+
+        private void BoardSetup()
         {//8 squares in each direction. Each piece is 3*3 currently, each square is 5*5 currently. 
             Console.CursorVisible = false;
             ushort distance = (ushort)(9 + 8 * squareSize);
@@ -92,7 +83,6 @@ namespace Chess
 
         private void BoardColouring()
         {
-            //need to be inside of a loop that moves it to the different places there should be coloured
             ushort distance = (ushort)(8 + 8 * squareSize);
             byte location = 1;
             for (int n = 0; n < distance; n += 1 + squareSize)
@@ -218,8 +208,8 @@ namespace Chess
             };
 
             uint[][] pawnMove =
-            { //first move, it got the possiblity of moving 1 or 2
-
+            { //first move, it got the possiblity of moving 1 or 2 //the pawn class should check if it, that is a specific pawn, have moved or not. If not it should give the option of moving 2 squares forward
+                new uint[] {1 }
             };
 
             uint[][] rockMove =
@@ -229,7 +219,7 @@ namespace Chess
                 //piece can move in each direction, i.e. when the piece hits a wall or another piece. 
                     //This just leave how to select the different direction, but then again, it same should be done for the "normal" 1-4 values. 
                     //Of course, the maximum move distance and move selection should be done over in the specific chesspiece. 
-                    //Git, are you working?
+                    //Git, are you working? Does not seem so, 3 hours spent and back to restore my work... yay... good job Git...
             };
 
             string team;
@@ -264,69 +254,164 @@ namespace Chess
 
     }
 
+    sealed class King : ChessPiece
+    { //this one really need to keep an eye on all other pieces and their location
+
+    }
+
+    sealed class Queen : ChessPiece
+    {
+
+    }
+
+    sealed class Pawn : ChessPiece
+    {
+        private bool firstTurn = false;
+
+    }
+
+    sealed class Rock : ChessPiece
+    {
+
+    }
+
+    sealed class Bishop : ChessPiece
+    {
+
+    }
+
+    sealed class Knight : ChessPiece
+    {
+
+        Knight(uint[] location_, byte[] colour_, string[] design_, bool team_, uint[] spawnLocation_, string ID)
+        {
+
+        }
+
+        public override bool BeenTaken => hasBeenTaken;
+
+ 
+        protected override bool SetBeenTaken
+        {
+            set => hasBeenTaken = value;
+        }
+        protected override uint[] Location { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
+        protected override byte[] Colour { set => throw new NotImplementedException(); }
+        protected override string[] Design { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
+        protected override byte[][] MovePattern { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
+        protected override byte[][] AttackPattern { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
+        protected override bool Team { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
+        protected override uint[] SpawnLocation { set => throw new NotImplementedException(); }
+        protected override string ID { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
+        protected override bool CanDoMove { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
 
 
-    class ChessPiece //after the UML this class should be abstract and the same for its methods
+        public override void Control()
+        {
+            throw new NotImplementedException();
+        }
+
+        public override void Taken()
+        {
+            
+        }
+
+        protected override void DisplayPossibleMove()
+        {
+            throw new NotImplementedException();
+        }
+
+        protected override void Draw() //hmm... since a lot of the code is going to be the same over the different pieces, maybe don't use an abstract class. Use the base class method implementation and overwrite where needed
+        {
+            byte[] designSize = new byte[] {(byte)Design[0].Length, (byte)Design.Length };
+            uint drawLocationX = Location[0]; //+ (the square size - designSize[0]) /2
+            uint drawLocationY = Location[1]; //+ (the square size - designSize[1]) /2
+
+
+        }
+
+        protected override void IsHoveredOn()
+        {
+            throw new NotImplementedException();
+        }
+
+        protected override void Move()
+        {
+            throw new NotImplementedException();
+        }
+
+        protected override void RemoveDraw()
+        {
+            throw new NotImplementedException();
+        }
+
+        protected override void SetTeam(bool? team_)
+        {
+            throw new NotImplementedException();
+        }
+
+        protected override void TakeEnemyPiece()
+        {
+            throw new NotImplementedException();
+        }
+    }
+
+    public abstract class ChessPiece 
     {//when put on a location, check if there is an allie, if there is invalid move, if enemy, call that pieces removeDraw and call their Taken using TakeEnemyPiece
-        private uint[] location; //x,y
-        private byte[] colour;
-        private string[] design;
-        private byte[][] movePattern;
-        private byte[][] attack; //in almost everycase it is the same as movePattern, so it can be set to null. If it is not null, i.e. pawn, it should be called when moving if there are enemies at the right location
-        private bool? team;
-        private uint[] spawnLocation;
-        private string ID;
-        private bool canDoMove;
+        protected uint[] location; //x,y
+        protected byte[] colour;
+        protected string[] design;
+        protected byte[][] movePattern;
+        protected byte[][] attack; //in almost everycase it is the same as movePattern, so it can be set to null. If it is not null, i.e. pawn, it should be called when moving if there are enemies at the right location
+        protected bool? team;
+        protected uint[] spawnLocation;
+        protected string id;
+        protected bool canDoMove;
+        protected bool hasBeenTaken = false;
+        //ChessPiece(uint[] location_, byte[] colour_, string[] design_, bool team_, uint[] spawnLocation_, string ID)
+        //{
 
-        ChessPiece(uint[] location_, byte[] colour_, string[] design_, bool team_, uint[] spawnLocation_, string ID)
-        {
+        //}
 
-        }
+        abstract public bool BeenTaken { get; } //use by other code to see if the piece have been "taken" and should be removed from game. 
 
-        public void Control()
-        {
+        abstract protected bool SetBeenTaken { set; }
 
-        }
+        abstract protected uint[] Location { get; set; } //consider for each of the properties what kind they should have
+        
+        abstract protected byte[] Colour { set; }
 
-        private void Move()
-        {
+        abstract protected string[] Design { set; }
 
-        }
+        abstract protected byte[][] MovePattern { set; }
 
-        private void Draw()
-        {
+        abstract protected byte[][] AttackPattern { get; set; }
 
-        }
+        abstract protected bool Team { get; set; } //need to know it own team, but does it need to know the others, the IDs can be used for that. 
 
-        public void IsHoveredOn()
-        {
+        abstract protected uint[] SpawnLocation { set; }
 
-        }
+        abstract protected string ID { get; set; } //maybe split into two. Get being protected and the set being public 
 
-        private void RemoveDraw()
-        {
+        abstract protected bool CanDoMove { get; set; } //what was the canDoMove suppose to be for again?
 
-        }
+        abstract public void Control();
 
-        public void Taken()
-        {
+        abstract protected void Move();
 
-        }
+        abstract protected void Draw();
 
-        private void SetTeam(bool? team_)
-        {
+        abstract protected void IsHoveredOn();
 
-        }
+        abstract protected void RemoveDraw();
 
-        private void DisplayPossibleMove()
-        {
+        abstract public void Taken(); //call by another piece, the one that takes this piece. 
 
-        }
+        abstract protected void SetTeam(bool? team_);
 
-        private void TakeEnemyPiece()
-        {
+        abstract protected void DisplayPossibleMove();
 
-        }
+        abstract protected void TakeEnemyPiece();
 
     }
 
