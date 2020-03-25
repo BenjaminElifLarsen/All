@@ -35,7 +35,6 @@ namespace Calculator
         bool circleBool = false;
         bool polygonBool = false;
         bool trapezoidBool = false;
-        string numberText;
         float? oldNumber = null;
         float resultNumber = 0;
         Circle circle;
@@ -51,10 +50,10 @@ namespace Calculator
         /// <summary>
         /// Sets the states of the differnet bools.
         /// </summary>
-        /// <param name="plus_"></param>
-        /// <param name="minus_"></param>
-        /// <param name="devide_"></param>
-        /// <param name="multiply_"></param>
+        /// <param name="plus_">Sets the value of the bool plus.</param>
+        /// <param name="minus_">Sets the value of the bool minus.</param>
+        /// <param name="divide_"> Sets the value of the bool divide.</param>
+        /// <param name="multiply_">Sets the value of the bool multiply.</param>
         private void MathBoolChanger(bool plus_, bool minus_, bool divide_, bool multiply_)
         {
             plus = plus_;
@@ -66,10 +65,10 @@ namespace Calculator
         /// <summary>
         /// Sets the states of the differnet bools.
         /// </summary>
-        /// <param name="cone_"></param>
-        /// <param name="circle_"></param>
-        /// <param name="polygon_"></param>
-        /// <param name="trapezoid_"></param>
+        /// <param name="cone_">Sets the value of the bool coneBool.</param>
+        /// <param name="circle_">Sets the value of the bool. circleBool</param>
+        /// <param name="polygon_">Sets the value of the bool polygonBool.</param>
+        /// <param name="trapezoid_">Sets the value of the bool trapezoidBool.</param>
         private void AreaBoolChanger(bool cone_, bool circle_, bool polygon_, bool trapezoid_)
         {
             coneBool = cone_;
@@ -125,7 +124,7 @@ namespace Calculator
             GetText(out string newNumText);
             bool isNumber = GetNumber(newNumText, out float? newNum);
             if (isNumber)
-            { //needs a reset button in case of NaN or infinity. 
+            { 
                 if (oldNumber != null)
                 {
                     numberOld.Text = oldNumber.ToString();
@@ -210,8 +209,8 @@ namespace Calculator
         /// <summary>
         /// Enables further progress for circle calculations. 
         /// </summary>
-        /// <param name="sender">What to write...</param>
-        /// <param name="e">What to write...</param>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void Circle_Click(object sender, RoutedEventArgs e)
         {
             AreaBoolChanger(false, true, false, false);
@@ -221,8 +220,8 @@ namespace Calculator
         /// <summary>
         /// Enables further progress for trapezoid calculations. 
         /// </summary>
-        /// <param name="sender">What to write...</param>
-        /// <param name="e">What to write...</param>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void Trapezoid_Click(object sender, RoutedEventArgs e)
         {
             AreaBoolChanger(false, false, false, true);
@@ -232,8 +231,8 @@ namespace Calculator
         /// <summary>
         /// Enables further progress for polygon calculations. 
         /// </summary>
-        /// <param name="sender">What to write...</param>
-        /// <param name="e">What to write...</param>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void Polygon_Click(object sender, RoutedEventArgs e)
         {
             AreaBoolChanger(false, false, true, false);
@@ -243,8 +242,8 @@ namespace Calculator
         /// <summary>
         /// Enables further progress for cone calculations. 
         /// </summary>
-        /// <param name="sender">What to write...</param>
-        /// <param name="e">What to write...</param>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void Cone_Click(object sender, RoutedEventArgs e)
         {
             AreaBoolChanger(true, false, false, false);
@@ -254,8 +253,8 @@ namespace Calculator
         /// <summary>
         /// If a shape have been selected, ask for information for it and gather it. Make it sound better
         /// </summary>
-        /// <param name="sender">What to write...</param>
-        /// <param name="e">What to write...</param>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void AreaVariableConfirm_Click(object sender, RoutedEventArgs e)
         {
             if (circleBool)
@@ -406,7 +405,6 @@ namespace Calculator
         private float MathComplex(string[] mathString)
         {
             float result = 0;
-            //string[] mathSplitted = mathString.Trim(' ').Split(' ');
             string[] mathSplitted = mathString;
             List<string> startList = mathSplitted.ToList();
             string[] toDoFirstOperators = { "^" };
@@ -505,52 +503,39 @@ namespace Calculator
         /// Splits an equation in its subparts, each subpart being a parentheses pair. 
         /// </summary>
         /// <param name="mathWithSpaces">The string containing the equation. Each part of the equation should be seperated using a space.</param>
-        /// <param name="totalParenthesesPairs">The total amount of parentheses pairs.</param>
-        /// <returns></returns>
+        /// <returns>Returns the result of the string <paramref name="mathWithSpaces"/></returns>
         private float MathCalculationsLong(string mathWithSpaces)
         {
             float result;
             string[] mathSplitted = mathWithSpaces.Trim(' ').Split(' ');
-            //string toDoMathOn;
             string[] toDoMathOn;
-            
-            List<string> parenthesesStrings = new List<string>();
-            List<List<string>> parenthesesStringsList = new List<List<string>>(); //consider this approach. How would this work and be done to allow the MathComplex take a(n) array/list...
-            //parenthesesStrings.Add("");
+            List<List<string>> parenthesesStringsList = new List<List<string>>(); 
             parenthesesStringsList.Add(new List<string>()); //if just given parenthesesStrings each time a new entry is addded it will cause problems, since List implements array and arrays points to the same place in memory.
             int currentString = 0;
             for (int n = 0; n < mathSplitted.Length; n++)
-            { // 2+(5+(2*(5+3*2)/3*3)+2)*0.3 gives 10,7 after Wolfram:Alpha and this program gives 10,7. 2+(5+(2*(5+3*2)/3*3)+2)*0,3+((5+((9)))+2) gives 26,7, this program gives 26,7
+            {
                 if (mathSplitted[n] == "(")
                 {
-                    //currentString++;
-                    //parenthesesStrings.Add("");
                     parenthesesStringsList.Add(new List<string>());
-                    //parenthesesStringsList[currentString].Add("");
                     currentString++;
                 }
                 else if (mathSplitted[n] == ")")
                 {
-                    //toDoMathOn = parenthesesStrings[currentString];
                     toDoMathOn = parenthesesStringsList[currentString].ToArray();
                     currentString--;
                     if (toDoMathOn.Length != 0)
                     {
                         result = MathComplex(toDoMathOn); 
-                        //parenthesesStrings.RemoveAt(parenthesesStrings.Count - 1);
                         parenthesesStringsList.RemoveAt(parenthesesStringsList.Count - 1);
-                        //parenthesesStrings[currentString] += result.ToString() + " ";  //spaces needs to be added after a new string since the MathComplex splits a string based upon spaces. 
                         parenthesesStringsList[currentString].Add(result.ToString());
                     }
                 }
                 else
-                { //spaces needs to be added after a new string since the MathComplex splits a string based upon spaces. 
-                    //parenthesesStrings[currentString] += mathSplitted[n] + " ";
+                {
                     if(mathSplitted[n] != " ")
                         parenthesesStringsList[currentString].Add(mathSplitted[n]);
                 }
             }
-            //toDoMathOn = parenthesesStrings[0];
             toDoMathOn = parenthesesStringsList[0].ToArray();
             result = MathComplex(toDoMathOn);
             return result;
@@ -585,13 +570,12 @@ namespace Calculator
         /// <summary>
         /// Checks if a string is a valid equation. 
         /// </summary>
-        /// <param name="toCheck">The string to check</param>
-        /// <returns></returns>
+        /// <param name="toCheck">The string to check.</param>
+        /// <returns>Returns true if the string contains a valid equation, else false.</returns>
         private bool IsMathEquationProper(string toCheck)
         {
             char lastChar = '\0';
             int posistion = 0;
-            //int parenthesesCheck = 0;
             int totalParenthesesPairs = 0;
             toCheck = toCheck.Trim(' ');
             List<uint> parenthesesFound = new List<uint>();
@@ -601,7 +585,7 @@ namespace Calculator
             char[] toCheckCharArray = toCheck.ToArray();
             foreach (char chr in toCheck)
             {
-                if (chr == '(') //find a way to make all of this look cleaner and easier to understand
+                if (chr == '(') 
                 {
                     //parenthesesCheck++;
                     parenthesesFound.Add(nestedLevel);
@@ -634,7 +618,7 @@ namespace Calculator
                         if (!(nextChar == '+' || nextChar == '-' || nextChar == '*' || nextChar == '/' || nextChar == '^' || nextChar == ')'))
                             return false; //if there are no operator after ')' and it is not the end of the equation, the equation is invalid. 
                     }
-                    totalParenthesesPairs++; //do this in a better way as )...( would be considered valid
+                    totalParenthesesPairs++; 
                 }
                 else if (chr == '^')
                 {
@@ -726,6 +710,11 @@ namespace Calculator
             return new string(newStringList.ToArray());
         }
 
+        /// <summary>
+        /// Resets the old number and the resultBox and numberOld Textboxes. 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void ResetButton_Click(object sender, RoutedEventArgs e)
         {
             oldNumber = 0;
@@ -735,7 +724,7 @@ namespace Calculator
     }
 
     /// <summary>
-    /// Class related to shapes. Should be used to inherient from.  
+    /// Class related to shapes. Should be used to inheritance.  
     /// </summary>
     public class Shape
     {
@@ -766,7 +755,7 @@ namespace Calculator
         /// </summary>
         /// <param name="height">The height of the square.</param>
         /// <param name="length">The length of the square.</param>
-        /// <returns></returns>
+        /// <returns>Returns the area.</returns>
         public virtual double Area(float height, float length)
         {
             float result = height * length;
@@ -796,7 +785,6 @@ namespace Calculator
             Pen pen = new Pen(Color.FromArgb(255, 255, 255), 2);
             GridDraw(g);
             g.DrawPolygon(pen, visualArray);
-
             imageBox.Source = BitmapTobitmapImage(shapeBitmap);
         }
 
@@ -867,7 +855,7 @@ namespace Calculator
         /// Calculates the area of a circle.
         /// </summary>
         /// <param name="radius">The radius of the circle.</param>
-        /// <returns></returns>
+        /// <returns>Returns the area.</returns>
         public double Area(float radius)
         {
             diameter = 2 * radius;
@@ -971,7 +959,7 @@ namespace Calculator
         /// <param name="height">The height of the trapezoid.</param>
         /// <param name="length_small">The smaller length of the trapezoid.</param>
         /// <param name="length_long">The longer length of the trapezoid.</param>
-        /// <returns></returns>
+        /// <returns>Returns the area.</returns>
         public double Area(float height, float length_small, float length_long)
         {
             this.height = height;
@@ -1149,7 +1137,7 @@ namespace Calculator
         /// </summary>
         /// <param name="radius">The radius of the cone.</param>
         /// <param name="height">The height of the cone.</param>
-        /// <returns></returns>
+        /// <returns>Returns the area.</returns>
         public override double Area(float radius, float height)
         {
             this.height = height;
