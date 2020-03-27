@@ -1,0 +1,14 @@
+D:\Skrivebord\Other\Kode\Calculator\bin\Release\Calculator.exe.config
+D:\Skrivebord\Other\Kode\Calculator\bin\Release\Calculator.exe
+D:\Skrivebord\Other\Kode\Calculator\bin\Release\Calculator.pdb
+D:\Skrivebord\Other\Kode\Calculator\obj\Release\Calculator.csprojAssemblyReference.cache
+D:\Skrivebord\Other\Kode\Calculator\obj\Release\MainWindow.g.cs
+D:\Skrivebord\Other\Kode\Calculator\obj\Release\App.g.cs
+D:\Skrivebord\Other\Kode\Calculator\obj\Release\Calculator_MarkupCompile.cache
+D:\Skrivebord\Other\Kode\Calculator\obj\Release\Calculator_MarkupCompile.lref
+D:\Skrivebord\Other\Kode\Calculator\obj\Release\MainWindow.baml
+D:\Skrivebord\Other\Kode\Calculator\obj\Release\Calculator.g.resources
+D:\Skrivebord\Other\Kode\Calculator\obj\Release\Calculator.Properties.Resources.resources
+D:\Skrivebord\Other\Kode\Calculator\obj\Release\Calculator.csproj.GenerateResource.cache
+D:\Skrivebord\Other\Kode\Calculator\obj\Release\Calculator.exe
+D:\Skrivebord\Other\Kode\Calculator\obj\Release\Calculator.pdb
