@@ -510,7 +510,7 @@ namespace Calculator
             string[] mathSplitted = mathWithSpaces.Trim(' ').Split(' ');
             string[] toDoMathOn;
             List<List<string>> parenthesesStringsList = new List<List<string>>(); 
-            parenthesesStringsList.Add(new List<string>()); //if just given parenthesesStrings each time a new entry is addded it will cause problems, since List implements array and arrays points to the same place in memory.
+            parenthesesStringsList.Add(new List<string>());
             int currentString = 0;
             for (int n = 0; n < mathSplitted.Length; n++)
             {

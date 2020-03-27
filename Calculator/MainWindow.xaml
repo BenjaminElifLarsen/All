@@ -30,7 +30,7 @@
         <TextBlock HorizontalAlignment="Left" Name="currentVariable" Margin="572.355,247,0,0" TextWrapping="Wrap" Text="Enter:" VerticalAlignment="Top" Width="120" Grid.Column="1"/>
         <Button Content="Confirm" Name="areaVariableConfirm" HorizontalAlignment="Left" VerticalAlignment="Top" Width="75" Margin="572.355,296,0,0" Click="AreaVariableConfirm_Click" Grid.Column="1"/>
         <TextBox HorizontalAlignment="Left" Name="AreaTextBox" Height="23" TextWrapping="Wrap" Text="Correct shape?" VerticalAlignment="Top" Width="120" Margin="572.355,268,0,0" Grid.Column="1"/>
-        <TextBox HorizontalAlignment="Left" Name="MathLongTextBox" Height="23" Margin="32,51,0,0" TextWrapping="Wrap" Text="New Math Function" VerticalAlignment="Top" Width="605" Grid.ColumnSpan="2" />
+        <TextBox HorizontalAlignment="Left" Name="MathLongTextBox" Height="23" Margin="32,51,0,0" TextWrapping="Wrap" Text="New Math Function. Allows use of () and ^" VerticalAlignment="Top" Width="605" Grid.ColumnSpan="2" />
         <Button Content="Calculate" Name="LongMathDone" HorizontalAlignment="Left" VerticalAlignment="Top" Width="75" Margin="617.355,54,0,0" Click="LongMathDone_Click" Grid.Column="1"/>
         <TextBlock HorizontalAlignment="Left" TextWrapping="Wrap" Text="Old Number" VerticalAlignment="Top" Margin="396.355,93,0,0" Width="82" Grid.Column="1"/>
         <TextBlock HorizontalAlignment="Left" TextWrapping="Wrap" Text="New Number" VerticalAlignment="Top" Margin="396.355,122,0,0" Width="82" Grid.Column="1"/>
