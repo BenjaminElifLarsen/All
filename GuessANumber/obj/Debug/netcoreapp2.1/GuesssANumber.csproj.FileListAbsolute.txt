@@ -9,3 +9,4 @@ D:\Skrivebord\Other\Kode\GuesssANumber\obj\Debug\netcoreapp2.1\GuesssANumber.Ass
 D:\Skrivebord\Other\Kode\GuesssANumber\obj\Debug\netcoreapp2.1\GuesssANumber.AssemblyInfo.cs
 D:\Skrivebord\Other\Kode\GuesssANumber\obj\Debug\netcoreapp2.1\GuesssANumber.dll
 D:\Skrivebord\Other\Kode\GuesssANumber\obj\Debug\netcoreapp2.1\GuesssANumber.pdb
+D:\Skrivebord\Other\Kode\GuesssANumber\bin\Debug\netcoreapp2.1\Highscore.txt

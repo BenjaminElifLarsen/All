@@ -1,0 +1,6 @@
+AAA: 6
+AAB: 5
+AAC: 4
+ABA: 3
+ABB: 2
+ABC: 1

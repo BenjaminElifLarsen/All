@@ -1,0 +1,6 @@
+AAA:126
+AAB:55
+AAC:34
+Bob:16
+ABA:13
+ABB:7

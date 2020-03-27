@@ -1,0 +1,11 @@
+D:\Skrivebord\Other\Kode\GuesssANumber\bin\Release\netcoreapp2.1\Highscore.txt
+D:\Skrivebord\Other\Kode\GuesssANumber\bin\Release\netcoreapp2.1\GuesssANumber.deps.json
+D:\Skrivebord\Other\Kode\GuesssANumber\bin\Release\netcoreapp2.1\GuesssANumber.runtimeconfig.json
+D:\Skrivebord\Other\Kode\GuesssANumber\bin\Release\netcoreapp2.1\GuesssANumber.runtimeconfig.dev.json
+D:\Skrivebord\Other\Kode\GuesssANumber\bin\Release\netcoreapp2.1\GuesssANumber.dll
+D:\Skrivebord\Other\Kode\GuesssANumber\bin\Release\netcoreapp2.1\GuesssANumber.pdb
+D:\Skrivebord\Other\Kode\GuesssANumber\obj\Release\netcoreapp2.1\GuesssANumber.csproj.CoreCompileInputs.cache
+D:\Skrivebord\Other\Kode\GuesssANumber\obj\Release\netcoreapp2.1\GuesssANumber.AssemblyInfoInputs.cache
+D:\Skrivebord\Other\Kode\GuesssANumber\obj\Release\netcoreapp2.1\GuesssANumber.AssemblyInfo.cs
+D:\Skrivebord\Other\Kode\GuesssANumber\obj\Release\netcoreapp2.1\GuesssANumber.dll
+D:\Skrivebord\Other\Kode\GuesssANumber\obj\Release\netcoreapp2.1\GuesssANumber.pdb

@@ -1,0 +1,6 @@
+﻿Test1:7
+AAA:5
+AAB:4
+AAC:3
+ABA:2
+ABB:1

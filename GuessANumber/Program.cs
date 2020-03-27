@@ -10,7 +10,7 @@ namespace GuesssANumber
 {
 
     /// <summary>
-    /// Get a random value. 
+    /// Class that allows for a random value. 
     /// </summary>
     public class Rnd
     {
@@ -230,7 +230,7 @@ namespace GuesssANumber
         /// <paramref name="texts"/> and <paramref name="values"/> should have the same length.
         /// </summary>
         /// <param name="texts">The strings to write.</param>
-        /// <param name="values">The  ulongs to write.</param>
+        /// <param name="values">The ulongs to write.</param>
         public void TextWriter(string[] texts, ulong[] values)
         {
             using (StreamWriter file = new StreamWriter("Highscore.txt", false))
