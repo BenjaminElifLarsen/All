@@ -7,27 +7,49 @@ namespace Chess
 
     public class MapMatrix
     {
-        private MapMatrix() { }
-        public static sbyte[,] map = new sbyte[8, 8];
+        private MapMatrix()
+        {
+            for (int n = 0; n < 8; n++)
+                for (int m = 0; m < 8; m++)
+                    map[n, m] = "";
+        }
+        public static string[,] map = new string[8, 8];
     }
 
     public class ChessList
     {
         private ChessList() { }
-        private List<ChessPiece> chessListBlack = new List<ChessPiece>();
-        private List<ChessPiece> chessListWhite = new List<ChessPiece>();
-        public void SetChessListBlack(List<ChessPiece> list)
+        private static List<ChessPiece> chessListBlack = new List<ChessPiece>();
+        private static List<ChessPiece> chessListWhite = new List<ChessPiece>();
+        public static void SetChessListBlack(List<ChessPiece> list)
         {
             chessListBlack = list;
         }
-        public void SetChessListWhite(List<ChessPiece> list)
+        public static void SetChessListWhite(List<ChessPiece> list)
         {
             chessListWhite = list;
         }
-        public List<ChessPiece> GetList(bool team)
+        public static List<ChessPiece> GetList(bool team)
         {
             return team == true ? chessListBlack : chessListWhite;
         }
+    }
+
+    public class Settings
+    {
+        private Settings() { }
+        private static byte squareSize = 5;
+        private static byte[] lineColour = new byte[] { 122, 122, 122 };
+        private static byte[] lineColourBase = new byte[] { 87, 65, 47 };
+        private static byte[] squareColour1 = new byte[] { 182, 123, 91 };
+        private static byte[] squareColour2 = new byte[] { 135, 68, 31 };
+        private static byte[] offset = new byte[] { 2, 2 };
+        public static byte SquareSize { get => squareSize; }
+        public static byte[] LineColour { get => lineColour; }
+        public static byte[] LineColourBase { get => lineColourBase; }
+        public static byte[] SquareColour1 { get => squareColour1; }
+        public static byte[] SquareColour2 { get => squareColour2; }
+        public static byte[] Offset { get => offset; } //remember the '|' and '-'
     }
 
     class Program
@@ -295,7 +317,8 @@ namespace Chess
 
         public bool IsInDanger()
         { //if true, it should force the player to move it. Also, it needs to check each time the other player has made a move 
-            //should also check if it even can move, if it cannot the game should end
+            //should also check if it even can move, if it cannot the game should end. //find the other player's chesspieces on the map matrix, look at the IDs and see if there is a clear legal move that touces the king.
+            //hmm... could also look check specific squares for specific chesspieces, e.g. check all left, right, up and down squares for rocks and queen, check specific squares that 3 squares away for knights and so on. 
 
             return false;
         }
@@ -375,7 +398,7 @@ namespace Chess
                 " |>",
                 "-k-"
             };
-
+            MovePattern = new byte[][] { new byte[] {6} }; //maybe drop the idea of a movePattern variable and just write it into the specialised move code 
 
 
         }
@@ -415,9 +438,14 @@ namespace Chess
         /// </summary>
         public bool BeenTaken { get => hasBeenTaken; } //use by other code to see if the piece have been "taken" and should be removed from game. 
 
-
+        /// <summary>
+        /// Sets the hasBeenTaken value...
+        /// </summary>
         protected bool SetBeenTaken { set => hasBeenTaken = value; }
 
+        /// <summary>
+        /// Gets and sets the location of the chesspiece on the console.  
+        /// </summary>
         protected uint[] Location { get => location; set => location = value; } //consider for each of the properties what kind they should have
 
         protected byte[] Colour { set => colour = value; }
@@ -450,7 +478,7 @@ namespace Chess
         }
 
         /// <summary>
-        /// 
+        /// Calculates the location the chesspiece is able to move too. 
         /// </summary>
         protected virtual void Move()
         { 
@@ -470,6 +498,9 @@ namespace Chess
         { //should squareSize be given using the consturctor or via a class. If given using the constructor the player constructur needs it too and having a single parameter just to give it on since wierd.
             //also need the offset, since the map matrix does not contain the any offset. 
             //maybe have a class that contain all "settings" of the game, e.g. offsets, colours, symbols '-' and '|', and so on
+            //remember that there is a space between all the squares and also from the offsets. 
+            uint locationX = mapLocation[0] * squareSize + mapLocation[0] * 1 + Settings.SquareSize; //would this work?. E.g. maplocation is {7,1}
+
         }
 
         /// <summary>
@@ -528,10 +559,8 @@ namespace Chess
         /// </summary>
         protected void UpdateMapMatrix(uint[] oldMapLocation)
         { //need to either give the array[,] or have a class that it can acess it from. Since it is an array, an update in one instance will update the array in all instances. 
-            string[] splittedID = ID.Split(':');
-            sbyte piece = sbyte.Parse(splittedID[0]);
-            MapMatrix.map[mapLocation[0], mapLocation[1]] = piece;
-            MapMatrix.map[oldMapLocation[0], oldMapLocation[1]] = 0;
+            MapMatrix.map[mapLocation[0], mapLocation[1]] = ID;
+            MapMatrix.map[oldMapLocation[0], oldMapLocation[1]] = "";
         }
 
 
