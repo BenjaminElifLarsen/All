@@ -9,3 +9,4 @@ D:\Skrivebord\Other\Kode\GuesssANumber\obj\Release\netcoreapp3.1\GuesssANumber.A
 D:\Skrivebord\Other\Kode\GuesssANumber\obj\Release\netcoreapp3.1\GuesssANumber.AssemblyInfo.cs
 D:\Skrivebord\Other\Kode\GuesssANumber\obj\Release\netcoreapp3.1\GuesssANumber.dll
 D:\Skrivebord\Other\Kode\GuesssANumber\obj\Release\netcoreapp3.1\GuesssANumber.pdb
+D:\Skrivebord\Other\Kode\GuesssANumber\obj\Release\netcoreapp3.1\GuesssANumber.csprojAssemblyReference.cache
