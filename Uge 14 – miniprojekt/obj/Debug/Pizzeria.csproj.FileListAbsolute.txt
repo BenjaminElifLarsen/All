@@ -1,0 +1,14 @@
+D:\Skrivebord\Other\Kode\Pizzeria\bin\Debug\Pizzeria.exe.config
+D:\Skrivebord\Other\Kode\Pizzeria\bin\Debug\Pizzeria.exe
+D:\Skrivebord\Other\Kode\Pizzeria\bin\Debug\Pizzeria.pdb
+D:\Skrivebord\Other\Kode\Pizzeria\obj\Debug\Pizzeria.csprojAssemblyReference.cache
+D:\Skrivebord\Other\Kode\Pizzeria\obj\Debug\MainWindow.g.cs
+D:\Skrivebord\Other\Kode\Pizzeria\obj\Debug\App.g.cs
+D:\Skrivebord\Other\Kode\Pizzeria\obj\Debug\Pizzeria_MarkupCompile.cache
+D:\Skrivebord\Other\Kode\Pizzeria\obj\Debug\Pizzeria_MarkupCompile.lref
+D:\Skrivebord\Other\Kode\Pizzeria\obj\Debug\MainWindow.baml
+D:\Skrivebord\Other\Kode\Pizzeria\obj\Debug\Pizzeria.g.resources
+D:\Skrivebord\Other\Kode\Pizzeria\obj\Debug\Pizzeria.Properties.Resources.resources
+D:\Skrivebord\Other\Kode\Pizzeria\obj\Debug\Pizzeria.csproj.GenerateResource.cache
+D:\Skrivebord\Other\Kode\Pizzeria\obj\Debug\Pizzeria.exe
+D:\Skrivebord\Other\Kode\Pizzeria\obj\Debug\Pizzeria.pdb

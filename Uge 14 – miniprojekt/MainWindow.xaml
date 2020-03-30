@@ -1,0 +1,36 @@
+﻿<Window x:Class="Pizzeria.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:Pizzeria"
+        mc:Ignorable="d"
+        Title="MainWindow" Height="450" Width="800">
+    <Grid>
+        <Button Content="Add" HorizontalAlignment="Left" Margin="609,310,0,0" VerticalAlignment="Top" Width="75" Click="Add_Click"/>
+        <Button Content="Order" HorizontalAlignment="Left" Margin="609,356,0,0" VerticalAlignment="Top" Width="75" Click="Order_Click"/>
+        <TextBlock HorizontalAlignment="Left" Name="IngredientsBox" TextWrapping="Wrap" Text="figure out to scale it to fit all the ingredients" VerticalAlignment="Top" Margin="293,58,0,0" Height="86" Width="117"/>
+        <TextBlock HorizontalAlignment="Left" Name="PriceBox" TextWrapping="Wrap" Text="Price" VerticalAlignment="Top" Margin="609,58,0,0" Width="116"/>
+        <TextBlock HorizontalAlignment="Left" Name="TotalPriceBox" TextWrapping="Wrap" Text="0" VerticalAlignment="Top" Margin="609,112,0,0" Width="116"/>
+        <TextBlock HorizontalAlignment="Left" Name="SelectedPizza_Name" TextWrapping="Wrap" Text="TextBlock" VerticalAlignment="Top" Margin="609,262,0,0" Width="75"/>
+        <TextBlock HorizontalAlignment="Left" Name="SelectedPizza_Size" TextWrapping="Wrap" Text="TextBlock" VerticalAlignment="Top" Margin="609,283,0,0" Width="75"/>
+        <ComboBox HorizontalAlignment="Left" Name="PizzaType" Margin="26,42,0,0" VerticalAlignment="Top" Width="120" SelectionChanged="PizzaType_SelectionChanged">
+            <ComboBoxItem Content="Margherita"></ComboBoxItem>
+            <ComboBoxItem Content="Napoletana"></ComboBoxItem>
+            <ComboBoxItem Content="Sarda"></ComboBoxItem>
+        </ComboBox>
+        <ComboBox HorizontalAlignment="Left" Name="PizzaSize" Margin="159,42,0,0" VerticalAlignment="Top" Width="120" SelectionChanged="PizzaSize_SelectionChanged">
+            <ComboBoxItem Content="Small" ></ComboBoxItem>
+            <ComboBoxItem Content="Normal" ></ComboBoxItem>
+            <ComboBoxItem Content="Family"></ComboBoxItem>
+        </ComboBox>
+        <TextBlock HorizontalAlignment="Left" TextWrapping="Wrap" Text="Pizza" VerticalAlignment="Top" Margin="26,26,0,0" RenderTransformOrigin="0.535,0.746"/>
+        <TextBlock HorizontalAlignment="Left" TextWrapping="Wrap" Text="Size" VerticalAlignment="Top" Margin="159,26,0,0"/>
+        <TextBlock HorizontalAlignment="Left" TextWrapping="Wrap" VerticalAlignment="Top" Margin="609,42,0,0" FontWeight="Bold"><Run Text="Current Pizza P"/><Run Text="r"/><Run Text="ice"/></TextBlock>
+        <TextBlock HorizontalAlignment="Left" TextWrapping="Wrap" VerticalAlignment="Top" Margin="609,96,0,0" Text="Total Pizza Price" FontWeight="Bold"/>
+        <TextBlock HorizontalAlignment="Left" TextWrapping="Wrap" Text="Ingredients" VerticalAlignment="Top" Margin="293,42,0,0" FontWeight="Bold" TextAlignment="Center"/>
+        <TextBlock HorizontalAlignment="Left" TextWrapping="Wrap" Text="Pizza List" VerticalAlignment="Top" Margin="415,42,0,0" FontWeight="Bold" TextAlignment="Center"/>
+        <TextBlock HorizontalAlignment="Left" Name="PizzaListBox" TextWrapping="Wrap" Text="figure out to scale it to fit all the ingredients" VerticalAlignment="Top" Margin="415,58,0,0" Height="327" Width="117"/>
+
+    </Grid>
+</Window>
