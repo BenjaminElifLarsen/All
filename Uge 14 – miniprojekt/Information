@@ -1,0 +1,5 @@
+Opgave 1 - Pizzaer på menuen.!
+Til at starte med, er det eneste vi skal tænke på, hvad der sker i køkkenet og vi skal have nogle pizzaer.
+-	Lav tre standard pizzaer i to forskellige størrelser som kunden kan vælge imellem.
+-	Gør det muligt for kunden at se, i en oversigt, de ingredienser pizzaen består af (f.eks. bund, tomatsovs, ost mm.).
+-	Lav en pris på de forskellige pizzaer, som man får givet, når man køber pizzaen.
