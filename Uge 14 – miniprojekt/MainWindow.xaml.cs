@@ -80,7 +80,7 @@ namespace Pizzeria
         }
 
         private void DictionaryAdd(ref Dictionary<string, float> dictionary, ComboBox combo)
-        {
+        { //https://stackoverflow.com/questions/11878217/add-items-to-combobox-in-wpf
             Random rnd = new Random();
             int amount = combo.Items.Count;
             for (int i = 0; i < amount; i++)
@@ -89,6 +89,7 @@ namespace Pizzeria
                 combo.SelectedIndex = i;
                 dictionary.Add(combo.Text, value);
             }
+            //combo.Items.Add("Test"); can be used to get all items from text files and their values and putting them into comboboxes.
 
         }
 
@@ -125,7 +126,7 @@ namespace Pizzeria
         }
 
         /// <summary>
-        /// 
+        /// Displays all the pizzas that have been added. 
         /// </summary>
         private void DisplayPizzaList()
         {
@@ -202,8 +203,13 @@ namespace Pizzeria
                 currentPizza = new Sarda(PriceBox, IngredientsBox, size, value);
             else if (index == 4)
                 currentPizza = new PizzaPolymorth(PriceBox, IngredientsBox, "Custom", 0, "Normal", 0);
+
             if (index != 0)
+            { 
+                dough.TryGetValue("Classic", out float valuePrice);
                 currentPizza.SetBasePrize = value;
+                currentPizza.SetDough("Classic", valuePrice);
+            }
         }
 
         private void Extra_Ingredients_SelectionChanged(object sender, SelectionChangedEventArgs e) 
@@ -310,7 +316,7 @@ namespace Pizzeria
         /// </summary>
         /// <param name="priceWrite">The textbox to write the price too.</param>
         /// <param name="ingredientsWrite">The textbos to write the ingredients too.</param>
-        public PizzaBase(TextBlock priceWrite, TextBlock ingredientsWrite)
+        public PizzaBase(TextBlock priceWrite, TextBlock ingredientsWrite) //might not make sense to let the pizzas write out, perhaps just get the values and write out in the main code. 
         {
             this.ingredientsWrite = ingredientsWrite;
             this.priceWrite = priceWrite;
@@ -411,6 +417,7 @@ namespace Pizzeria
                 if (key == keyToAdd)
                 {
                     wasFound = true;
+                    ingredients[keyToAdd] = valueToAdd;
                 }
             }
             if (!wasFound)
@@ -506,6 +513,7 @@ namespace Pizzeria
                 if (key == ingredient)
                 {
                     wasFound = true;
+                    ingredients[ingredient] = value;
                 }
             }
             if (!wasFound)
