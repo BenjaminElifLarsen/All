@@ -3,3 +3,13 @@ Til at starte med, er det eneste vi skal tænke på, hvad der sker i køkkenet o
 -	Lav tre standard pizzaer i to forskellige størrelser som kunden kan vælge imellem.
 -	Gør det muligt for kunden at se, i en oversigt, de ingredienser pizzaen består af (f.eks. bund, tomatsovs, ost mm.).
 -	Lav en pris på de forskellige pizzaer, som man får givet, når man køber pizzaen.
+
+Gør-det-selv-pizza!
+Nu vil kunderne selv have lov til at komme med deres udgave af en pizza. (Tag højde for kræsne kunder!) Dvs. det skal være muligt at vælge:
+-	.. størrelsen på pizzaen
+-	.. type af dej
+-	.. sovs
+-	.. tilbehør/fyld (maks. 4)
+-	.. ost 
+-	.. krydderier
+OBS! - Udvid de allerede lavede pizzaer, så det er muligt at vælge dem og komme med ændringer til dem!
