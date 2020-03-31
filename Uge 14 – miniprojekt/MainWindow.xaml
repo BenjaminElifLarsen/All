@@ -9,28 +9,69 @@
     <Grid>
         <Button Content="Add" HorizontalAlignment="Left" Margin="609,310,0,0" VerticalAlignment="Top" Width="75" Click="Add_Click"/>
         <Button Content="Order" HorizontalAlignment="Left" Margin="609,356,0,0" VerticalAlignment="Top" Width="75" Click="Order_Click"/>
-        <TextBlock HorizontalAlignment="Left" Name="IngredientsBox" TextWrapping="Wrap" Text="figure out to scale it to fit all the ingredients" VerticalAlignment="Top" Margin="293,58,0,0" Height="86" Width="117"/>
-        <TextBlock HorizontalAlignment="Left" Name="PriceBox" TextWrapping="Wrap" Text="Price" VerticalAlignment="Top" Margin="609,58,0,0" Width="116"/>
-        <TextBlock HorizontalAlignment="Left" Name="TotalPriceBox" TextWrapping="Wrap" Text="0" VerticalAlignment="Top" Margin="609,112,0,0" Width="116"/>
+        <TextBlock HorizontalAlignment="Left" Name="IngredientsBox" TextWrapping="Wrap" Text="figure out to scale it to fit all the ingredients" VerticalAlignment="Top" Margin="293,45,0,0" Height="177" Width="117"/>
+        <TextBlock HorizontalAlignment="Left" Name="PriceBox" TextWrapping="Wrap" Text="Price" VerticalAlignment="Top" Margin="609,45,0,0" Width="116"/>
+        <TextBlock HorizontalAlignment="Left" Name="TotalPriceBox" TextWrapping="Wrap" Text="0" VerticalAlignment="Top" Margin="609,99,0,0" Width="116"/>
         <TextBlock HorizontalAlignment="Left" Name="SelectedPizza_Name" TextWrapping="Wrap" Text="TextBlock" VerticalAlignment="Top" Margin="609,262,0,0" Width="75"/>
         <TextBlock HorizontalAlignment="Left" Name="SelectedPizza_Size" TextWrapping="Wrap" Text="TextBlock" VerticalAlignment="Top" Margin="609,283,0,0" Width="75"/>
         <ComboBox HorizontalAlignment="Left" Name="PizzaType" Margin="26,42,0,0" VerticalAlignment="Top" Width="120" SelectionChanged="PizzaType_SelectionChanged">
+            <ComboBoxItem Content="None"></ComboBoxItem>
             <ComboBoxItem Content="Margherita"></ComboBoxItem>
             <ComboBoxItem Content="Napoletana"></ComboBoxItem>
             <ComboBoxItem Content="Sarda"></ComboBoxItem>
+            <ComboBoxItem Content="Custom"></ComboBoxItem>
         </ComboBox>
         <ComboBox HorizontalAlignment="Left" Name="PizzaSize" Margin="159,42,0,0" VerticalAlignment="Top" Width="120" SelectionChanged="PizzaSize_SelectionChanged">
             <ComboBoxItem Content="Small" ></ComboBoxItem>
             <ComboBoxItem Content="Normal" ></ComboBoxItem>
             <ComboBoxItem Content="Family"></ComboBoxItem>
         </ComboBox>
-        <TextBlock HorizontalAlignment="Left" TextWrapping="Wrap" Text="Pizza" VerticalAlignment="Top" Margin="26,26,0,0" RenderTransformOrigin="0.535,0.746"/>
-        <TextBlock HorizontalAlignment="Left" TextWrapping="Wrap" Text="Size" VerticalAlignment="Top" Margin="159,26,0,0"/>
-        <TextBlock HorizontalAlignment="Left" TextWrapping="Wrap" VerticalAlignment="Top" Margin="609,42,0,0" FontWeight="Bold"><Run Text="Current Pizza P"/><Run Text="r"/><Run Text="ice"/></TextBlock>
-        <TextBlock HorizontalAlignment="Left" TextWrapping="Wrap" VerticalAlignment="Top" Margin="609,96,0,0" Text="Total Pizza Price" FontWeight="Bold"/>
-        <TextBlock HorizontalAlignment="Left" TextWrapping="Wrap" Text="Ingredients" VerticalAlignment="Top" Margin="293,42,0,0" FontWeight="Bold" TextAlignment="Center"/>
-        <TextBlock HorizontalAlignment="Left" TextWrapping="Wrap" Text="Pizza List" VerticalAlignment="Top" Margin="415,42,0,0" FontWeight="Bold" TextAlignment="Center"/>
-        <TextBlock HorizontalAlignment="Left" Name="PizzaListBox" TextWrapping="Wrap" Text="figure out to scale it to fit all the ingredients" VerticalAlignment="Top" Margin="415,58,0,0" Height="327" Width="117"/>
+        <TextBlock HorizontalAlignment="Left" TextWrapping="Wrap" Text="Pizza" VerticalAlignment="Top" Margin="26,26,0,0" RenderTransformOrigin="0.535,0.746" FontWeight="Bold"/>
+        <TextBlock HorizontalAlignment="Left" TextWrapping="Wrap" Text="Size" VerticalAlignment="Top" Margin="159,26,0,0" FontWeight="Bold"/>
+        <TextBlock HorizontalAlignment="Left" TextWrapping="Wrap" VerticalAlignment="Top" Margin="609,29,0,0" FontWeight="Bold"><Run Text="Current Pizza P"/><Run Text="r"/><Run Text="ice"/></TextBlock>
+        <TextBlock HorizontalAlignment="Left" TextWrapping="Wrap" VerticalAlignment="Top" Margin="609,83,0,0" Text="Total Pizza Price" FontWeight="Bold"/>
+        <TextBlock HorizontalAlignment="Left" TextWrapping="Wrap" Text="Ingredients" VerticalAlignment="Top" Margin="293,29,0,0" FontWeight="Bold" TextAlignment="Center"/>
+        <TextBlock HorizontalAlignment="Left" TextWrapping="Wrap" Text="Pizza List" VerticalAlignment="Top" Margin="415,29,0,0" FontWeight="Bold" TextAlignment="Center"/>
+        <TextBlock HorizontalAlignment="Left" Name="PizzaListBox" TextWrapping="Wrap" Text="figure out to scale it to fit all the ingredients" VerticalAlignment="Top" Margin="415,45,0,0" Height="327" Width="117"/>
+        <TextBlock HorizontalAlignment="Left" Margin="26,115,0,0" TextWrapping="Wrap" VerticalAlignment="Top" FontWeight="Bold" Height="29" Width="104"><Run Text="Extra Ingredients"/><Run Text=" (4"/><Run Text=" max"/><Run Text=")"/></TextBlock>
+        <TextBlock HorizontalAlignment="Left" TextWrapping="Wrap" VerticalAlignment="Top" Margin="159,128,0,0"><Run FontWeight="Bold" Text="Dough"/></TextBlock>
+        <ComboBox HorizontalAlignment="Left" Name="Extra_Ingredients" Margin="26,149,0,0" VerticalAlignment="Top" Width="120" SelectionChanged="Extra_Ingredients_SelectionChanged">
+            <ComboBoxItem Content="None"></ComboBoxItem>
+            <ComboBoxItem Content="Garlic"></ComboBoxItem>
+            <ComboBoxItem Content="Spinach"></ComboBoxItem>
+            <ComboBoxItem Content="Beef"></ComboBoxItem>
+            <ComboBoxItem Content="Cherry tomatoes"></ComboBoxItem>
+            <ComboBoxItem Content="Corn"></ComboBoxItem>
+            <ComboBoxItem Content="Anchovies"></ComboBoxItem>
+            <ComboBoxItem Content="Mushrooms"></ComboBoxItem>
+            <ComboBoxItem Content="Artichokes"></ComboBoxItem>
+            <ComboBoxItem Content="Cauliflower"></ComboBoxItem>
+        </ComboBox>
+        <ComboBox HorizontalAlignment="Left" Name="Dough" VerticalAlignment="Top" Width="120" Margin="159,149,0,0" SelectionChanged="Dough_SelectionChanged">
+            <ComboBoxItem Content="Classic"></ComboBoxItem>
+            <ComboBoxItem Content="Skinny"></ComboBoxItem>
+            <ComboBoxItem Content="Thin crust"></ComboBoxItem>
+            <ComboBoxItem Content="Sfincione"></ComboBoxItem>
+            <ComboBoxItem Content="Whole Grain"></ComboBoxItem>
+        </ComboBox>
+        <ComboBox HorizontalAlignment="Left" Name="Cheese" Margin="26,213,0,0" VerticalAlignment="Top" Width="120" SelectionChanged="Cheese_SelectionChanged">
+            <ComboBoxItem Content="None"></ComboBoxItem>
+            <ComboBoxItem Content="Mozzarella"></ComboBoxItem>
+            <ComboBoxItem Content="Gorgonzola"></ComboBoxItem>
+            <ComboBoxItem Content="Fontina"></ComboBoxItem>
+            <ComboBoxItem Content="Parmesan"></ComboBoxItem>
+            <ComboBoxItem Content="Cheddar"></ComboBoxItem>
+            <ComboBoxItem Content="Emmental"></ComboBoxItem>
+        </ComboBox>
+        <TextBlock HorizontalAlignment="Left" TextWrapping="Wrap" VerticalAlignment="Top" Margin="26,192,0,0"><Run FontWeight="Bold" Text="Cheese"/></TextBlock>
+        <TextBlock HorizontalAlignment="Left" TextWrapping="Wrap" VerticalAlignment="Top" Margin="159,195,0,0"><Run FontWeight="Bold" Text="Tomato Sauce"/></TextBlock>
+        <ComboBox HorizontalAlignment="Left" Name="Tomato_Sauce" Margin="159,213,0,0" VerticalAlignment="Top" Width="120" SelectionChanged="Tomato_Sauce_SelectionChanged">
+            <ComboBoxItem Content="None"></ComboBoxItem>
+            <ComboBoxItem Content="Basic Sauce"></ComboBoxItem>
+            <ComboBoxItem Content="Spicy Sauce"></ComboBoxItem>
+            <ComboBoxItem Content="Garlic Sauce"></ComboBoxItem>
+            <ComboBoxItem Content="Pesto Sauce"></ComboBoxItem>
+        </ComboBox>
 
     </Grid>
 </Window>
