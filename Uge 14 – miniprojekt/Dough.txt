@@ -1,0 +1,5 @@
+﻿Classic : 10
+Skinny : 12
+Thin crust : 12
+Sfincione : 14
+Whole Grain : 18

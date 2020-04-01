@@ -1,5 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -20,7 +23,6 @@ namespace Pizzeria
     /// </summary>
     public partial class MainWindow : Window //https://www.forketers.com/italian-pizza-names-list/
     {
-        List<float> pizzaPrices = new List<float>();
         List<string> pizzaNames = new List<string>();
         Dictionary<string, float> sizePrice = new Dictionary<string, float>();
         PizzaBase currentPizza;
@@ -34,29 +36,75 @@ namespace Pizzeria
         Dictionary<string, float> ingredientsSelected = new Dictionary<string, float>();
         uint maxIngredients = 4;
         uint currentAmountOfIngredients = 0;
-        bool doughChosen = false;
-        bool tomatoSauceChosen = false;
-        bool cheeseChosen = false;
-        bool start = false;
-
+        DataList extraIngredientsList;
+        DataList cheeseList;
+        DataList doughList;
+        DataList tomatoSauceList;
+        DataList testList;
         public MainWindow()
         {
             InitializeComponent();
-
+            DataContext = this;
 
             TotalPriceBox.Text = "0 kr.";
             this.Title = "Pizzaria Venator Pizza Sanctum";
             DictionarySetUp();
             currentAmountOfIngredients = 0; //needs to be after DictionarySetUp, since it active the selct code 
             ingredientsSelected.Clear();
-            start = true;
+
+            string[] testStrings = { "Test", "TestTest" }; //to do proper binding of data to combobox it seems the entire program needs to be redone from scratch
+            float[] testFloats = { 4, 5 };
+            Dictionary<string, float> testDic = new Dictionary<string, float>();
+            DictionaryAndComboBoxAdd(ref testDic, TestComboBox, out testList, testStrings, testFloats);
+            TestComboBox.ItemsSource = testList;
+            TestComboBox.SelectedIndex = 0;
+            //TestComboBox.Text = testList.GetSetDataList;
+            //DataContext = testList;
+            //Setup();
+        }
+
+        private string[] FileReader(string filename)
+        {
+            string[] lines = File.ReadAllLines(filename);
+            return lines;
+        }
+
+        private void Setup() //does not work. All comboboxes are null and not null at the same times, even the comboboxes that are not set using these. 
+        { //if used the 3 comboboxes used here should in the XAML not have anything in them
+            sizePrice.Add("Small", 15); //when displaying the size, might also want to display the price
+            sizePrice.Add("Normal", 20);
+            sizePrice.Add("Family", 30);
+            //https://stackoverflow.com/questions/4902039/difference-between-selecteditem-selectedvalue-and-selectedvaluepath
+            PizzaType.SelectedIndex = 0;
+
+            string[] lines; float[] values; string[] items;
+            lines = FileReader("Dough.txt");
+            TextSplit(lines, out items, out values);
+            DictionaryAndComboBoxAdd(ref dough, Dough, out doughList, items, values);
+            lines = FileReader("Cheese.txt");
+            TextSplit(lines, out items, out values);
+            DictionaryAndComboBoxAdd(ref cheese, Cheese, out cheeseList, items, values);
+            lines = FileReader("Ingredients.txt");
+            TextSplit(lines, out items, out values);
+            DictionaryAndComboBoxAdd(ref extraIngredients, Extra_Ingredients, out extraIngredientsList, items, values);
+            lines = FileReader("Tomato_Sauce.txt");
+            TextSplit(lines, out items, out values);
+            DictionaryAndComboBoxAdd(ref tomatoSauce, Tomato_Sauce, out tomatoSauceList, items, values);
+
+            Cheese.ItemsSource = cheeseList;
+            
+            Dough.ItemsSource = doughList;
+            Tomato_Sauce.ItemsSource = tomatoSauceList;
+            Extra_Ingredients.ItemsSource = extraIngredientsList;
+            
+            //ResetIndexes();
         }
 
         private void DictionarySetUp()
         {
-            sizePrice.Add("small", 15); //when displaying the size, might also want to display the price
-            sizePrice.Add("normal", 20);
-            sizePrice.Add("family", 30);
+            sizePrice.Add("Small", 15); //when displaying the size, might also want to display the price
+            sizePrice.Add("Normal", 20);
+            sizePrice.Add("Family", 30);
 
             DictionaryAdd(ref dough, Dough);
             DictionaryAdd(ref tomatoSauce, Tomato_Sauce);
@@ -65,9 +113,6 @@ namespace Pizzeria
 
             PizzaType.SelectedIndex = 0;
             ResetIndexes();
-            doughChosen = false;
-            tomatoSauceChosen = false;
-            cheeseChosen = false;
         }
 
         private void ResetIndexes()
@@ -89,8 +134,39 @@ namespace Pizzeria
                 combo.SelectedIndex = i;
                 dictionary.Add(combo.Text, value);
             }
-            //combo.Items.Add("Test"); can be used to get all items from text files and their values and putting them into comboboxes.
+        }
 
+
+        private void TextSplit(string[] textToSplit, out string[] items, out float[] values)
+        {
+            uint posistion = 0;
+            items = new string[textToSplit.Length];
+            values = new float[textToSplit.Length];
+            foreach (string str in textToSplit)
+            {
+                string[] splitStr = str.Split(':');
+                try
+                {
+                    items[posistion] = splitStr[0].Trim();
+                    values[posistion] = Single.Parse(splitStr[1].Trim());
+                }
+                catch
+                {
+                    Debug.WriteLine("List is not in correct format: item : value");
+                }
+                posistion++;
+            }
+        }
+
+        private void DictionaryAndComboBoxAdd(ref Dictionary<string, float> dictionary, ComboBox combo, out DataList list , string[] items, float[] values)
+        {
+            for (int i = 0; i < items.Length; i++)
+            {
+                dictionary.Add(items[i], values[i]);
+                //combo.Items.Add(items[i]);
+            }
+            list = new DataList(items);
+            //combo.ItemsSource = list;
         }
 
         /// <summary>
@@ -110,9 +186,6 @@ namespace Pizzeria
                 DisplayPizzaList();
                 ingredientsSelected.Clear();
                 currentAmountOfIngredients = 0;
-                doughChosen = false;
-                cheeseChosen = false;
-                tomatoSauceChosen = false;
                 currentPizza = null;
                 PriceBox.Text = "0 kr";
                 IngredientsBox.Text = "";
@@ -162,15 +235,14 @@ namespace Pizzeria
         private void PizzaSize_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
 
-            int index = PizzaSize.SelectedIndex;
-            if (index == 0)
-                size = "small";
-            else if (index == 1)
-                size = "normal";
-            else if (index == 2)
-                size = "family";
-
-
+            //int index = PizzaSize.SelectedIndex;
+            //if (index == 0)
+            //    size = "small";
+            //else if (index == 1)
+            //    size = "normal";
+            //else if (index == 2)
+            //    size = "family";
+            size = PizzaSize.SelectedValue.ToString();
             if (currentPizza != null)
             {
                 sizePrice.TryGetValue(size, out float value);
@@ -205,91 +277,146 @@ namespace Pizzeria
                 currentPizza = new PizzaPolymorth(PriceBox, IngredientsBox, "Custom", 0, "Normal", 0);
 
             if (index != 0)
-            { 
+            {
                 dough.TryGetValue("Classic", out float valuePrice);
                 currentPizza.SetBasePrize = value;
                 currentPizza.SetDough("Classic", valuePrice);
             }
         }
 
-        private void Extra_Ingredients_SelectionChanged(object sender, SelectionChangedEventArgs e) 
+        private void Extra_Ingredients_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             int index = Extra_Ingredients.SelectedIndex;
             Extra_Ingredients.SelectedIndex = index;
-            string whyDoesTextGiveTheOldResultAndNotTheNewResult = Extra_Ingredients.Items[index].ToString().Split(':')[1].Trim();
-            string text = whyDoesTextGiveTheOldResultAndNotTheNewResult;
+            //string whyDoesTextGiveTheOldResultAndNotTheNewResult = Extra_Ingredients.Items[index].ToString().Split(':')[1].Trim();
+            //string text = whyDoesTextGiveTheOldResultAndNotTheNewResult;
+            string text = Extra_Ingredients.SelectedValue.ToString();
             extraIngredients.TryGetValue(text, out float value);
 
-            if (currentPizza != null)
-                if (currentPizza.GetName == "Custom")
+            if (currentPizza != null && index != 0)
+            {
+                bool exist = ExistAlreadyInDictionary(ingredientsSelected, text);
+                if (currentAmountOfIngredients < maxIngredients && !exist) 
                 {
-                    if (currentAmountOfIngredients < maxIngredients)
-                        ingredientsSelected.Add(text, value);
+                    ingredientsSelected.Add(text, value);
                     currentAmountOfIngredients++;
                     currentPizza.AddIngredients(text, value);
                 }
-                else
+            }
+            else if (currentPizza != null && index == 0)
+            {
+                foreach(string ingredient in ingredientsSelected.Keys)
                 {
-                    if (currentAmountOfIngredients < maxIngredients)
-                        ingredientsSelected.Add(text, value);
-                    currentAmountOfIngredients++;
-                    currentPizza.AddIngredients(text, value);
-
-
+                    currentPizza.RemoveIngredient(ingredient);
                 }
+                ingredientsSelected = new Dictionary<string, float>();
+                currentAmountOfIngredients = 0;
+            }
+        }
 
+        private string[] GetKeys(Dictionary<string, float> getKeyFrom)
+        {
+            uint i = 0;
+            List<string> keys = new List<string>();
+            Task tast = Task.Factory.StartNew(
+                () =>
+                {
+                    foreach (var key in getKeyFrom.Keys)
+                        keys.Add(key.ToString());
+                }
+            );
+            Task.WaitAll(tast);
+            string[] keyArray = new string[keys.Count];
+            foreach (string key in keys)
+            {
+                keyArray[i] = key;
+                i++;
+            }
+            return keyArray;
+        }
+
+        private bool ExistAlreadyInDictionary(Dictionary<string, float> toCheck, string keyToFind)
+        {
+            bool wasFound = false;
+            string[] keys = GetKeys(toCheck);
+            foreach (string key in keys)
+            {
+                if (key == keyToFind)
+                {
+                    wasFound = true;
+                    break;
+                }
+            }
+            return wasFound;
         }
 
         private void Dough_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            if (!doughChosen) //consider allowing the non-custom pizzas to have their dough and such changed. A foreach loop with a breaak for the ingridents list checking against the different doughs should work
+            //consider allowing the non-custom pizzas to have their dough and such changed. A foreach loop with a breaak for the ingridents list checking against the different doughs should work
+
+            if (currentPizza != null)
             {
-
-                if (currentPizza != null)
-                {
-                    //doughChosen = true;
-                    int index = Dough.SelectedIndex;
-                    string text = Dough.Items[index].ToString().Split(':')[1].Trim();
-                    dough.TryGetValue(text, out float value);
-                    //ingredientsSelected.Add(text, value);
-                    //currentPizza.SetIngredients(ingredientsSelected);
-                    currentPizza.SetDough(text, value);
-                }
-
-
+                int index = Dough.SelectedIndex;
+                string text = Dough.SelectedValue.ToString();
+                dough.TryGetValue(text, out float value);
+                currentPizza.SetDough(text, value);
             }
         }
 
         private void Tomato_Sauce_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            if (!tomatoSauceChosen)
+            int index = Tomato_Sauce.SelectedIndex;
+            if (currentPizza != null)
             {
-
-                if (currentPizza != null)
-                {
-                    int index = Tomato_Sauce.SelectedIndex;
-                    string text = Tomato_Sauce.Items[index].ToString().Split(':')[1].Trim();
-                    tomatoSauce.TryGetValue(text, out float value);
-                    currentPizza.SetTomatoSauce(text, value);
-                }
+                string text = Tomato_Sauce.SelectedValue.ToString();//Items[index].ToString().Split(':')[1].Trim();
+                tomatoSauce.TryGetValue(text, out float value);
+                currentPizza.SetTomatoSauce(text, value);
             }
+            else if (currentPizza != null && index != 0)
+            {
+                string tomatoSauce = currentPizza.GetTomatoSauce;
+                bool removed = currentPizza.RemoveIngredient(tomatoSauce);
+            }
+
         }
 
         private void Cheese_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            if (!cheeseChosen)
-            {
 
-                if (currentPizza != null)
-                {
-                    int index = Cheese.SelectedIndex;
-                    string text = Cheese.Items[index].ToString().Split(':')[1].Trim();
-                    cheese.TryGetValue(text, out float value);
-                    currentPizza.SetCheese(text, value);
-                }
+            int index = Cheese.SelectedIndex;
+            if (currentPizza != null && index != 0)
+            {
+                string text = Cheese.SelectedValue.ToString();
+                cheese.TryGetValue(text, out float value);
+                currentPizza.SetCheese(text, value);
             }
+            else if(currentPizza != null && index != 0)
+            {
+                //find the cheese and remove it, same should be done with the tomato_Sauce
+                string cheese = currentPizza.GetCheese;
+                bool removed = currentPizza.RemoveIngredient(cheese);
+            }
+
         }
+
+        private void TestComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        { //used to figure out stuff...
+            var test = TestComboBox.SelectedItem; //this is working when using the new system, but the other comboboxes do not work using the new systems...
+            string test2 = TestComboBox.SelectedValue.ToString(); //it might be SelectedValuePath="Content" that is causing a problem. With it, the SelectedValue is null, without it is the same as test
+            //it seems that SelectedValuePath="Content" is needed to just get the "content" of a ComboBoxItem when it is hardwritten, but if itemsSource is used it is not needed. Perhaps the "content" is not set when set using itemsSource?
+            //Try and find material to read up on about this
+            //maybe it is the ComboBoxItem
+
+            //https://docs.microsoft.com/en-us/dotnet/api/system.windows.controls.combobox?view=netframework-4.8
+
+            //https://stackoverflow.com/questions/3063320/combobox-adding-text-and-value-to-an-item-no-binding-source
+            Test.Text = test + " " + test2;
+        } 
     }
+
+
+
+    //------------------------------------------------------------------------------
 
 
     public class PizzaBase
@@ -334,6 +461,10 @@ namespace Pizzeria
         public string Size { get => sizeType; set => sizeType = value; }
 
         public float SetBasePrize { set { basePrice = value; price = CalculatePrice() + basePrice; DisplayPrice(); } }
+
+        public string GetCheese { get => cheese; }
+        public string GetDough { get => dough; }
+        public string GetTomatoSauce { get => tomatoSauce; }
 
         /// <summary>
         /// Gets the keys (the names) of the ingredients of the pizza
@@ -383,7 +514,21 @@ namespace Pizzeria
                 i++;
             }
             return valueArray;
-        
+
+        }
+
+        public bool RemoveIngredient(string ingredient)
+        {
+            try
+            {
+                ingredients.Remove(ingredient);
+                Update();
+                return true;
+            }
+            catch
+            {
+                return false;
+            }
         }
 
         /// <summary>
@@ -489,14 +634,6 @@ namespace Pizzeria
         }
 
 
-        //public void SetBase(string dough, float value)
-        //{
-        //    ingredients.Add(dough, value);
-        //    price = basePrice + CalculatePrice();
-        //    DisplayIngredients();
-        //    DisplayPrice();
-        //}
-
         public Dictionary<string, float> GetIngredientsDictionary { get => ingredients; }
 
         /// <summary>
@@ -545,7 +682,16 @@ namespace Pizzeria
         public PizzaPolymorth(TextBlock priceWrite, TextBlock ingredientsWrite, string name, uint number, /*Dictionary<string, float> ingredients,*/ string size = "Normal", float basePrice = 20) : base(priceWrite, ingredientsWrite)
         {
             this.name = name;
-            //this.ingredients = ingredients;
+            this.number = number;
+            sizeType = size;
+            price = basePrice + CalculatePrice();
+            DisplayIngredients();
+        }
+
+        public PizzaPolymorth(TextBlock priceWrite, TextBlock ingredientsWrite, string name, uint number, Dictionary<string, float> ingredients, string size = "Normal", float basePrice = 20) : base(priceWrite, ingredientsWrite)
+        {
+            this.name = name;
+            this.ingredients = ingredients;
             this.number = number;
             sizeType = size;
             price = basePrice + CalculatePrice();
@@ -621,6 +767,18 @@ namespace Pizzeria
             DisplayIngredients();
         }
     }
+
+
+    public class DataList : ObservableCollection<string>
+    { //https://docs.microsoft.com/en-us/dotnet/api/system.windows.controls.itemscontrol?view=netframework-4.8
+        public DataList(string[] list)
+        {
+            foreach (string str in list)
+                Add(str);
+        }
+        public string[] GetSetDataList { get; set; }
+    }
+
 
 
 

@@ -1,0 +1,11 @@
+﻿None : 0
+Garlic : 5
+Spinach : 6
+Beef : 15
+Cherry tomatoes : 10
+Corn : 7
+Anchovies : 19
+Mushrooms : 10
+Artichokes : 4
+Fries : 14
+Cauliflower : 17
