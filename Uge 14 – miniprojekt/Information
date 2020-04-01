@@ -13,3 +13,7 @@ Nu vil kunderne selv have lov til at komme med deres udgave af en pizza. (Tag h�
 -	.. ost 
 -	.. krydderier
 OBS! - Udvid de allerede lavede pizzaer, så det er muligt at vælge dem og komme med ændringer til dem!
+
+Shit, vi har gjort det gratis!
+-	Lav et system så hver pizza (dele af pizzaen (Ingradienser, deje, sovs, mm.) har en pris, og en samlet pris som kunden kan betale.
+
