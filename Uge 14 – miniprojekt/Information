@@ -17,3 +17,11 @@ OBS! - Udvid de allerede lavede pizzaer, så det er muligt at vælge dem og komm
 Shit, vi har gjort det gratis!
 -	Lav et system så hver pizza (dele af pizzaen (Ingradienser, deje, sovs, mm.) har en pris, og en samlet pris som kunden kan betale.
 
+Jamen jeg kan spise to pizzaer, og jeg er da også i grunden lidt tørstig!
+Det skal selvfølgelig være muligt at købe noget at drikke, når man får sin pizza! (Mere salg = flere penge!)
+-	Lav tre typer drikkevarer som kunden kan købe med som et tilvalg, når han/hun køber en pizza.
+o	Fås i tre forskellige størrelser (lille, mellem og stor).
+o	Husk prisen!
+De sultne kunder som kan spise mere end én pizza, eller drikke mere end én drikkevare, skal selvfølgelig have mulighed for det!
+-	Gør det muligt at kunne lave en ordre, så man kan bestille flere pizzaer og flere drikkevare.!
+o	Husk at opdatere udregningen af en samlet pris i form af en samlet ordre.
