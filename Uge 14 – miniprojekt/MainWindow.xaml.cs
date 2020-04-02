@@ -41,6 +41,7 @@ namespace Pizzeria
         Dictionary<string, float> tomatoSauce = new Dictionary<string, float>();
         Dictionary<string, float> ingredientsSelected = new Dictionary<string, float>();
         Dictionary<string, float> drink = new Dictionary<string, float>();
+        Dictionary<string, float> prePizzaIngredients = new Dictionary<string, float>();
         uint maxIngredients = 4;
         uint currentAmountOfIngredients = 0;
         DataList extraIngredientsList;
@@ -50,6 +51,9 @@ namespace Pizzeria
         DataList drinkList;
         DataList drinkSizeList;
         DataList pizzaSizeList;
+
+        List<PizzaBase> prePizzaList = new List<PizzaBase>();
+        DataList prePizzaDataList;
 
         DataList testList;
 
@@ -63,20 +67,120 @@ namespace Pizzeria
             this.Title = "Pizzaria Venator Pizza Sanctum";
             //DictionarySetUp();
 
-
-            string[] testStrings = { "Test", "TestTest" }; //to do proper binding of data to combobox it seems the entire program needs to be redone from scratch
-            float[] testFloats = { 4, 5 };
-            Dictionary<string, float> testDic = new Dictionary<string, float>();
-            DictionaryAndComboBoxAdd(ref testDic, TestComboBox, out testList, testStrings, testFloats);
-            TestComboBox.ItemsSource = testList;
-            TestComboBox.SelectedIndex = 0;
-            //TestComboBox.Text = testList.GetSetDataList;
-            //DataContext = testList;
             Setup();
-
+            PrePizzaSetup();
             currentAmountOfIngredients = 0; //needs to be after DictionarySetUp, since it active the selct code 
             ingredientsSelected.Clear();
+            PizzaType.ItemsSource = prePizzaDataList;
+            PizzaType.SelectedIndex = 0;
+        }
 
+        private void PrePizzaSetup() //how to handle custome pizza and "none"
+        {
+            
+            string[] lines = File.ReadAllLines("PreExistingPizza.txt");
+            //string[] ingredientsPre = File.ReadAllLines("PreExistingPizzaIngredients.txt");
+            uint number_ = 0;
+            string name_ = null;
+            string dough_ = null;
+            string tomatoSauce_ = null;
+            string cheese_ = null;
+            float doug_Number = 0;
+            float tomatoSauce_Number = 0;
+            float cheese_Number = 0;
+            Dictionary<string, float> preIngredients = new Dictionary<string, float>();
+            uint posistion = 0;
+            PizzaPolymorth prePizza;
+            List<string> prePizzaNames = new List<string>();
+            prePizzaNames.Add("None");
+            while (posistion < lines.Length) { 
+                do
+                {
+                    if (UInt32.TryParse(lines[posistion], out uint value))
+                        number_ = value;
+                    else if (name_ == null)
+                        name_ = lines[posistion];
+                    else
+                    {
+                        try
+                        {
+                            if(lines[posistion] != "")
+                            {
+                                prePizzaIngredients.TryGetValue(lines[posistion], out float price); //will not work since dough and that is not part of the extraIngredients list... so new list 
+                                preIngredients.Add(lines[posistion], price);
+                                if (IsADough(lines[posistion]))
+                                {
+                                    dough_ = lines[posistion];
+                                    doug_Number = price;
+                                }
+                                else if (IsATomatoSauce(lines[posistion]))
+                                {
+                                    tomatoSauce_ = lines[posistion];
+                                    tomatoSauce_Number = price;
+                                }
+                                else if (IsACheese(lines[posistion]))
+                                {
+                                    cheese_ = lines[posistion];
+                                    cheese_Number = price;
+                                }
+                            }
+                        }
+                        catch
+                        {
+                            Debug.WriteLine("Ingredient does not exist in the Ingredients text file.");
+                        }
+                    }
+
+                    posistion++;
+                    if (posistion == lines.Length)
+                        break;
+                } while (!Single.TryParse(lines[posistion], out _));
+                prePizza = new PizzaPolymorth(PriceBox, IngredientsBox, name_, number_, preIngredients);
+                prePizza.SetDough(dough_, doug_Number);
+                prePizza.SetCheese(cheese_, cheese_Number);
+                prePizza.SetTomatoSauce(tomatoSauce_, tomatoSauce_Number);
+                prePizzaList.Add(prePizza);
+                prePizzaNames.Add(name_);
+                name_ = null;
+                dough_ = null;
+                cheese_ = null;
+                tomatoSauce_ = null;
+                preIngredients.Clear();
+
+            }
+            prePizzaDataList = new DataList(prePizzaNames.ToArray());
+
+
+        }
+
+        private bool IsADough(string ingredientToCheck)
+        {
+            foreach (string str in dough.Keys)
+            {
+                if (str == ingredientToCheck)
+                    return true;
+            }
+            return false;
+        }
+
+        private bool IsACheese(string ingredientToCheck)
+        {
+            foreach (string str in cheese.Keys)
+            {
+                if (str == ingredientToCheck)
+                    return true;
+            }
+            return false;
+        }
+
+        private bool IsATomatoSauce(string ingredientToCheck)
+        {
+            foreach (string str in tomatoSauce.Keys)
+            {
+                if (str == ingredientToCheck)
+                    return true;
+            }
+            return false;
         }
 
         private string[] FileReader(string filename)
@@ -91,27 +195,30 @@ namespace Pizzeria
 
 
             string[] lines; float[] values; string[] items;
+            lines = FileReader("PreExistingPizzaIngredients.txt");
+            TextSplit(lines, out items, out values);
+            DictionaryAndComboBoxAdd(ref prePizzaIngredients, out _, items, values);
             lines = FileReader("PizzaSize.txt");
             TextSplit(lines, out items, out values);
-            DictionaryAndComboBoxAdd(ref sizePricePizza, PizzaSize, out pizzaSizeList, items, values);
+            DictionaryAndComboBoxAdd(ref sizePricePizza, out pizzaSizeList, items, values);
             lines = FileReader("Dough.txt");
             TextSplit(lines, out items, out values);
-            DictionaryAndComboBoxAdd(ref dough, Dough, out doughList, items, values);
+            DictionaryAndComboBoxAdd(ref dough, out doughList, items, values);
             lines = FileReader("Cheese.txt");
             TextSplit(lines, out items, out values);
-            DictionaryAndComboBoxAdd(ref cheese, Cheese, out cheeseList, items, values);
+            DictionaryAndComboBoxAdd(ref cheese, out cheeseList, items, values);
             lines = FileReader("Ingredients.txt");
             TextSplit(lines, out items, out values);
-            DictionaryAndComboBoxAdd(ref extraIngredients, Extra_Ingredients, out extraIngredientsList, items, values);
+            DictionaryAndComboBoxAdd(ref extraIngredients, out extraIngredientsList, items, values);
             lines = FileReader("Tomato_Sauce.txt");
             TextSplit(lines, out items, out values);
-            DictionaryAndComboBoxAdd(ref tomatoSauce, Tomato_Sauce, out tomatoSauceList, items, values);
+            DictionaryAndComboBoxAdd(ref tomatoSauce, out tomatoSauceList, items, values);
             lines = FileReader("Drink.txt");
             TextSplit(lines, out items, out values);
-            DictionaryAndComboBoxAdd(ref drink, Drink, out drinkList, items, values);
+            DictionaryAndComboBoxAdd(ref drink, out drinkList, items, values);
             lines = FileReader("DrinkSize.txt");
             TextSplit(lines, out items, out values);
-            DictionaryAndComboBoxAdd(ref sizePriceDrink, DrinkSize, out drinkSizeList, items, values);
+            DictionaryAndComboBoxAdd(ref sizePriceDrink, out drinkSizeList, items, values);
 
             Cheese.ItemsSource = cheeseList;
             Dough.ItemsSource = doughList;
@@ -204,7 +311,7 @@ namespace Pizzeria
             }
         }
 
-        private void DictionaryAndComboBoxAdd(ref Dictionary<string, float> dictionary, ComboBox combo, out DataList list, string[] items, float[] values)
+        private void DictionaryAndComboBoxAdd(ref Dictionary<string, float> dictionary, out DataList list, string[] items, float[] values)
         {
             for (int i = 0; i < items.Length; i++)
             {
@@ -286,6 +393,7 @@ namespace Pizzeria
             }
             ResetDrinkIndexes();
             ResetIndexes();
+            PizzaType.SelectedIndex = 0;
 
         }
 
@@ -321,23 +429,26 @@ namespace Pizzeria
                 PriceBox.Text = "0 kr";
                 IngredientsBox.Text = "";
             }
-            else if (index == 1)
-                currentPizza = new Margherita(PriceBox, IngredientsBox, sizePizza, value);
-            else if (index == 2)
-                currentPizza = new Napoletana(PriceBox, IngredientsBox, sizePizza, value);
-            else if (index == 3)
-                currentPizza = new Sarda(PriceBox, IngredientsBox, sizePizza, value);
-            else if (index == 4)
-                currentPizza = new PizzaPolymorth(PriceBox, IngredientsBox, "Custom", 0, "Normal", 0);
+            else
+            {
+                //prePizzaList[index-1]; //minus 1 because there is one more option in the combobox, "None", than there are pizzas. 
+                currentPizza = new PizzaPolymorth(PriceBox, IngredientsBox, prePizzaList[index - 1].GetName, prePizzaList[index - 1].GetNumber, prePizzaList[index - 1].GetIngredientsDictionary); //prevents overwriting the "base" pizzas
 
+            }
             if (index != 0)
             {
-                dough.TryGetValue("Classic", out float valuePrice);
+                dough.TryGetValue(prePizzaList[index - 1].GetDough, out float valuePrice);
                 currentPizza.SetBasePrize = value;
-                currentPizza.SetDough("Classic", valuePrice);
+                currentPizza.SetDough(prePizzaList[index - 1].GetDough, valuePrice);
             }
         }
 
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void Extra_Ingredients_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             int index = Extra_Ingredients.SelectedIndex;
@@ -455,8 +566,8 @@ namespace Pizzeria
 
         private void TestComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
         { //used to figure out stuff...
-            var test = TestComboBox.SelectedItem; //this is working when using the new system, but the other comboboxes do not work using the new systems...
-            string test2 = TestComboBox.SelectedValue.ToString(); //it might be SelectedValuePath="Content" that is causing a problem. With it, the SelectedValue is null, without it is the same as test
+            //var test = TestComboBox.SelectedItem; //this is working when using the new system, but the other comboboxes do not work using the new systems...
+            //string test2 = TestComboBox.SelectedValue.ToString(); //it might be SelectedValuePath="Content" that is causing a problem. With it, the SelectedValue is null, without it is the same as test
             //it seems that SelectedValuePath="Content" is needed to just get the "content" of a ComboBoxItem when it is hardwritten, but if itemsSource is used it is not needed. Perhaps the "content" is not set when set using itemsSource?
             //Try and find material to read up on about this
             //maybe it is the ComboBoxItem
@@ -464,7 +575,7 @@ namespace Pizzeria
             //https://docs.microsoft.com/en-us/dotnet/api/system.windows.controls.combobox?view=netframework-4.8
 
             //https://stackoverflow.com/questions/3063320/combobox-adding-text-and-value-to-an-item-no-binding-source
-            Test.Text = test + " " + test2;
+            //Test.Text = test + " " + test2;
         }
 
         private void Drink_SelectionChanged(object sender, SelectionChangedEventArgs e)
@@ -473,6 +584,7 @@ namespace Pizzeria
             {
                 currentDrink = null;
                 DrinkPrice.Text = "0 kr";
+                Ice.IsChecked = false;
             }
             else
             {
@@ -722,12 +834,14 @@ namespace Pizzeria
         /// <summary>
         /// Sets the dough of the pizza and the price of the tomato sauce.
         /// </summary>
-        /// <param name="dough">The type of tomato sauce.</param>
+        /// <param name="tomatoSauce">The type of tomato sauce.</param>
         /// <param name="value">The price of the tomato sauce.</param>
         public void SetTomatoSauce(string tomatoSauce, float value)
         {
-            CheckAndAddToDictionary(tomatoSauce, value, ref this.tomatoSauce);
+            bool added = CheckAndAddToDictionary(tomatoSauce, value, ref this.tomatoSauce);
             Update();
+            if (added && this.tomatoSauce != tomatoSauce)
+                this.tomatoSauce = tomatoSauce;
         }
 
         /// <summary>
@@ -741,36 +855,49 @@ namespace Pizzeria
         }
 
 
-        protected void CheckAndAddToDictionary(string keyToAdd, float valueToAdd, ref string OldKeyToRemove)
+        protected bool CheckAndAddToDictionary(string keyToAdd, float valueToAdd, ref string OldKeyToRemove)
         {
-            bool wasFound = false;
-            string[] keys = GetKeys();
-            foreach (string key in keys)
+            if (keyToAdd != null)
             {
-                if (key == keyToAdd)
+                bool wasFound = false;
+                string[] keys = GetKeys();
+                foreach (string key in keys)
                 {
-                    wasFound = true;
-                    ingredients[keyToAdd] = valueToAdd;
+                    if (key == keyToAdd)
+                    {
+                        wasFound = true;
+                        ingredients[keyToAdd] = valueToAdd;
+                        break;
+                    }
                 }
-            }
-            if (!wasFound)
-            {
-                ingredients.Add(keyToAdd, valueToAdd);
-                ingredients.Remove(OldKeyToRemove);
-                OldKeyToRemove = keyToAdd;
-            }
+                if (!wasFound)
+                {
+                    ingredients.Add(keyToAdd, valueToAdd);
+                    ingredients.Remove(OldKeyToRemove);
+                    OldKeyToRemove = keyToAdd;
+                    return true;
+                }
+                else
+                    return true;
 
+            }
+            else
+            {
+                return false;
+            }
         }
 
         /// <summary>
         /// Sets the dough of the pizza and the price of the cheese.
         /// </summary>
-        /// <param name="dough">The type of cheese.</param>
+        /// <param name="cheese">The type of cheese.</param>
         /// <param name="value">The price of the cheese.</param>
         public void SetCheese(string cheese, float value)
         {
-            CheckAndAddToDictionary(cheese, value, ref this.cheese);
+            bool added = CheckAndAddToDictionary(cheese, value, ref this.cheese);
             Update();
+            if (added && this.cheese != cheese)
+                this.cheese = cheese;
         }
 
         /// <summary>
@@ -780,8 +907,10 @@ namespace Pizzeria
         /// <param name="value">The price of the dough.</param>
         public void SetDough(string dough, float value)
         {
-            CheckAndAddToDictionary(dough, value, ref this.dough);
+            bool added = CheckAndAddToDictionary(dough, value, ref this.dough);
             Update();
+            if (added && this.dough != dough)
+                this.dough = dough;
         }
 
         /// <summary>
@@ -856,8 +985,12 @@ namespace Pizzeria
         /// <param name="ingredients">Dinctionary containing the new ingredients</param>
         public void SetIngredients(Dictionary<string, float> ingredients)
         {
-            this.ingredients = null;
-            this.ingredients = ingredients;
+            this.ingredients.Clear();
+            foreach (string key in ingredients.Keys)
+            {
+                ingredients.TryGetValue(key, out float value);
+                this.ingredients.Add(key, value);
+            }
             price = basePrice + CalculatePrice();
             DisplayIngredients();
             DisplayPrice();
@@ -879,7 +1012,12 @@ namespace Pizzeria
         public PizzaPolymorth(TextBlock priceWrite, TextBlock ingredientsWrite, string name, uint number, Dictionary<string, float> ingredients, string size = "Normal", float basePrice = 20) : base(priceWrite, ingredientsWrite)
         {
             this.name = name;
-            this.ingredients = ingredients;
+            //this.ingredients = ingredients;
+            foreach(string key in ingredients.Keys)
+            {
+                ingredients.TryGetValue(key, out float value);
+                this.ingredients.Add(key, value);
+            }
             this.number = number;
             sizeType = size;
             price = basePrice + CalculatePrice();

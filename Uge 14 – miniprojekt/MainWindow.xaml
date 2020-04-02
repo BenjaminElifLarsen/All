@@ -12,12 +12,8 @@
         <TextBlock HorizontalAlignment="Left" Name="IngredientsBox" TextWrapping="Wrap" Text="figure out to scale it to fit all the ingredients" VerticalAlignment="Top" Margin="293,42,0,0" Height="247" Width="117"/>
         <TextBlock HorizontalAlignment="Left" Name="PriceBox" TextWrapping="Wrap" Text="Price" VerticalAlignment="Top" Margin="601,42,0,0" Width="116"/>
         <TextBlock HorizontalAlignment="Left" Name="TotalPriceBox" TextWrapping="Wrap" Text="0" VerticalAlignment="Top" Margin="601,128,0,0" Width="116"/>
-        <ComboBox HorizontalAlignment="Left" Name="PizzaType" Margin="26,42,0,0" VerticalAlignment="Top" SelectedValuePath="Content" Width="120" SelectionChanged="PizzaType_SelectionChanged">
-            <ComboBoxItem Content="None"></ComboBoxItem>
-            <ComboBoxItem Content="Margherita"></ComboBoxItem>
-            <ComboBoxItem Content="Napoletana"></ComboBoxItem>
-            <ComboBoxItem Content="Sarda"></ComboBoxItem>
-            <ComboBoxItem Content="Custom"></ComboBoxItem>
+        <ComboBox HorizontalAlignment="Left" Name="PizzaType" Margin="26,42,0,0" VerticalAlignment="Top" Width="120" SelectionChanged="PizzaType_SelectionChanged">
+            
         </ComboBox>
         <ComboBox HorizontalAlignment="Left" Name="PizzaSize" Margin="159,42,0,0" VerticalAlignment="Top" Width="120" SelectionChanged="PizzaSize_SelectionChanged">
             
@@ -44,8 +40,6 @@
         <ComboBox HorizontalAlignment="Left" Name="Tomato_Sauce" Margin="159,213,0,0" VerticalAlignment="Top" Width="120" SelectionChanged="Tomato_Sauce_SelectionChanged">
 
         </ComboBox>
-        <ComboBox HorizontalAlignment="Left" Name="TestComboBox" Margin="361,370,0,0" VerticalAlignment="Top" Width="120" SelectionChanged="TestComboBox_SelectionChanged"/>
-        <TextBlock HorizontalAlignment="Left" Name="Test" Margin="500,374,0,0" TextWrapping="Wrap" Text="TextBlock" VerticalAlignment="Top"/>
         <TextBlock HorizontalAlignment="Left" TextWrapping="Wrap" VerticalAlignment="Top" Margin="26,246,0,0" FontWeight="Bold" Text="Drinks"/>
         <TextBlock HorizontalAlignment="Left" TextWrapping="Wrap" VerticalAlignment="Top" Margin="601,69,0,0" FontWeight="Bold"><Run Text="Current Drink "/><Run Text="Price"/></TextBlock>
         <TextBlock HorizontalAlignment="Left" Name="DrinkPrice" TextWrapping="Wrap" Text="Price" VerticalAlignment="Top" Margin="601,85,0,0"/>
