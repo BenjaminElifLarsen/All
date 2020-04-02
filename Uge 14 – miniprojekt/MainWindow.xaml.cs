@@ -24,33 +24,45 @@ namespace Pizzeria
     public partial class MainWindow : Window //https://www.forketers.com/italian-pizza-names-list/
     {
         List<string> pizzaNames = new List<string>();
-        Dictionary<string, float> sizePrice = new Dictionary<string, float>();
+        List<string> drinkNames = new List<string>();
+        Dictionary<string, float> sizePricePizza = new Dictionary<string, float>();
+        Dictionary<string, float> sizePriceDrink = new Dictionary<string, float>();
         PizzaBase currentPizza;
+        DrinkBase currentDrink;
         List<PizzaBase> allPizza = new List<PizzaBase>();
-        string size = null;
+        List<DrinkBase> allDrinks = new List<DrinkBase>();
+
+        string sizePizza = null;
+        string sizeDrink = null;
         float finalPrice = 0;
         Dictionary<string, float> extraIngredients = new Dictionary<string, float>();
         Dictionary<string, float> cheese = new Dictionary<string, float>();
         Dictionary<string, float> dough = new Dictionary<string, float>();
         Dictionary<string, float> tomatoSauce = new Dictionary<string, float>();
         Dictionary<string, float> ingredientsSelected = new Dictionary<string, float>();
+        Dictionary<string, float> drink = new Dictionary<string, float>();
         uint maxIngredients = 4;
         uint currentAmountOfIngredients = 0;
         DataList extraIngredientsList;
         DataList cheeseList;
         DataList doughList;
         DataList tomatoSauceList;
+        DataList drinkList;
+        DataList drinkSizeList;
+        DataList pizzaSizeList;
+
         DataList testList;
+
         public MainWindow()
         {
             InitializeComponent();
             DataContext = this;
 
             TotalPriceBox.Text = "0 kr.";
+            DrinkPrice.Text = "0 kr";
             this.Title = "Pizzaria Venator Pizza Sanctum";
-            DictionarySetUp();
-            currentAmountOfIngredients = 0; //needs to be after DictionarySetUp, since it active the selct code 
-            ingredientsSelected.Clear();
+            //DictionarySetUp();
+
 
             string[] testStrings = { "Test", "TestTest" }; //to do proper binding of data to combobox it seems the entire program needs to be redone from scratch
             float[] testFloats = { 4, 5 };
@@ -60,7 +72,11 @@ namespace Pizzeria
             TestComboBox.SelectedIndex = 0;
             //TestComboBox.Text = testList.GetSetDataList;
             //DataContext = testList;
-            //Setup();
+            Setup();
+
+            currentAmountOfIngredients = 0; //needs to be after DictionarySetUp, since it active the selct code 
+            ingredientsSelected.Clear();
+
         }
 
         private string[] FileReader(string filename)
@@ -69,15 +85,15 @@ namespace Pizzeria
             return lines;
         }
 
-        private void Setup() //does not work. All comboboxes are null and not null at the same times, even the comboboxes that are not set using these. 
-        { //if used the 3 comboboxes used here should in the XAML not have anything in them
-            sizePrice.Add("Small", 15); //when displaying the size, might also want to display the price
-            sizePrice.Add("Normal", 20);
-            sizePrice.Add("Family", 30);
+        private void Setup()
+        {
             //https://stackoverflow.com/questions/4902039/difference-between-selecteditem-selectedvalue-and-selectedvaluepath
-            PizzaType.SelectedIndex = 0;
+
 
             string[] lines; float[] values; string[] items;
+            lines = FileReader("PizzaSize.txt");
+            TextSplit(lines, out items, out values);
+            DictionaryAndComboBoxAdd(ref sizePricePizza, PizzaSize, out pizzaSizeList, items, values);
             lines = FileReader("Dough.txt");
             TextSplit(lines, out items, out values);
             DictionaryAndComboBoxAdd(ref dough, Dough, out doughList, items, values);
@@ -90,21 +106,32 @@ namespace Pizzeria
             lines = FileReader("Tomato_Sauce.txt");
             TextSplit(lines, out items, out values);
             DictionaryAndComboBoxAdd(ref tomatoSauce, Tomato_Sauce, out tomatoSauceList, items, values);
+            lines = FileReader("Drink.txt");
+            TextSplit(lines, out items, out values);
+            DictionaryAndComboBoxAdd(ref drink, Drink, out drinkList, items, values);
+            lines = FileReader("DrinkSize.txt");
+            TextSplit(lines, out items, out values);
+            DictionaryAndComboBoxAdd(ref sizePriceDrink, DrinkSize, out drinkSizeList, items, values);
 
             Cheese.ItemsSource = cheeseList;
-            
             Dough.ItemsSource = doughList;
             Tomato_Sauce.ItemsSource = tomatoSauceList;
             Extra_Ingredients.ItemsSource = extraIngredientsList;
-            
-            //ResetIndexes();
+            Drink.ItemsSource = drinkList;
+            DrinkSize.ItemsSource = drinkSizeList;
+            PizzaSize.ItemsSource = pizzaSizeList;
+            ResetIndexes();
+            ResetDrinkIndexes();
         }
 
-        private void DictionarySetUp()
+        /// <summary>
+        /// Sets up the dictionaries with keys and values
+        /// </summary>
+        private void DictionarySetUp() //no longer used and usable
         {
-            sizePrice.Add("Small", 15); //when displaying the size, might also want to display the price
-            sizePrice.Add("Normal", 20);
-            sizePrice.Add("Family", 30);
+            sizePricePizza.Add("Small", 15); //when displaying the size, might also want to display the price
+            sizePricePizza.Add("Normal", 20);
+            sizePricePizza.Add("Family", 30);
 
             DictionaryAdd(ref dough, Dough);
             DictionaryAdd(ref tomatoSauce, Tomato_Sauce);
@@ -113,8 +140,12 @@ namespace Pizzeria
 
             PizzaType.SelectedIndex = 0;
             ResetIndexes();
+            ResetDrinkIndexes();
         }
 
+        /// <summary>
+        /// Resets the comboboxes related to the pizza to their default values.
+        /// </summary>
         private void ResetIndexes()
         {
             PizzaSize.SelectedIndex = 1;
@@ -122,6 +153,16 @@ namespace Pizzeria
             Dough.SelectedIndex = 0;
             Cheese.SelectedIndex = 0;
             Tomato_Sauce.SelectedIndex = 0;
+        }
+
+        /// <summary>
+        /// Resets the comboboxes related to the drink to their default values. 
+        /// </summary>
+        private void ResetDrinkIndexes()
+        {
+            Drink.SelectedIndex = 0;
+            DrinkSize.SelectedIndex = 1;
+            Ice.IsChecked = false;
         }
 
         private void DictionaryAdd(ref Dictionary<string, float> dictionary, ComboBox combo)
@@ -136,7 +177,12 @@ namespace Pizzeria
             }
         }
 
-
+        /// <summary>
+        /// ... Splits a string based upong ':'. Left side is assumed to be a string, the right side a float. 
+        /// </summary>
+        /// <param name="textToSplit"></param>
+        /// <param name="items"></param>
+        /// <param name="values"></param>
         private void TextSplit(string[] textToSplit, out string[] items, out float[] values)
         {
             uint posistion = 0;
@@ -158,7 +204,7 @@ namespace Pizzeria
             }
         }
 
-        private void DictionaryAndComboBoxAdd(ref Dictionary<string, float> dictionary, ComboBox combo, out DataList list , string[] items, float[] values)
+        private void DictionaryAndComboBoxAdd(ref Dictionary<string, float> dictionary, ComboBox combo, out DataList list, string[] items, float[] values)
         {
             for (int i = 0; i < items.Length; i++)
             {
@@ -176,39 +222,39 @@ namespace Pizzeria
         /// <param name="e"></param>
         private void Add_Click(object sender, RoutedEventArgs e)
         {
-            if (currentPizza != null) //if the pizza is a custom it needs to make sure it got a dough... as a minimum
+            if (currentPizza != null)
             {
                 float price;
                 pizzaNames.Add(currentPizza.GetName + " (" + currentPizza.Size + ")");
                 price = currentPizza.GetPrice;
                 allPizza.Add(currentPizza);
                 DisplayFinalPrice(price);
-                DisplayPizzaList();
+                DisplayOrderList();
                 ingredientsSelected.Clear();
                 currentAmountOfIngredients = 0;
                 currentPizza = null;
                 PriceBox.Text = "0 kr";
                 IngredientsBox.Text = "";
-                PizzaSize.SelectedIndex = 1;
+                ResetIndexes();
                 PizzaType.SelectedIndex = 0;
-                Extra_Ingredients.SelectedIndex = 0;
-                Dough.SelectedIndex = 0;
-                Cheese.SelectedIndex = 0;
-                Tomato_Sauce.SelectedIndex = 0;
             }
         }
 
         /// <summary>
         /// Displays all the pizzas that have been added. 
         /// </summary>
-        private void DisplayPizzaList()
+        private void DisplayOrderList()
         {
-            string pizzaListWriteOut = "";
+            string listWriteOut = "";
             foreach (string str in pizzaNames)
             {
-                pizzaListWriteOut += str + "\n";
+                listWriteOut += str + "\n";
             }
-            PizzaListBox.Text = pizzaListWriteOut;
+            foreach (string str in drinkNames)
+            {
+                listWriteOut += str + "\n";
+            }
+            PizzaListBox.Text = listWriteOut;
         }
 
         /// <summary>
@@ -224,6 +270,22 @@ namespace Pizzeria
 
         private void Order_Click(object sender, RoutedEventArgs e)
         {
+            TotalPriceBox.Text = "0 kr";
+            allDrinks.Clear();
+            allPizza.Clear();
+            pizzaNames.Clear();
+            drinkNames.Clear();
+            PizzaListBox.Text = "";
+            if (currentDrink != null)
+            { //need to update the price boxes
+                currentDrink = null;
+            }
+            if (currentPizza != null)
+            {
+                currentPizza = null;
+            }
+            ResetDrinkIndexes();
+            ResetIndexes();
 
         }
 
@@ -234,20 +296,12 @@ namespace Pizzeria
         /// <param name="e"></param>
         private void PizzaSize_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-
-            //int index = PizzaSize.SelectedIndex;
-            //if (index == 0)
-            //    size = "small";
-            //else if (index == 1)
-            //    size = "normal";
-            //else if (index == 2)
-            //    size = "family";
-            size = PizzaSize.SelectedValue.ToString();
+            sizePizza = PizzaSize.SelectedValue.ToString();
             if (currentPizza != null)
-            {
-                sizePrice.TryGetValue(size, out float value);
+            {   //make it such that custome pizza can not have slice no can any extra be placed on a slice of pizza
+                sizePricePizza.TryGetValue(sizePizza, out float value);
                 currentPizza.SetBasePrize = value;
-                currentPizza.Size = size;
+                currentPizza.Size = sizePizza;
             }
         }
 
@@ -259,7 +313,7 @@ namespace Pizzeria
         private void PizzaType_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             ResetIndexes();
-            sizePrice.TryGetValue(size, out float value);
+            sizePricePizza.TryGetValue(sizePizza, out float value);
             int index = PizzaType.SelectedIndex;
             if (index == 0)
             {
@@ -268,11 +322,11 @@ namespace Pizzeria
                 IngredientsBox.Text = "";
             }
             else if (index == 1)
-                currentPizza = new Margherita(PriceBox, IngredientsBox, size, value);
+                currentPizza = new Margherita(PriceBox, IngredientsBox, sizePizza, value);
             else if (index == 2)
-                currentPizza = new Napoletana(PriceBox, IngredientsBox, size, value);
+                currentPizza = new Napoletana(PriceBox, IngredientsBox, sizePizza, value);
             else if (index == 3)
-                currentPizza = new Sarda(PriceBox, IngredientsBox, size, value);
+                currentPizza = new Sarda(PriceBox, IngredientsBox, sizePizza, value);
             else if (index == 4)
                 currentPizza = new PizzaPolymorth(PriceBox, IngredientsBox, "Custom", 0, "Normal", 0);
 
@@ -296,7 +350,7 @@ namespace Pizzeria
             if (currentPizza != null && index != 0)
             {
                 bool exist = ExistAlreadyInDictionary(ingredientsSelected, text);
-                if (currentAmountOfIngredients < maxIngredients && !exist) 
+                if (currentAmountOfIngredients < maxIngredients && !exist)
                 {
                     ingredientsSelected.Add(text, value);
                     currentAmountOfIngredients++;
@@ -305,7 +359,7 @@ namespace Pizzeria
             }
             else if (currentPizza != null && index == 0)
             {
-                foreach(string ingredient in ingredientsSelected.Keys)
+                foreach (string ingredient in ingredientsSelected.Keys)
                 {
                     currentPizza.RemoveIngredient(ingredient);
                 }
@@ -390,7 +444,7 @@ namespace Pizzeria
                 cheese.TryGetValue(text, out float value);
                 currentPizza.SetCheese(text, value);
             }
-            else if(currentPizza != null && index != 0)
+            else if (currentPizza != null && index != 0)
             {
                 //find the cheese and remove it, same should be done with the tomato_Sauce
                 string cheese = currentPizza.GetCheese;
@@ -411,9 +465,145 @@ namespace Pizzeria
 
             //https://stackoverflow.com/questions/3063320/combobox-adding-text-and-value-to-an-item-no-binding-source
             Test.Text = test + " " + test2;
-        } 
+        }
+
+        private void Drink_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            if (Drink.SelectedIndex == 0)
+            {
+                currentDrink = null;
+                DrinkPrice.Text = "0 kr";
+            }
+            else
+            {
+                sizeDrink = DrinkSize.SelectedValue.ToString();
+                string drinkString = Drink.SelectedValue.ToString();
+                drink.TryGetValue(drinkString, out float value);
+                currentDrink = new DrinkPolymorth(DrinkPrice, drinkString, 0, sizeDrink, value, 5);
+                sizePriceDrink.TryGetValue(sizeDrink, out value);
+                currentDrink.SetSizePrice = value;
+                currentDrink.Ice = (bool)Ice.IsChecked;
+            }
+        }
+
+        private void DrinkSize_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+
+            if (currentDrink != null)
+            {
+
+                sizeDrink = DrinkSize.SelectedValue.ToString();
+                currentDrink.Size = sizeDrink;
+                sizePriceDrink.TryGetValue(currentDrink.Size, out float value);
+                currentDrink.SetSizePrice = value;
+            }
+
+        }
+
+        private void AddDrink_Click(object sender, RoutedEventArgs e)
+        {
+            if (currentDrink != null)
+            {
+                float price;
+                string withIce = currentDrink.Ice ? "(Ice)" : "";
+                drinkNames.Add(currentDrink.GetName + " (" + currentDrink.Size + ") " + withIce);
+                price = currentDrink.GetPrice;
+                allDrinks.Add(currentDrink);
+                DisplayFinalPrice(price);
+                DisplayOrderList();
+                currentDrink = null;
+                DrinkPrice.Text = "0 kr";
+                ResetDrinkIndexes();
+            }
+        }
+
+        private void CheckBox_CheckedChanged(object sender, RoutedEventArgs e)
+        {
+            if (currentDrink != null)
+            {
+                bool iceBool = (bool)Ice.IsChecked;
+                currentDrink.Ice = iceBool;
+            }
+            else
+                Ice.IsChecked = false;
+        }
     }
 
+
+    //------------------------------------------------------------------------------
+
+
+    public class DrinkBase
+    {
+        protected float basePrice;
+        protected float price;
+        protected float sizePrise;
+        protected string sizeType;
+        protected bool ice = false;
+        protected string name;
+        protected uint number;
+        protected TextBlock priceWrite;
+        protected TextBlock sizeWrite;
+        protected float icePrice;
+
+        public DrinkBase(TextBlock priceWrite, float icePrice)
+        {
+            this.priceWrite = priceWrite;
+            this.icePrice = icePrice;
+        }
+
+        public float GetPrice { get => price; }
+
+        public string GetName { get => name; }
+
+        public uint GetNumber { get => number; }
+
+        public bool Ice { get => ice; set { ice = value; /*icePrice = value ? icePrice : 0;*/ price = CalculatePrice(); DisplayPrice(); } }
+
+        public string Size { get => sizeType; set { sizeType = value; } }
+
+        public float SetBasePrize { set { basePrice = value; price = CalculatePrice(); DisplayPrice(); } }
+
+        public float SetSizePrice { set { sizePrise = value; price = CalculatePrice(); DisplayPrice(); } }
+
+        protected float CalculatePrice()
+        {
+            float price_ = basePrice + sizePrise;
+            price_ += ice ? icePrice : 0;
+            return price_;
+        }
+
+        /// <summary>
+        /// Displays the price of the pizza. 
+        /// </summary>
+        public void DisplayPrice()
+        {
+            priceWrite.Text = price.ToString() + " kr.";
+        }
+
+        public void DisplaySize()
+        {
+            sizeWrite.Text = sizeType;
+        }
+
+    }
+
+
+    public class DrinkPolymorth : DrinkBase
+    {
+        public DrinkPolymorth(TextBlock priceWrite, string name, uint number, string size, float basePrice, float icePrice) : base(priceWrite, icePrice)
+        {
+            this.name = name;
+            this.number = number;
+            this.basePrice = basePrice;
+            sizeType = size;
+            price = CalculatePrice();
+            DisplayPrice();
+        }
+
+
+
+    }
 
 
     //------------------------------------------------------------------------------
@@ -424,7 +614,6 @@ namespace Pizzeria
 
         protected float basePrice;
         protected float price;
-        //protected string[] ingredients;
         protected Dictionary<string, float> ingredients = new Dictionary<string, float>(); //float is the value 
         protected string sizeType; //familie, normal etc.
         protected string name; //name of the pizza
@@ -432,11 +621,10 @@ namespace Pizzeria
         protected string dough = "";
         protected string tomatoSauce = "";
         protected string cheese = "";
-        //need a constructor that contains parameters for where text should be displayed. So use thoe : base(...) next to the derived classes's constructors
-        TextBlock priceWrite;
-        TextBlock pizzaNameWrite;
-        TextBlock ingredientsWrite;
-        TextBlock pizzaSize;
+        protected TextBlock priceWrite;
+        protected TextBlock pizzaNameWrite;
+        protected TextBlock ingredientsWrite;
+        protected TextBlock pizzaSize;
 
         /// <summary>
         /// The basic constructor of all pizzas
@@ -767,6 +955,9 @@ namespace Pizzeria
             DisplayIngredients();
         }
     }
+
+
+    //------------------------------------------------------------------------------
 
 
     public class DataList : ObservableCollection<string>

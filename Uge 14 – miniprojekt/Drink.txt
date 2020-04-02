@@ -1,0 +1,7 @@
+﻿None : 0
+Water : 5
+Pepsi Max : 15
+Pepsi : 15
+Cider : 10
+Bear : 40
+Beer : 20

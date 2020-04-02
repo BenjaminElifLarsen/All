@@ -1,0 +1,6 @@
+﻿Small : 15
+Normal : 20
+Family : 30
+3 Slices : -5
+Half : 8
+Calzone : 25

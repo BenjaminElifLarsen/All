@@ -7,11 +7,11 @@
         mc:Ignorable="d"
         Title="MainWindow" Height="450" Width="800">
     <Grid>
-        <Button Content="Add" HorizontalAlignment="Left" Margin="609,310,0,0" VerticalAlignment="Top" Width="75" Click="Add_Click"/>
+        <Button Content="Add Pizza" HorizontalAlignment="Left" Margin="609,286,0,0" VerticalAlignment="Top" Width="75" Click="Add_Click"/>
         <Button Content="Order" HorizontalAlignment="Left" Margin="609,356,0,0" VerticalAlignment="Top" Width="75" Click="Order_Click"/>
-        <TextBlock HorizontalAlignment="Left" Name="IngredientsBox" TextWrapping="Wrap" Text="figure out to scale it to fit all the ingredients" VerticalAlignment="Top" Margin="293,42,0,0" Height="177" Width="117"/>
+        <TextBlock HorizontalAlignment="Left" Name="IngredientsBox" TextWrapping="Wrap" Text="figure out to scale it to fit all the ingredients" VerticalAlignment="Top" Margin="293,42,0,0" Height="247" Width="117"/>
         <TextBlock HorizontalAlignment="Left" Name="PriceBox" TextWrapping="Wrap" Text="Price" VerticalAlignment="Top" Margin="601,42,0,0" Width="116"/>
-        <TextBlock HorizontalAlignment="Left" Name="TotalPriceBox" TextWrapping="Wrap" Text="0" VerticalAlignment="Top" Margin="601,96,0,0" Width="116"/>
+        <TextBlock HorizontalAlignment="Left" Name="TotalPriceBox" TextWrapping="Wrap" Text="0" VerticalAlignment="Top" Margin="601,128,0,0" Width="116"/>
         <ComboBox HorizontalAlignment="Left" Name="PizzaType" Margin="26,42,0,0" VerticalAlignment="Top" SelectedValuePath="Content" Width="120" SelectionChanged="PizzaType_SelectionChanged">
             <ComboBoxItem Content="None"></ComboBoxItem>
             <ComboBoxItem Content="Margherita"></ComboBoxItem>
@@ -19,60 +19,42 @@
             <ComboBoxItem Content="Sarda"></ComboBoxItem>
             <ComboBoxItem Content="Custom"></ComboBoxItem>
         </ComboBox>
-        <ComboBox HorizontalAlignment="Left" Name="PizzaSize" Margin="159,42,0,0" VerticalAlignment="Top" Width="120" SelectedValuePath="Content" SelectionChanged="PizzaSize_SelectionChanged">
-            <ComboBoxItem Content="Small" ></ComboBoxItem>
-            <ComboBoxItem Content="Normal" ></ComboBoxItem>
-            <ComboBoxItem Content="Family"></ComboBoxItem>
+        <ComboBox HorizontalAlignment="Left" Name="PizzaSize" Margin="159,42,0,0" VerticalAlignment="Top" Width="120" SelectionChanged="PizzaSize_SelectionChanged">
+            
         </ComboBox>
         <TextBlock HorizontalAlignment="Left" TextWrapping="Wrap" Text="Pizza" VerticalAlignment="Top" Margin="26,26,0,0" RenderTransformOrigin="0.535,0.746" FontWeight="Bold"/>
         <TextBlock HorizontalAlignment="Left" TextWrapping="Wrap" Text="Size" VerticalAlignment="Top" Margin="159,26,0,0" FontWeight="Bold"/>
         <TextBlock HorizontalAlignment="Left" TextWrapping="Wrap" VerticalAlignment="Top" Margin="601,26,0,0" FontWeight="Bold"><Run Text="Current Pizza P"/><Run Text="r"/><Run Text="ice"/></TextBlock>
-        <TextBlock HorizontalAlignment="Left" TextWrapping="Wrap" VerticalAlignment="Top" Margin="601,80,0,0" Text="Total Pizza Price" FontWeight="Bold"/>
+        <TextBlock HorizontalAlignment="Left" TextWrapping="Wrap" VerticalAlignment="Top" Margin="601,112,0,0" Text="Total Price" FontWeight="Bold"/>
         <TextBlock HorizontalAlignment="Left" TextWrapping="Wrap" Text="Ingredients" VerticalAlignment="Top" Margin="293,26,0,0" FontWeight="Bold" TextAlignment="Center"/>
-        <TextBlock HorizontalAlignment="Left" TextWrapping="Wrap" Text="Pizza List" VerticalAlignment="Top" Margin="407,26,0,0" FontWeight="Bold" TextAlignment="Center"/>
-        <TextBlock HorizontalAlignment="Left" Name="PizzaListBox" TextWrapping="Wrap" VerticalAlignment="Top" Margin="407,42,0,0" Height="327" Width="117"/>
+        <TextBlock HorizontalAlignment="Left" TextWrapping="Wrap" VerticalAlignment="Top" Margin="407,26,0,0" FontWeight="Bold" TextAlignment="Center"><Run Text="Order "/><Run Text="List"/></TextBlock>
+        <TextBlock HorizontalAlignment="Left" Name="PizzaListBox" TextWrapping="Wrap" VerticalAlignment="Top" Margin="407,42,0,0" Height="247" Width="117"/>
         <TextBlock HorizontalAlignment="Left" Margin="26,115,0,0" TextWrapping="Wrap" VerticalAlignment="Top" FontWeight="Bold" Height="29" Width="104"><Run Text="Extra Ingredients"/><Run Text=" (4"/><Run Text=" max"/><Run Text=")"/></TextBlock>
         <TextBlock HorizontalAlignment="Left" TextWrapping="Wrap" VerticalAlignment="Top" Margin="159,128,0,0"><Run FontWeight="Bold" Text="Dough"/></TextBlock>
-        <ComboBox HorizontalAlignment="Left" Name="Extra_Ingredients" Margin="26,149,0,0" VerticalAlignment="Top" SelectedValuePath="Content" Width="120" SelectionChanged="Extra_Ingredients_SelectionChanged">
-            <ComboBoxItem Content="None"></ComboBoxItem>
-            <ComboBoxItem Content="Garlic"></ComboBoxItem>
-            <ComboBoxItem Content="Spinach"></ComboBoxItem>
-            <ComboBoxItem Content="Beef"></ComboBoxItem>
-            <ComboBoxItem Content="Cherry tomatoes"></ComboBoxItem>
-            <ComboBoxItem Content="Corn"></ComboBoxItem>
-            <ComboBoxItem Content="Anchovies"></ComboBoxItem>
-            <ComboBoxItem Content="Mushrooms"></ComboBoxItem>
-            <ComboBoxItem Content="Artichokes"></ComboBoxItem>
-            <ComboBoxItem Content="Fries"></ComboBoxItem>
-            <ComboBoxItem Content="Cauliflower"></ComboBoxItem>
+        <ComboBox HorizontalAlignment="Left" Name="Extra_Ingredients" Margin="26,149,0,0" VerticalAlignment="Top" Width="120" SelectionChanged="Extra_Ingredients_SelectionChanged">
         </ComboBox>
-        <ComboBox HorizontalAlignment="Left" Name="Dough" VerticalAlignment="Top" Width="120" Margin="159,149,0,0" SelectedValuePath="Content" SelectionChanged="Dough_SelectionChanged">
-            <ComboBoxItem Content="Classic"></ComboBoxItem>
-            <ComboBoxItem Content="Skinny"></ComboBoxItem>
-            <ComboBoxItem Content="Thin crust"></ComboBoxItem>
-            <ComboBoxItem Content="Sfincione"></ComboBoxItem>
-            <ComboBoxItem Content="Whole Grain"></ComboBoxItem>
+        <ComboBox HorizontalAlignment="Left" Name="Dough" VerticalAlignment="Top" Width="120" Margin="159,149,0,0" SelectionChanged="Dough_SelectionChanged">
+
         </ComboBox>
-        <ComboBox HorizontalAlignment="Left" Name="Cheese" Margin="26,213,0,0" VerticalAlignment="Top" Width="120" SelectedValuePath="Content" SelectionChanged="Cheese_SelectionChanged">
-            <ComboBoxItem Content="None"></ComboBoxItem>
-            <ComboBoxItem Content="Mozzarella"></ComboBoxItem>
-            <ComboBoxItem Content="Gorgonzola"></ComboBoxItem>
-            <ComboBoxItem Content="Fontina"></ComboBoxItem>
-            <ComboBoxItem Content="Parmesan"></ComboBoxItem>
-            <ComboBoxItem Content="Cheddar"></ComboBoxItem>
-            <ComboBoxItem Content="Emmental"></ComboBoxItem>
+        <ComboBox HorizontalAlignment="Left" Name="Cheese" Margin="26,213,0,0" VerticalAlignment="Top" Width="120" SelectionChanged="Cheese_SelectionChanged">
+
         </ComboBox>
-        <TextBlock HorizontalAlignment="Left" TextWrapping="Wrap" VerticalAlignment="Top" Margin="26,192,0,0"><Run FontWeight="Bold" Text="Cheese"/></TextBlock>
+        <TextBlock HorizontalAlignment="Left" TextWrapping="Wrap" VerticalAlignment="Top" Margin="26,195,0,0"><Run FontWeight="Bold" Text="Cheese"/></TextBlock>
         <TextBlock HorizontalAlignment="Left" TextWrapping="Wrap" VerticalAlignment="Top" Margin="159,195,0,0"><Run FontWeight="Bold" Text="Tomato Sauce"/></TextBlock>
-        <ComboBox HorizontalAlignment="Left" Name="Tomato_Sauce" Margin="159,213,0,0" VerticalAlignment="Top" Width="120" SelectedValuePath="Content" SelectionChanged="Tomato_Sauce_SelectionChanged">
-            <ComboBoxItem Content="None"></ComboBoxItem>
-            <ComboBoxItem Content="Basic Sauce"></ComboBoxItem>
-            <ComboBoxItem Content="Spicy Sauce"></ComboBoxItem>
-            <ComboBoxItem Content="Garlic Sauce"></ComboBoxItem>
-            <ComboBoxItem Content="Pesto Sauce"></ComboBoxItem>
+        <ComboBox HorizontalAlignment="Left" Name="Tomato_Sauce" Margin="159,213,0,0" VerticalAlignment="Top" Width="120" SelectionChanged="Tomato_Sauce_SelectionChanged">
+
         </ComboBox>
         <ComboBox HorizontalAlignment="Left" Name="TestComboBox" Margin="361,370,0,0" VerticalAlignment="Top" Width="120" SelectionChanged="TestComboBox_SelectionChanged"/>
         <TextBlock HorizontalAlignment="Left" Name="Test" Margin="500,374,0,0" TextWrapping="Wrap" Text="TextBlock" VerticalAlignment="Top"/>
+        <TextBlock HorizontalAlignment="Left" TextWrapping="Wrap" VerticalAlignment="Top" Margin="26,246,0,0" FontWeight="Bold" Text="Drinks"/>
+        <TextBlock HorizontalAlignment="Left" TextWrapping="Wrap" VerticalAlignment="Top" Margin="601,69,0,0" FontWeight="Bold"><Run Text="Current Drink "/><Run Text="Price"/></TextBlock>
+        <TextBlock HorizontalAlignment="Left" Name="DrinkPrice" TextWrapping="Wrap" Text="Price" VerticalAlignment="Top" Margin="601,85,0,0"/>
+        <TextBlock HorizontalAlignment="Left" TextWrapping="Wrap" VerticalAlignment="Top" Margin="159,246,0,0" FontWeight="Bold"><Run Text="Drinks"/><Run Text=" Size"/></TextBlock>
+        <ComboBox HorizontalAlignment="Left" Name="Drink" Margin="26,267,0,0" VerticalAlignment="Top" Width="120" SelectionChanged="Drink_SelectionChanged"/>
+        <ComboBox HorizontalAlignment="Left" Name ="DrinkSize" Margin="159,267,0,0" VerticalAlignment="Top" Width="120" SelectionChanged="DrinkSize_SelectionChanged"/>
+        <Button Content="Add Drink" HorizontalAlignment="Left" Margin="609,318,0,0" VerticalAlignment="Top" Width="75" Click="AddDrink_Click"/>
+        <TextBlock HorizontalAlignment="Left" TextWrapping="Wrap" VerticalAlignment="Top" Margin="26,305,0,0" FontWeight="Bold" Text="Ice"/>
+        <CheckBox Content="Yes" Name="Ice" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="47,306,0,0" Unchecked="CheckBox_CheckedChanged" Checked="CheckBox_CheckedChanged"/>
 
 
     </Grid>
