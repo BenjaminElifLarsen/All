@@ -1,0 +1,22 @@
+﻿1
+Margherita
+Classic
+Basic Sauce
+Mozzarella
+Oregano
+
+2
+Napoletana
+Classic
+Basic Sauce
+Mozzarella
+Oregano
+Anchovies
+
+3
+Sarda
+Classic
+Basic Sauce
+Mozzarella
+Pecorino Cheese
+Spicy Salami

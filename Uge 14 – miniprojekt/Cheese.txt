@@ -1,7 +1,7 @@
 ﻿None : 0
-Mozzarella : 0
-Gorgonzola : 0
-Fontina : 0
-Parmesan : 0
-Cheddar : 0
-Emmental : 0
+Mozzarella : 4
+Gorgonzola : 6
+Fontina : 5
+Parmesan : 5
+Cheddar : 4
+Emmental : 2

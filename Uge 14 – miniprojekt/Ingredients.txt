@@ -9,3 +9,9 @@ Mushrooms : 10
 Artichokes : 4
 Fries : 14
 Cauliflower : 17
+Onions : 2
+Pepperoni : 12
+Potatoes : 5
+Pasta : 7
+Spicy Salami : 12
+Pecorino Cheese : 12

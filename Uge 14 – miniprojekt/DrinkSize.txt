@@ -1,0 +1,3 @@
+﻿Little : 0
+Medium : 5
+Big : 10
