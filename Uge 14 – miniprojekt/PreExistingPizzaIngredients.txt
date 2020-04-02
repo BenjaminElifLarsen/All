@@ -1,0 +1,7 @@
+﻿Classic : 10
+Basic Sauce : 4
+Mozzarella : 4
+Oregano : 4
+Anchovies : 19
+Pecorino Cheese : 12
+Spicy Salami : 12
