@@ -25,3 +25,10 @@ o	Husk prisen!
 De sultne kunder som kan spise mere end én pizza, eller drikke mere end én drikkevare, skal selvfølgelig have mulighed for det!
 -	Gør det muligt at kunne lave en ordre, så man kan bestille flere pizzaer og flere drikkevare.!
 o	Husk at opdatere udregningen af en samlet pris i form af en samlet ordre.
+
+Rabat – Hvad er det.?
+Vi har haft flere kunder, som køber mange pizzaer og drikkevarer ad gangen – dem vil vi gerne vise, at vi værdsætter, så derfor skal vi have indført en rabatordning, så disse kunder føler sig værdsat af os!
+-	Lav et rabatsystem, så ved køb af min. 2 pizzaer og 2 drikkevarer, bliver prisen på pizza-dejen (dyreste dej, hvis der er prisforskel) gratis på én pizza.
+o	Husk at tilføje til prisoversigten, at rabatten er tilføjet.
+
+
