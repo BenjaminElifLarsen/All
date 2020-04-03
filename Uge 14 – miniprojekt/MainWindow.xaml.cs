@@ -55,7 +55,9 @@ namespace Pizzeria
         List<PizzaBase> prePizzaList = new List<PizzaBase>();
         DataList prePizzaDataList;
 
-        DataList testList;
+        string mostExpensiveDough_Name = null;
+        float? mostExpensiveDough_Price = null;
+        bool discount = false;
 
         public MainWindow()
         {
@@ -65,21 +67,21 @@ namespace Pizzeria
             TotalPriceBox.Text = "0 kr.";
             DrinkPrice.Text = "0 kr";
             this.Title = "Pizzaria Venator Pizza Sanctum";
-            //DictionarySetUp();
 
             Setup();
             PrePizzaSetup();
-            currentAmountOfIngredients = 0; //needs to be after DictionarySetUp, since it active the selct code 
+            currentAmountOfIngredients = 0; //needs to be after DictionarySetUp, since DictionarySetUp activate the selct code 
             ingredientsSelected.Clear();
             PizzaType.ItemsSource = prePizzaDataList;
             PizzaType.SelectedIndex = 0;
-        }
+        } //should really decouple as many functions as possible to make them easier to use in other projects
 
-        private void PrePizzaSetup() //how to handle custome pizza and "none"
+        /// <summary>
+        /// Sets up all the pre-existing pizzas. Also add the option for no pizza "None". 
+        /// </summary>
+        private void PrePizzaSetup() 
         {
-            
             string[] lines = File.ReadAllLines("PreExistingPizza.txt");
-            //string[] ingredientsPre = File.ReadAllLines("PreExistingPizzaIngredients.txt");
             uint number_ = 0;
             string name_ = null;
             string dough_ = null;
@@ -106,19 +108,19 @@ namespace Pizzeria
                         {
                             if(lines[posistion] != "")
                             {
-                                prePizzaIngredients.TryGetValue(lines[posistion], out float price); //will not work since dough and that is not part of the extraIngredients list... so new list 
-                                preIngredients.Add(lines[posistion], price);
-                                if (IsADough(lines[posistion]))
+                                prePizzaIngredients.TryGetValue(lines[posistion], out float price); //need to capture errors that can be caused in a line contain data that does not exist in any of the dictionaries. 
+                                preIngredients.Add(lines[posistion], price); //should it discard the whole pizza? Just the ingredients? Just the ingredients would be a problem if it is a dough...
+                                if (IsInDictionary(lines[posistion],dough))
                                 {
                                     dough_ = lines[posistion];
                                     doug_Number = price;
                                 }
-                                else if (IsATomatoSauce(lines[posistion]))
+                                else if (IsInDictionary(lines[posistion], tomatoSauce))
                                 {
                                     tomatoSauce_ = lines[posistion];
                                     tomatoSauce_Number = price;
                                 }
-                                else if (IsACheese(lines[posistion]))
+                                else if (IsInDictionary(lines[posistion], cheese))
                                 {
                                     cheese_ = lines[posistion];
                                     cheese_Number = price;
@@ -136,7 +138,7 @@ namespace Pizzeria
                         break;
                 } while (!Single.TryParse(lines[posistion], out _));
                 prePizza = new PizzaPolymorth(PriceBox, IngredientsBox, name_, number_, preIngredients);
-                prePizza.SetDough(dough_, doug_Number);
+                prePizza.SetDough(dough_, doug_Number); 
                 prePizza.SetCheese(cheese_, cheese_Number);
                 prePizza.SetTomatoSauce(tomatoSauce_, tomatoSauce_Number);
                 prePizzaList.Add(prePizza);
@@ -146,16 +148,20 @@ namespace Pizzeria
                 cheese_ = null;
                 tomatoSauce_ = null;
                 preIngredients.Clear();
-
             }
             prePizzaDataList = new DataList(prePizzaNames.ToArray());
 
 
         }
 
-        private bool IsADough(string ingredientToCheck)
+        /// <summary>
+        /// Checks if a string appears in the dough dictionary. 
+        /// </summary>
+        /// <param name="ingredientToCheck"></param>
+        /// <returns></returns>
+        private bool IsInDictionary(string ingredientToCheck, Dictionary<string,float> toCheck)
         {
-            foreach (string str in dough.Keys)
+            foreach (string str in toCheck.Keys)
             {
                 if (str == ingredientToCheck)
                     return true;
@@ -163,32 +169,28 @@ namespace Pizzeria
             return false;
         }
 
-        private bool IsACheese(string ingredientToCheck)
-        {
-            foreach (string str in cheese.Keys)
-            {
-                if (str == ingredientToCheck)
-                    return true;
-            }
-            return false;
-        }
-
-        private bool IsATomatoSauce(string ingredientToCheck)
-        {
-            foreach (string str in tomatoSauce.Keys)
-            {
-                if (str == ingredientToCheck)
-                    return true;
-            }
-            return false;
-        }
-
+        /// <summary>
+        /// Reads all the lines in <paramref name="filename"/> and returns them in an array. If the file cannot be found, it returns null
+        /// </summary>
+        /// <param name="filename">File to find</param>
+        /// <returns>If file is found, returns a string array, else it will return null.</returns>
         private string[] FileReader(string filename)
         {
-            string[] lines = File.ReadAllLines(filename);
-            return lines;
+            try
+            {
+                string[] lines = File.ReadAllLines(filename);
+                return lines;
+            }
+            catch (Exception e)
+            {
+                Debug.WriteLine(e);
+                return null;
+            }
         }
 
+        /// <summary>
+        /// Sets up all of the dictionaries, Datalists, comboboxes, and indexes.
+        /// </summary>
         private void Setup()
         {
             //https://stackoverflow.com/questions/4902039/difference-between-selecteditem-selectedvalue-and-selectedvaluepath
@@ -197,28 +199,28 @@ namespace Pizzeria
             string[] lines; float[] values; string[] items;
             lines = FileReader("PreExistingPizzaIngredients.txt");
             TextSplit(lines, out items, out values);
-            DictionaryAndComboBoxAdd(ref prePizzaIngredients, out _, items, values);
+            DictionaryAdd(ref prePizzaIngredients, out _, items, values);
             lines = FileReader("PizzaSize.txt");
             TextSplit(lines, out items, out values);
-            DictionaryAndComboBoxAdd(ref sizePricePizza, out pizzaSizeList, items, values);
+            DictionaryAdd(ref sizePricePizza, out pizzaSizeList, items, values);
             lines = FileReader("Dough.txt");
             TextSplit(lines, out items, out values);
-            DictionaryAndComboBoxAdd(ref dough, out doughList, items, values);
+            DictionaryAdd(ref dough, out doughList, items, values);
             lines = FileReader("Cheese.txt");
             TextSplit(lines, out items, out values);
-            DictionaryAndComboBoxAdd(ref cheese, out cheeseList, items, values);
+            DictionaryAdd(ref cheese, out cheeseList, items, values);
             lines = FileReader("Ingredients.txt");
             TextSplit(lines, out items, out values);
-            DictionaryAndComboBoxAdd(ref extraIngredients, out extraIngredientsList, items, values);
+            DictionaryAdd(ref extraIngredients, out extraIngredientsList, items, values);
             lines = FileReader("Tomato_Sauce.txt");
             TextSplit(lines, out items, out values);
-            DictionaryAndComboBoxAdd(ref tomatoSauce, out tomatoSauceList, items, values);
+            DictionaryAdd(ref tomatoSauce, out tomatoSauceList, items, values);
             lines = FileReader("Drink.txt");
             TextSplit(lines, out items, out values);
-            DictionaryAndComboBoxAdd(ref drink, out drinkList, items, values);
+            DictionaryAdd(ref drink, out drinkList, items, values);
             lines = FileReader("DrinkSize.txt");
             TextSplit(lines, out items, out values);
-            DictionaryAndComboBoxAdd(ref sizePriceDrink, out drinkSizeList, items, values);
+            DictionaryAdd(ref sizePriceDrink, out drinkSizeList, items, values);
 
             Cheese.ItemsSource = cheeseList;
             Dough.ItemsSource = doughList;
@@ -227,25 +229,6 @@ namespace Pizzeria
             Drink.ItemsSource = drinkList;
             DrinkSize.ItemsSource = drinkSizeList;
             PizzaSize.ItemsSource = pizzaSizeList;
-            ResetIndexes();
-            ResetDrinkIndexes();
-        }
-
-        /// <summary>
-        /// Sets up the dictionaries with keys and values
-        /// </summary>
-        private void DictionarySetUp() //no longer used and usable
-        {
-            sizePricePizza.Add("Small", 15); //when displaying the size, might also want to display the price
-            sizePricePizza.Add("Normal", 20);
-            sizePricePizza.Add("Family", 30);
-
-            DictionaryAdd(ref dough, Dough);
-            DictionaryAdd(ref tomatoSauce, Tomato_Sauce);
-            DictionaryAdd(ref extraIngredients, Extra_Ingredients);
-            DictionaryAdd(ref cheese, Cheese);
-
-            PizzaType.SelectedIndex = 0;
             ResetIndexes();
             ResetDrinkIndexes();
         }
@@ -272,54 +255,49 @@ namespace Pizzeria
             Ice.IsChecked = false;
         }
 
-        private void DictionaryAdd(ref Dictionary<string, float> dictionary, ComboBox combo)
-        { //https://stackoverflow.com/questions/11878217/add-items-to-combobox-in-wpf
-            Random rnd = new Random();
-            int amount = combo.Items.Count;
-            for (int i = 0; i < amount; i++)
-            {
-                int value = rnd.Next(5, 25);
-                combo.SelectedIndex = i;
-                dictionary.Add(combo.Text, value);
-            }
-        }
-
         /// <summary>
-        /// ... Splits a string based upong ':'. Left side is assumed to be a string, the right side a float. 
+        /// Splits up all strings in <paramref name="textToSplit"/>. Splits a string based upong ':'. Left side is assumed to be a string, the right side a float. 
+        /// If a string is not correctly set up, that string will not be placed in the two arrays.
         /// </summary>
-        /// <param name="textToSplit"></param>
-        /// <param name="items"></param>
-        /// <param name="values"></param>
+        /// <param name="textToSplit">Array of strings to split.</param>
+        /// <param name="items">The items in the string array.</param>
+        /// <param name="values">The price of the items in the string array.</param>
         private void TextSplit(string[] textToSplit, out string[] items, out float[] values)
         {
-            uint posistion = 0;
-            items = new string[textToSplit.Length];
-            values = new float[textToSplit.Length];
+            List<string> stringList = new List<string>();
+            List<float> floatList = new List<float>();
             foreach (string str in textToSplit)
             {
                 string[] splitStr = str.Split(':');
                 try
                 {
-                    items[posistion] = splitStr[0].Trim();
-                    values[posistion] = Single.Parse(splitStr[1].Trim());
+                    stringList.Add(splitStr[0].Trim());
+                    floatList.Add(Single.Parse(splitStr[1].Trim()));
                 }
                 catch
                 {
+                    stringList.RemoveAt(stringList.Count - 1);
                     Debug.WriteLine("List is not in correct format: item : value");
                 }
-                posistion++;
             }
+            items = stringList.ToArray();
+            values = floatList.ToArray();
         }
 
-        private void DictionaryAndComboBoxAdd(ref Dictionary<string, float> dictionary, out DataList list, string[] items, float[] values)
-        {
-            for (int i = 0; i < items.Length; i++)
+        /// <summary>
+        /// Fills up a <paramref name="dictionary"/>, keys being <paramref name="keys"/> and the values being <paramref name="values"/>. Returns both the dictionary and a DataList <paramref name="list"/> containing the keys.
+        /// </summary>
+        /// <param name="dictionary">The dictionary to fill up.</param>
+        /// <param name="list">The Datalist of keys.</param>
+        /// <param name="keys">The keys.</param>
+        /// <param name="values">The values.</param>
+        private void DictionaryAdd(ref Dictionary<string, float> dictionary, out DataList list, string[] keys, float[] values) //consider a better name
+        { //should capture if keys and values got different lengths and handle that error. If more keys than values it will cause a indexOfOutRange, more values than keys will not cause an error.
+            for (int i = 0; i < keys.Length; i++)
             {
-                dictionary.Add(items[i], values[i]);
-                //combo.Items.Add(items[i]);
+                dictionary.Add(keys[i], values[i]);
             }
-            list = new DataList(items);
-            //combo.ItemsSource = list;
+            list = new DataList(keys);
         }
 
         /// <summary>
@@ -331,12 +309,10 @@ namespace Pizzeria
         {
             if (currentPizza != null)
             {
-                float price;
                 pizzaNames.Add(currentPizza.GetName + " (" + currentPizza.Size + ")");
-                price = currentPizza.GetPrice;
                 allPizza.Add(currentPizza);
-                DisplayFinalPrice(price);
                 DisplayOrderList();
+                DisplayFinalPrice();
                 ingredientsSelected.Clear();
                 currentAmountOfIngredients = 0;
                 currentPizza = null;
@@ -348,10 +324,11 @@ namespace Pizzeria
         }
 
         /// <summary>
-        /// Displays all the pizzas that have been added. 
+        /// Displays all the wares that have been added. If a discount has been earned, it will also be displayed.  
         /// </summary>
         private void DisplayOrderList()
         {
+            discount = Discound(out mostExpensiveDough_Name, out mostExpensiveDough_Price);
             string listWriteOut = "";
             foreach (string str in pizzaNames)
             {
@@ -361,20 +338,66 @@ namespace Pizzeria
             {
                 listWriteOut += str + "\n";
             }
+            if (discount)
+            {
+                listWriteOut += "Discount (" + mostExpensiveDough_Name + " dough) - " + mostExpensiveDough_Price + "kr.\n";
+                //DisplayFinalPrice(-(float)mostExpensiveDough_Price);
+            }
             PizzaListBox.Text = listWriteOut;
         }
 
         /// <summary>
-        /// Adds the price of the current pizza to the overall price and displays the final price. 
+        /// Cheecks if the customer is privileged to a discord. If they have not earned one, <paramref name="doughExpensive"/> and <paramref name="doughPrice"/> are null.
         /// </summary>
-        /// <param name="priceToAdd"></param>
-        private void DisplayFinalPrice(float priceToAdd)
-        { //it is doing two different things, split it into the functions. 
-            //should update and display the final price
-            finalPrice += priceToAdd;
+        /// <param name="doughExpensive">The name of the dough they have earned a discond on.</param>
+        /// <param name="doughPrice">The price of the dough they have earned a discond on.</param>
+        /// <returns>Returns true if a discound has been earned, else false.</returns>
+        private bool Discound(out string doughExpensive, out float? doughPrice)
+        {
+
+            if(pizzaNames.Count >= 2 && drinkNames.Count >= 2)
+            {
+                doughPrice = 0;
+                doughExpensive = "";
+                foreach (PizzaBase pizza in allPizza)
+                {
+                    string doughUsed = pizza.GetDough;
+                    dough.TryGetValue(doughUsed, out float value);
+                    doughPrice = doughPrice > value ? doughPrice : value;
+                    doughExpensive = doughPrice > value ? doughExpensive : doughUsed;
+                }
+                return true;
+            }
+            doughExpensive = null;
+            doughPrice = null;
+            return false;
+        }
+
+        /// <summary>
+        /// Calculates the final price and displays it.
+        /// </summary>
+        private void DisplayFinalPrice()
+        {
+            float price_ = 0;
+            if (discount)
+                price_ -= (float)mostExpensiveDough_Price;
+            foreach(PizzaBase pizza in allPizza)
+            {
+                price_ += pizza.GetPrice;
+            }
+            foreach(DrinkBase drink in allDrinks)
+            {
+                price_ += drink.GetPrice;
+            }
+            finalPrice = price_;
             TotalPriceBox.Text = finalPrice.ToString() + " kr.";
         }
 
+        /// <summary>
+        /// Resests list of added pizzas, drinks, indexes, and values regarding the textboxes, and the textboxes themselves. 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void Order_Click(object sender, RoutedEventArgs e)
         {
             TotalPriceBox.Text = "0 kr";
@@ -384,16 +407,16 @@ namespace Pizzeria
             drinkNames.Clear();
             PizzaListBox.Text = "";
             if (currentDrink != null)
-            { //need to update the price boxes
                 currentDrink = null;
-            }
             if (currentPizza != null)
-            {
                 currentPizza = null;
-            }
             ResetDrinkIndexes();
             ResetIndexes();
             PizzaType.SelectedIndex = 0;
+            discount = false;
+            mostExpensiveDough_Name = null;
+            mostExpensiveDough_Price = null;
+            finalPrice = 0;
 
         }
 
@@ -408,13 +431,13 @@ namespace Pizzeria
             if (currentPizza != null)
             {   //make it such that custome pizza can not have slice no can any extra be placed on a slice of pizza
                 sizePricePizza.TryGetValue(sizePizza, out float value);
-                currentPizza.SetBasePrize = value;
+                currentPizza.SetBasePrice = value;
                 currentPizza.Size = sizePizza;
             }
         }
 
         /// <summary>
-        /// Sets the size of the pizza. 
+        /// Sets the current pizza out from the chosen pizza on the pizza combobox. 
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
@@ -433,19 +456,16 @@ namespace Pizzeria
             {
                 //prePizzaList[index-1]; //minus 1 because there is one more option in the combobox, "None", than there are pizzas. 
                 currentPizza = new PizzaPolymorth(PriceBox, IngredientsBox, prePizzaList[index - 1].GetName, prePizzaList[index - 1].GetNumber, prePizzaList[index - 1].GetIngredientsDictionary); //prevents overwriting the "base" pizzas
-
-            }
-            if (index != 0)
-            {
                 dough.TryGetValue(prePizzaList[index - 1].GetDough, out float valuePrice);
-                currentPizza.SetBasePrize = value;
+                currentPizza.SetBasePrice = value;
                 currentPizza.SetDough(prePizzaList[index - 1].GetDough, valuePrice);
+                currentPizza.SetCheese(prePizzaList[index - 1].GetCheese, valuePrice);
+                currentPizza.SetTomatoSauce(prePizzaList[index - 1].GetTomatoSauce, valuePrice);
             }
         }
 
-
         /// <summary>
-        /// 
+        /// Adds extra ingredients to a pizza, if the limit on extra ingredients have not been reached. 
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
@@ -453,8 +473,6 @@ namespace Pizzeria
         {
             int index = Extra_Ingredients.SelectedIndex;
             Extra_Ingredients.SelectedIndex = index;
-            //string whyDoesTextGiveTheOldResultAndNotTheNewResult = Extra_Ingredients.Items[index].ToString().Split(':')[1].Trim();
-            //string text = whyDoesTextGiveTheOldResultAndNotTheNewResult;
             string text = Extra_Ingredients.SelectedValue.ToString();
             extraIngredients.TryGetValue(text, out float value);
 
@@ -479,6 +497,11 @@ namespace Pizzeria
             }
         }
 
+        /// <summary>
+        /// Gets the string keys from <paramref name="getKeyFrom"/> dictionary.
+        /// </summary>
+        /// <param name="getKeyFrom">Dictionary to get the keys from.</param>
+        /// <returns>Returns an string array consisting of the keys of <paramref name="getKeyFrom"/> dictionary.</returns>
         private string[] GetKeys(Dictionary<string, float> getKeyFrom)
         {
             uint i = 0;
@@ -500,6 +523,12 @@ namespace Pizzeria
             return keyArray;
         }
 
+        /// <summary>
+        /// Chekcs if a string key <paramref name="keyToFind"/> already exist or not in dictionary <paramref name="keyToFind"/>.
+        /// </summary>
+        /// <param name="toCheck">Dictionary to check.</param>
+        /// <param name="keyToFind">Key to check exist.</param>
+        /// <returns>Returns true if <paramref name="keyToFind"/> is present, else false.</returns>
         private bool ExistAlreadyInDictionary(Dictionary<string, float> toCheck, string keyToFind)
         {
             bool wasFound = false;
@@ -515,6 +544,11 @@ namespace Pizzeria
             return wasFound;
         }
 
+        /// <summary>
+        /// Sets the selected dough as the dough and its price of the pizza. 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void Dough_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             //consider allowing the non-custom pizzas to have their dough and such changed. A foreach loop with a breaak for the ingridents list checking against the different doughs should work
@@ -528,6 +562,11 @@ namespace Pizzeria
             }
         }
 
+        /// <summary>
+        /// Sets the selected tomato sauce as the tomato sauce and its price of the pizza. 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void Tomato_Sauce_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             int index = Tomato_Sauce.SelectedIndex;
@@ -545,6 +584,11 @@ namespace Pizzeria
 
         }
 
+        /// <summary>
+        /// Sets the selected cheese as the cheese and its price of the pizza. 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void Cheese_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
 
@@ -564,20 +608,11 @@ namespace Pizzeria
 
         }
 
-        private void TestComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
-        { //used to figure out stuff...
-            //var test = TestComboBox.SelectedItem; //this is working when using the new system, but the other comboboxes do not work using the new systems...
-            //string test2 = TestComboBox.SelectedValue.ToString(); //it might be SelectedValuePath="Content" that is causing a problem. With it, the SelectedValue is null, without it is the same as test
-            //it seems that SelectedValuePath="Content" is needed to just get the "content" of a ComboBoxItem when it is hardwritten, but if itemsSource is used it is not needed. Perhaps the "content" is not set when set using itemsSource?
-            //Try and find material to read up on about this
-            //maybe it is the ComboBoxItem
-
-            //https://docs.microsoft.com/en-us/dotnet/api/system.windows.controls.combobox?view=netframework-4.8
-
-            //https://stackoverflow.com/questions/3063320/combobox-adding-text-and-value-to-an-item-no-binding-source
-            //Test.Text = test + " " + test2;
-        }
-
+        /// <summary>
+        /// Sets the drink. 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void Drink_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             if (Drink.SelectedIndex == 0)
@@ -598,6 +633,11 @@ namespace Pizzeria
             }
         }
 
+        /// <summary>
+        /// Sets the size of the drink.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void DrinkSize_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
 
@@ -612,6 +652,11 @@ namespace Pizzeria
 
         }
 
+        /// <summary>
+        /// Adds the drink to the order list. 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void AddDrink_Click(object sender, RoutedEventArgs e)
         {
             if (currentDrink != null)
@@ -621,14 +666,19 @@ namespace Pizzeria
                 drinkNames.Add(currentDrink.GetName + " (" + currentDrink.Size + ") " + withIce);
                 price = currentDrink.GetPrice;
                 allDrinks.Add(currentDrink);
-                DisplayFinalPrice(price);
                 DisplayOrderList();
+                DisplayFinalPrice();
                 currentDrink = null;
                 DrinkPrice.Text = "0 kr";
                 ResetDrinkIndexes();
             }
         }
 
+        /// <summary>
+        /// Sets whether the drink contains ice or not. 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void CheckBox_CheckedChanged(object sender, RoutedEventArgs e)
         {
             if (currentDrink != null)
@@ -643,6 +693,7 @@ namespace Pizzeria
 
 
     //------------------------------------------------------------------------------
+
 
 
     public class DrinkBase
@@ -664,20 +715,45 @@ namespace Pizzeria
             this.icePrice = icePrice;
         }
 
+        /// <summary>
+        /// Returns the price of the product.
+        /// </summary>
         public float GetPrice { get => price; }
 
+        /// <summary>
+        /// Returns the name of the product.
+        /// </summary>
         public string GetName { get => name; }
 
+        /// <summary>
+        /// Returns the number of the product.
+        /// </summary>
         public uint GetNumber { get => number; }
 
+        /// <summary>
+        /// True if products contain ice, false otherwise. Returns true if the products contain ice, else false. Also updates the price.  
+        /// </summary>
         public bool Ice { get => ice; set { ice = value; /*icePrice = value ? icePrice : 0;*/ price = CalculatePrice(); DisplayPrice(); } }
 
+        /// <summary>
+        /// Gets and sets the size of the product.
+        /// </summary>
         public string Size { get => sizeType; set { sizeType = value; } }
 
+        /// <summary>
+        /// Sets the base price of the product and updates the price. 
+        /// </summary>
         public float SetBasePrize { set { basePrice = value; price = CalculatePrice(); DisplayPrice(); } }
 
+        /// <summary>
+        /// Sets the size price of the product and updates the price. 
+        /// </summary>
         public float SetSizePrice { set { sizePrise = value; price = CalculatePrice(); DisplayPrice(); } }
 
+        /// <summary>
+        /// Calculates the price of the product.
+        /// </summary>
+        /// <returns>Returns the price of the product.</returns>
         protected float CalculatePrice()
         {
             float price_ = basePrice + sizePrise;
@@ -686,13 +762,16 @@ namespace Pizzeria
         }
 
         /// <summary>
-        /// Displays the price of the pizza. 
+        /// Displays the price of the product. 
         /// </summary>
         public void DisplayPrice()
         {
             priceWrite.Text = price.ToString() + " kr.";
         }
 
+        /// <summary>
+        /// Displays the size of the product. 
+        /// </summary>
         public void DisplaySize()
         {
             sizeWrite.Text = sizeType;
@@ -700,9 +779,20 @@ namespace Pizzeria
 
     }
 
-
+    /// <summary>
+    /// Class for polymorth of drinks.
+    /// </summary>
     public class DrinkPolymorth : DrinkBase
     {
+        /// <summary>
+        /// Constructor for the drink polymorth class. 
+        /// </summary>
+        /// <param name="priceWrite">Price Textblock.</param>
+        /// <param name="name">Name of the product.</param>
+        /// <param name="number">Number of the product.</param>
+        /// <param name="size">The size of the product.</param>
+        /// <param name="basePrice">The base price of the product.</param>
+        /// <param name="icePrice">The price of ice, if added to the product. </param>
         public DrinkPolymorth(TextBlock priceWrite, string name, uint number, string size, float basePrice, float icePrice) : base(priceWrite, icePrice)
         {
             this.name = name;
@@ -713,14 +803,15 @@ namespace Pizzeria
             DisplayPrice();
         }
 
-
-
     }
 
 
     //------------------------------------------------------------------------------
 
 
+    /// <summary>
+    /// Class to be derive from regarding pizzas. 
+    /// </summary>
     public class PizzaBase
     {
 
@@ -750,20 +841,49 @@ namespace Pizzeria
             //DisplayPrice();
         }
 
+        /// <summary>
+        /// Gets the ingredients of the product.
+        /// </summary>
         public string[] GetIngredients { get => GetKeys(); }
 
+        /// <summary>
+        /// Gets the price of the product.
+        /// </summary>
         public float GetPrice { get => price; }
 
+        /// <summary>
+        /// Gets the name of the product.
+        /// </summary>
         public string GetName { get => name; }
 
+        /// <summary>
+        /// Gets the number of the product.
+        /// </summary>
         public uint GetNumber { get => number; }
 
+        /// <summary>
+        /// Get and sets the size of the products. 
+        /// </summary>
         public string Size { get => sizeType; set => sizeType = value; }
 
-        public float SetBasePrize { set { basePrice = value; price = CalculatePrice() + basePrice; DisplayPrice(); } }
+        /// <summary>
+        /// Sets the base price of the products and updates the price. 
+        /// </summary>
+        public float SetBasePrice { set { basePrice = value; price = CalculatePrice() + basePrice; DisplayPrice(); } }
 
+        /// <summary>
+        /// Gets the cheese of the product.
+        /// </summary>
         public string GetCheese { get => cheese; }
+
+        /// <summary>
+        /// Gets the dough of the product.
+        /// </summary>
         public string GetDough { get => dough; }
+
+        /// <summary>
+        /// Gets  the tomato sauce of the product.
+        /// </summary>
         public string GetTomatoSauce { get => tomatoSauce; }
 
         /// <summary>
@@ -817,6 +937,11 @@ namespace Pizzeria
 
         }
 
+        /// <summary>
+        /// Removes an ingrdient from the product.
+        /// </summary>
+        /// <param name="ingredient">Ingredients to remove.</param>
+        /// <returns>Returns true if the ingredient was removed, else false.</returns>
         public bool RemoveIngredient(string ingredient)
         {
             try
@@ -854,7 +979,13 @@ namespace Pizzeria
             DisplayPrice();
         }
 
-
+        /// <summary>
+        /// Checks if <paramref name="keyToAdd"/> exist in the ingredient dictionary. If it does, updates its value using <paramref name="valueToAdd"/>. It it was not found it, it will be added and <paramref name="OldKeyToRemove"/> will be removed.
+        /// </summary>
+        /// <param name="keyToAdd">The key to add.</param>
+        /// <param name="valueToAdd">The value of the key.</param>
+        /// <param name="OldKeyToRemove">The old key. If <paramref name="keyToAdd"/> is found it will become the new <paramref name="OldKeyToRemove"/>.</param>
+        /// <returns></returns>
         protected bool CheckAndAddToDictionary(string keyToAdd, float valueToAdd, ref string OldKeyToRemove)
         {
             if (keyToAdd != null)
@@ -950,11 +1081,13 @@ namespace Pizzeria
 
         }
 
-
+        /// <summary>
+        /// Gets the dictionary that contains the ingredients and their values. 
+        /// </summary>
         public Dictionary<string, float> GetIngredientsDictionary { get => ingredients; }
 
         /// <summary>
-        /// Adds a single ingredient and its cost to the pizza, if it does not exist. 
+        /// Adds a single ingredient and its cost to the pizza, if it does not exist. If it exist, updates its value.
         /// </summary>
         /// <param name="ingredient">Ingredient to add.</param>
         /// <param name="value">Price of the ingredient.</param>
@@ -998,8 +1131,20 @@ namespace Pizzeria
 
     }
 
+    /// <summary>
+    /// Class for polymorting pizzas. Derived from <c>PizzaBase</c>
+    /// </summary>
     public class PizzaPolymorth : PizzaBase
     {
+        /// <summary>
+        /// Constructor for pizzas that does not contain any ingredients by default.
+        /// </summary>
+        /// <param name="priceWrite">Textblock to write price too.</param>
+        /// <param name="ingredientsWrite">Textblock to write ingredients too.</param>
+        /// <param name="name">The name of the pizza.</param>
+        /// <param name="number">The number of the pizza.</param>
+        /// <param name="size">The size of the pizza.</param>
+        /// <param name="basePrice">The base price of the pizza.</param>
         public PizzaPolymorth(TextBlock priceWrite, TextBlock ingredientsWrite, string name, uint number, /*Dictionary<string, float> ingredients,*/ string size = "Normal", float basePrice = 20) : base(priceWrite, ingredientsWrite)
         {
             this.name = name;
@@ -1009,6 +1154,16 @@ namespace Pizzeria
             DisplayIngredients();
         }
 
+        /// <summary>
+        /// Constructor for pizzas that does contain any ingredients by default.
+        /// </summary>
+        /// <param name="priceWrite">Textblock to write price too.</param>
+        /// <param name="ingredientsWrite">Textblock to write ingredients too.</param>
+        /// <param name="name">The name of the pizza.</param>
+        /// <param name="number">The number of the pizza.</param>
+        /// <param name="ingredients">Dictionary containing the ingredients, and their price, of the pizza.</param>
+        /// <param name="size">The size of the pizza.</param>
+        /// <param name="basePrice">The base price of the pizza.</param>
         public PizzaPolymorth(TextBlock priceWrite, TextBlock ingredientsWrite, string name, uint number, Dictionary<string, float> ingredients, string size = "Normal", float basePrice = 20) : base(priceWrite, ingredientsWrite)
         {
             this.name = name;
@@ -1026,85 +1181,27 @@ namespace Pizzeria
 
     }
 
-    public class Margherita : PizzaBase //maybe instead of classes, use polymoth. So a single class which consturctor takes all of the variable that decide what kind of pizza it is. But for now, you do this intil the visual and that is working
-    { //See the animal simulation project. Make it so no new code is needed to be added when a new pizza is added to the menu. Maybe end up with it read all txt files in a folder for the ingredients and prices. The names come from the text file name
-        public Margherita(TextBlock priceWrite, TextBlock ingredientsWrite, string size = "Normal", float basePrice = 20) : base(priceWrite, ingredientsWrite)//this(priceWrite, ingredientsWrite)
-        { //base consturctor is run before the code in the derived constructor
-            sizeType = size;
-            this.basePrice = basePrice;
-            ingredients.Add("Classic", 10);
-            ingredients.Add("Basic Sauce", 5);
-            ingredients.Add("Mozzarella", 20);
-            ingredients.Add("Oregano", 5);
-            name = "Margherita";
-            number = 1;
-            dough = "Classic";
-            tomatoSauce = "Basic Sauce";
-            cheese = "Mozzarella";
-            price = basePrice + CalculatePrice();
-            DisplayIngredients();
-        }
-
-        //public Margherita(TextBlock priceWrite, TextBlock ingredientsWrite) : base(priceWrite, ingredientsWrite)
-        //{
-
-        //}
-
-    }
-
-    public class Napoletana : PizzaBase
-    {
-        public Napoletana(TextBlock priceWrite, TextBlock ingredientsWrite, string size = "Normal", float basePrice = 20) : base(priceWrite, ingredientsWrite)
-        {
-            sizeType = size;
-            this.basePrice = basePrice;
-            ingredients.Add("Classic", 10);
-            ingredients.Add("Basic Sauce", 5);
-            ingredients.Add("Mozzarella", 20);
-            ingredients.Add("Oregano", 5);
-            ingredients.Add("Anchovies", 30);
-            name = "Napoletana";
-            number = 2;
-            dough = "Classic";
-            tomatoSauce = "Basic Sauce";
-            cheese = "Mozzarella";
-            price = basePrice + CalculatePrice();
-            DisplayIngredients();
-        }
-    }
-
-    public class Sarda : PizzaBase
-    {
-        public Sarda(TextBlock priceWrite, TextBlock ingredientsWrite, string size = "Normal", float basePrice = 20) : base(priceWrite, ingredientsWrite)
-        {
-            sizeType = size;
-            this.basePrice = basePrice;
-            ingredients.Add("Classic", 10);
-            ingredients.Add("Basic Sauce", 5);
-            ingredients.Add("Mozzarella", 20);
-            ingredients.Add("Pecorino Cheese", 12);
-            ingredients.Add("Spicy Salami", 21);
-            name = "Sarda";
-            number = 3;
-            dough = "Classic";
-            tomatoSauce = "Basic Sauce";
-            cheese = "Mozzarella";
-            price = basePrice + CalculatePrice();
-            DisplayIngredients();
-        }
-    }
-
 
     //------------------------------------------------------------------------------
 
 
+    /// <summary>
+    /// DataList class, implements ObservableCollection<string>.
+    /// </summary>
     public class DataList : ObservableCollection<string>
     { //https://docs.microsoft.com/en-us/dotnet/api/system.windows.controls.itemscontrol?view=netframework-4.8
+        /// <summary>
+        /// Constructor for the Datalist class.
+        /// </summary>
+        /// <param name="list">Strings to add to the class.</param>
         public DataList(string[] list)
         {
             foreach (string str in list)
                 Add(str);
         }
+        /// <summary>
+        /// Gets and sets the data in the dataList class. 
+        /// </summary>
         public string[] GetSetDataList { get; set; }
     }
 

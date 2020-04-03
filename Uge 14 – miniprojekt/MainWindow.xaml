@@ -9,35 +9,35 @@
     <Grid>
         <Button Content="Add Pizza" HorizontalAlignment="Left" Margin="609,286,0,0" VerticalAlignment="Top" Width="75" Click="Add_Click"/>
         <Button Content="Order" HorizontalAlignment="Left" Margin="609,356,0,0" VerticalAlignment="Top" Width="75" Click="Order_Click"/>
-        <TextBlock HorizontalAlignment="Left" Name="IngredientsBox" TextWrapping="Wrap" Text="figure out to scale it to fit all the ingredients" VerticalAlignment="Top" Margin="293,42,0,0" Height="247" Width="117"/>
+        <TextBlock HorizontalAlignment="Left" Name="IngredientsBox" TextWrapping="Wrap" VerticalAlignment="Top" Margin="293,42,0,0" Height="367" Width="117"/>
         <TextBlock HorizontalAlignment="Left" Name="PriceBox" TextWrapping="Wrap" Text="Price" VerticalAlignment="Top" Margin="601,42,0,0" Width="116"/>
         <TextBlock HorizontalAlignment="Left" Name="TotalPriceBox" TextWrapping="Wrap" Text="0" VerticalAlignment="Top" Margin="601,128,0,0" Width="116"/>
         <ComboBox HorizontalAlignment="Left" Name="PizzaType" Margin="26,42,0,0" VerticalAlignment="Top" Width="120" SelectionChanged="PizzaType_SelectionChanged">
-            
+
         </ComboBox>
         <ComboBox HorizontalAlignment="Left" Name="PizzaSize" Margin="159,42,0,0" VerticalAlignment="Top" Width="120" SelectionChanged="PizzaSize_SelectionChanged">
-            
+
         </ComboBox>
         <TextBlock HorizontalAlignment="Left" TextWrapping="Wrap" Text="Pizza" VerticalAlignment="Top" Margin="26,26,0,0" RenderTransformOrigin="0.535,0.746" FontWeight="Bold"/>
         <TextBlock HorizontalAlignment="Left" TextWrapping="Wrap" Text="Size" VerticalAlignment="Top" Margin="159,26,0,0" FontWeight="Bold"/>
         <TextBlock HorizontalAlignment="Left" TextWrapping="Wrap" VerticalAlignment="Top" Margin="601,26,0,0" FontWeight="Bold"><Run Text="Current Pizza P"/><Run Text="r"/><Run Text="ice"/></TextBlock>
         <TextBlock HorizontalAlignment="Left" TextWrapping="Wrap" VerticalAlignment="Top" Margin="601,112,0,0" Text="Total Price" FontWeight="Bold"/>
         <TextBlock HorizontalAlignment="Left" TextWrapping="Wrap" Text="Ingredients" VerticalAlignment="Top" Margin="293,26,0,0" FontWeight="Bold" TextAlignment="Center"/>
-        <TextBlock HorizontalAlignment="Left" TextWrapping="Wrap" VerticalAlignment="Top" Margin="407,26,0,0" FontWeight="Bold" TextAlignment="Center"><Run Text="Order "/><Run Text="List"/></TextBlock>
-        <TextBlock HorizontalAlignment="Left" Name="PizzaListBox" TextWrapping="Wrap" VerticalAlignment="Top" Margin="407,42,0,0" Height="247" Width="117"/>
-        <TextBlock HorizontalAlignment="Left" Margin="26,115,0,0" TextWrapping="Wrap" VerticalAlignment="Top" FontWeight="Bold" Height="29" Width="104"><Run Text="Extra Ingredients"/><Run Text=" (4"/><Run Text=" max"/><Run Text=")"/></TextBlock>
-        <TextBlock HorizontalAlignment="Left" TextWrapping="Wrap" VerticalAlignment="Top" Margin="159,128,0,0"><Run FontWeight="Bold" Text="Dough"/></TextBlock>
-        <ComboBox HorizontalAlignment="Left" Name="Extra_Ingredients" Margin="26,149,0,0" VerticalAlignment="Top" Width="120" SelectionChanged="Extra_Ingredients_SelectionChanged">
+        <TextBlock HorizontalAlignment="Left" TextWrapping="Wrap" VerticalAlignment="Top" Margin="415,26,0,0" FontWeight="Bold" TextAlignment="Center"><Run Text="Order "/><Run Text="List"/></TextBlock>
+        <TextBlock HorizontalAlignment="Left" Name="PizzaListBox" TextWrapping="Wrap" VerticalAlignment="Top" Margin="415,42,0,0" Height="367" Width="153"/>
+        <TextBlock HorizontalAlignment="Left" Margin="26,86,0,0" TextWrapping="Wrap" VerticalAlignment="Top" FontWeight="Bold" Height="29" Width="104"><Run Text="Extra Ingredients"/><Run Text=" (4"/><Run Text=" max"/><Run Text=")"/></TextBlock>
+        <TextBlock HorizontalAlignment="Left" TextWrapping="Wrap" VerticalAlignment="Top" Margin="159,99,0,0"><Run FontWeight="Bold" Text="Dough"/></TextBlock>
+        <ComboBox HorizontalAlignment="Left" Name="Extra_Ingredients" Margin="26,120,0,0" VerticalAlignment="Top" Width="120" SelectionChanged="Extra_Ingredients_SelectionChanged">
         </ComboBox>
-        <ComboBox HorizontalAlignment="Left" Name="Dough" VerticalAlignment="Top" Width="120" Margin="159,149,0,0" SelectionChanged="Dough_SelectionChanged">
+        <ComboBox HorizontalAlignment="Left" Name="Dough" VerticalAlignment="Top" Width="120" Margin="159,120,0,0" SelectionChanged="Dough_SelectionChanged">
 
         </ComboBox>
-        <ComboBox HorizontalAlignment="Left" Name="Cheese" Margin="26,213,0,0" VerticalAlignment="Top" Width="120" SelectionChanged="Cheese_SelectionChanged">
+        <ComboBox HorizontalAlignment="Left" Name="Cheese" Margin="26,184,0,0" VerticalAlignment="Top" Width="120" SelectionChanged="Cheese_SelectionChanged">
 
         </ComboBox>
-        <TextBlock HorizontalAlignment="Left" TextWrapping="Wrap" VerticalAlignment="Top" Margin="26,195,0,0"><Run FontWeight="Bold" Text="Cheese"/></TextBlock>
-        <TextBlock HorizontalAlignment="Left" TextWrapping="Wrap" VerticalAlignment="Top" Margin="159,195,0,0"><Run FontWeight="Bold" Text="Tomato Sauce"/></TextBlock>
-        <ComboBox HorizontalAlignment="Left" Name="Tomato_Sauce" Margin="159,213,0,0" VerticalAlignment="Top" Width="120" SelectionChanged="Tomato_Sauce_SelectionChanged">
+        <TextBlock HorizontalAlignment="Left" TextWrapping="Wrap" VerticalAlignment="Top" Margin="26,166,0,0"><Run FontWeight="Bold" Text="Cheese"/></TextBlock>
+        <TextBlock HorizontalAlignment="Left" TextWrapping="Wrap" VerticalAlignment="Top" Margin="159,166,0,0"><Run FontWeight="Bold" Text="Tomato Sauce"/></TextBlock>
+        <ComboBox HorizontalAlignment="Left" Name="Tomato_Sauce" Margin="159,184,0,0" VerticalAlignment="Top" Width="120" SelectionChanged="Tomato_Sauce_SelectionChanged">
 
         </ComboBox>
         <TextBlock HorizontalAlignment="Left" TextWrapping="Wrap" VerticalAlignment="Top" Margin="26,246,0,0" FontWeight="Bold" Text="Drinks"/>
@@ -49,6 +49,16 @@
         <Button Content="Add Drink" HorizontalAlignment="Left" Margin="609,318,0,0" VerticalAlignment="Top" Width="75" Click="AddDrink_Click"/>
         <TextBlock HorizontalAlignment="Left" TextWrapping="Wrap" VerticalAlignment="Top" Margin="26,305,0,0" FontWeight="Bold" Text="Ice"/>
         <CheckBox Content="Yes" Name="Ice" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="47,306,0,0" Unchecked="CheckBox_CheckedChanged" Checked="CheckBox_CheckedChanged"/>
+        <TextBlock HorizontalAlignment="Left" Margin="581,241,0,0" TextWrapping="Wrap" VerticalAlignment="Top" RenderTransformOrigin="0.5,0.5" FontStyle="Italic" FontWeight="Bold" FontFamily="Times New Roman" Height="42" Width="211" FontSize="14">
+            <TextBlock.RenderTransform>
+                <TransformGroup>
+                    <ScaleTransform/>
+                    <SkewTransform/>
+                    <RotateTransform Angle="19.428"/>
+                    <TranslateTransform/>
+                </TransformGroup>
+            </TextBlock.RenderTransform><Run Text="Buy two or more pizzas and drinks, save the most expensive"/><Run Text=" "/><Run Text="dough"/><Run Text="!!!"/><Run Text="*"/></TextBlock>
+        <TextBlock HorizontalAlignment="Left" TextWrapping="Wrap" VerticalAlignment="Top" Margin="629,393,0,0" FontSize="6"><Run Text="*"/><Run Text="Only if you "/><Run Text="buy "/><Run Text="two or more drinks "/><Run FontStyle="Italic" Text="and "/><Run Text="two or more "/><Run Text="pizzas"/><Run Text=" at the same time"/></TextBlock>
 
 
     </Grid>
