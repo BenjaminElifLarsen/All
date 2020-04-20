@@ -835,10 +835,10 @@ namespace Chess
                     break;
                 }
             }
-            RemoveDraw(mapLocation);
+            //RemoveDraw(mapLocation); //these are not needed since the Move function does not care about the movement of the chesspiece and thus can be used for moving the king. 
             //move itself
-            Draw();
-            hasMoved = true;
+            //Draw();
+            //hasMoved = true; //call from the move function
         }
 
     }
