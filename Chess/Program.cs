@@ -89,6 +89,15 @@ namespace Chess
         private static char lineY = '|'; //works as it should
         private static byte extraSpacing = 1; //if changes, numbers and letters do not move down, edges moves the correct amount and the squares moves to very much wrong locations
         private static byte edgeSize = (byte)(extraSpacing + 1); //does not affect top and left side numbers and letters in the correct way
+        private static byte[] windowSizeModifer = new byte[] {20,4 }; //not a setting that should be access too.
+        private static int[] windowSize = new int[] { squareSize * 8 + 9 + 2 * edgeSize + offset[0] * 2 + windowSizeModifer[0], squareSize * 8 + 9 + 2 * edgeSize + offset[1] * 2 + windowSizeModifer[1] };
+        private static int[,] writeLocationCheck = new int[,] { {windowSize[0]-windowSizeModifer[0],10 },{ windowSize[0] - windowSizeModifer[0] + 8,10 } }; //x,y //each line should contain two symbols, e.g. D5, A2 etc..
+        //Black    White
+        //king     king
+        //----     ----
+        //D5       A6
+        //         D4
+        private static int[] writeLocationPromotion = new int[] {offset[0]+edgeSize+2, windowSize[1] - windowSizeModifer[1] };
         /// <summary>
         /// Gets the size of the squares. 
         /// </summary>
@@ -141,6 +150,18 @@ namespace Chess
         /// Get the edge size...
         /// </summary>
         public static byte EdgeSpacing { get => edgeSize; }
+        /// <summary>
+        /// Gets the size of the window.
+        /// </summary>
+        public static int[] WindowSize { get => windowSize; } //consider having two settings for player write locations
+        /// <summary>
+        /// Gets the locations to write check out to. 
+        /// </summary>
+        public static int[,] CheckWriteLocation { get => writeLocationCheck; }
+        /// <summary>
+        /// Gets the location to write out the promotions. 
+        /// </summary>
+        public static int[] PromotionWriteLocation { get => writeLocationPromotion; }
     }
 
     class Program
@@ -173,7 +194,7 @@ namespace Chess
         private byte[] squareColour1;
         private byte[] squareColour2;
         private byte[] offset;
-        private byte[] windowsSize = new byte[2];
+        private int[] windowsSize = new int[2];
 
 
         public ChessTable()
@@ -191,8 +212,8 @@ namespace Chess
             squareColour2 = new byte[] { 135, 68, 31 };
             offset = new byte[] { 2, 2 };
 
-            windowsSize[0] = (byte)(9 + 8 * squareSize + 10);
-            windowsSize[1] = (byte)(9 + 8 * squareSize + 10);
+            windowsSize[0] = Settings.WindowSize[0];
+            windowsSize[1] = Settings.WindowSize[1];
             Console.SetWindowSize(windowsSize[0], windowsSize[1]);
             blackSpawnLocation = new int[,] {
                 { 0, 1 }, { 1, 1 }, { 2, 1 }, { 3, 1 }, { 4, 1 }, { 5, 1 }, { 6, 1 }, { 7, 1 },
@@ -589,23 +610,57 @@ namespace Chess
                 "-K-"
             };
             Draw();
-        } //king cannot move next to another king
-
-        public void KingTest()
-        {
-
         }
 
         /// <summary>
-        /// Calculates end locations and if legal add them to a list. 
+        /// Returns true if the king is checked, false otherwise. 
+        /// </summary>
+        public override bool SpecialBool {
+            get
+            {
+                isChecked = IsInChecked(mapLocation, checkLocations);
+                CheckWriteOut();
+                return isChecked;
+            }
+            set => specialBool = value; 
+        }
+
+        public override void Control()
+        {
+            Move();
+            RemoveDraw(oldMapLocation);
+            LocationUpdate();
+            Draw();
+            UpdateMapMatrix(oldMapLocation);
+            //CheckWriteOut();
+            checkLocations.Clear();
+            castLingCandidates.Clear();
+        }
+
+        private void CheckWriteOut()
+        {
+            if (isChecked) //have a class variable used to know how many lines need to be cleared from last time. 
+            {
+                //string writeLout = "";
+                int[,] writeLocation = Settings.CheckWriteLocation; //should be modified so it return a new array rather than the existing array. 
+                foreach (int[] loc in checkLocations)
+                {
+                    char letter = (char)(97 + loc[0]);
+                    string writeLout = String.Format("{0}{1}",letter,loc[1]);
+                }
+            }
+        }
+
+        /// <summary>
+        /// Calculates end locations and if legal and is not under threat adds them to a list. 
         /// </summary>
         protected override void EndLocations()
         { //implement a check for Castling and/or call the Castling function
             //is there a better way to do this than the current way. Currently it can go out of bounds. 
             //could most likely make a nested function of the do while loop
 
-            isChecked = IsInChecked(mapLocation,checkLocations); //not proper location, just there for testing. This version should be called after the other player has moved a piece to check if the king is threaten or not. 
-            SpecialBool = isChecked;
+            //isChecked = IsInChecked(mapLocation,checkLocations); //not proper location, just there for testing. This version should be called after the other player has moved a piece to check if the king is threaten or not. 
+            //SpecialBool = isChecked;
             //other versions, each with a different endlocation should be called in the Move function and any threaten endlocation should be removed. 
             //maybe have the endlocation removal in this function or at least call a function that does that from this function?
             //If there are no endlocations left and the current location is under threat... the player should not be allowed to move the king and they should move another piece. if the turn ends with the king still threaten, checkmate. 
@@ -613,7 +668,6 @@ namespace Chess
 
             FindCastlingOptions();
 
-            //when the king has moved, it should clear the checkLocations list. 
             sbyte[] position = new sbyte[2] { -1, 0 };
             CheckPosistions(position); //left
 
@@ -633,45 +687,56 @@ namespace Chess
             CheckPosistions(position); //right, up
 
             position = new sbyte[2] { -1, 1 };
-            CheckPosistions(position); //,left down
+            CheckPosistions(position); //left down
 
             position = new sbyte[2] { 1, 1 };
             CheckPosistions(position); //right, down
 
             if(possibleEndLocations.Count != 0)
-            { //need to make sure that if a player selects the king and it cannot move, it does not prevent castling from happening. 
-                SpecialBool = true;
+            {
+                hasMoved = true;
             }
 
             void CheckPosistions(sbyte[] currentPosition)
-            { //need to have code implemented that check each square and wether a hostile piece can take it on that square. E.g. need to check if there is a knight in a location that can jump there
-                //if there is a straight line with a rock or queen on it. Diagnoal lines with a queen or a bishop. If a pawn is up or below (depending on team) and to the side of that square.
-                //Lastly, it should check if the hostile king is touching that square. 
+            { 
                 sbyte[] loc = new sbyte[2] { currentPosition[0], currentPosition[1] };
-
-                if (!((loc[0] + mapLocation[0] > 7 || loc[0] + mapLocation[0] < 0) || (loc[1] + mapLocation[1] > 7 || loc[1] + mapLocation[1] < 0)))
+                int[] loc_ = new int[] {loc[0] + mapLocation[0], loc[1] + mapLocation[1] };
+                if (!((loc_[0] > 7 || loc_[0] < 0) || (loc_[1] > 7 || loc_[1] < 0)))
                 {
+                    List<int[]> locationUnderThreat = new List<int[]>();
                     string feltID = MapMatrix.Map[loc[0] + mapLocation[0], mapLocation[1] + loc[1]];
                     if (feltID == "")
-                    {
-                        Add(loc);
-                        loc[0] += currentPosition[0];
-                        loc[1] += currentPosition[1];
+                    { 
+                        
+                        if(!IsInChecked(loc_,locationUnderThreat))
+                            Add(loc_);
                     }
                     else
                     {
                         if (teamString != feltID.Split(':')[0])
-                        {
-                            Add(loc);
+                        { 
+                            if (!IsInChecked(loc_, locationUnderThreat))
+                                Add(loc_);
                         }
                     }
                 }
             }
 
-            void Add(sbyte[] posistions)
+            void Add(int[] posistions)
             {
-                possibleEndLocations.Add(new int[,] { { (int)(mapLocation[0] + posistions[0]) }, { (int)(mapLocation[1] + posistions[1]) } });
+                possibleEndLocations.Add(new int[,] { { (posistions[0]) }, { (posistions[1]) } });
             }
+        }
+
+        /// <summary>
+        /// Function that checks if <paramref name="location_"/> is under threat by a hostile chess piece. Returns true if it is.
+        /// </summary>
+        /// <param name="location_">Location to check for being threaten.</param>
+        /// <returns>Returns true if <paramref name="location_"/>is under threat, false otherwise. </returns>
+        public bool IsInChecked(int[] location_)
+        {
+            List<int[]> list_ = new List<int[]>();
+            return IsInChecked(location_, list_);
         }
 
         /// <summary>
@@ -683,37 +748,84 @@ namespace Chess
         public bool IsInChecked(int[] location_, List<int[]> toAddToList)
         { //if true, it should force the player to move it. Also, it needs to check each time the other player has made a move 
             //should also check if it even can move, if it cannot the game should end. 
-            //find the other player's chesspieces on the map matrix, look at the IDs and see if there is a clear legal move that touces the king.
-            //hmm... could also look check specific squares for specific chesspieces, e.g. check all left, right, up and down squares for rocks and queen, check specific squares that 3 squares away for knights and so on. 
-            //the king can, however, take a chesspiece as long time that piece is not protected by another nor is the other king. Cannot move next to the hostile king 
-            //used to check if the king is check mate or check
             //the king does not need to move in a check as long time there is a friendly chesspiece that can take the hostile piece. 
             //should all the pieces that can move to prevent a mate be highlighted? Should their endlocations be forced to only those that can prevent a check?
             //how much should the game hold the player in hand?
             //Should the game write to a location that the king is check and the location (letter and number) of the hostile pieces that threatens the king?
             //should the king's constructor have a write location, so the king can do the writting and not the board/player?
             //When should this code be called? Ideally, at the start of the player turn. But should it be called at other moments? E.g. before or after a king movement or should the move code check by itself 
-            //should the move code double check the checkLocations list to see if a location in possibleEndLocations should be removed?
             sbyte[,] moveDirection;
-            string[] toLookFor;
+            string[][] toLookFor;
             moveDirection = new sbyte[,] { { -1, 0 }, { 0, -1 }, { -1, -1 }, { -1, 1 }, { 0, 1 }, { 1, 0 }, { 1, 1 }, { 1, -1 },}; 
             //                              left        up          left/up   left/down   down     right    right/down right/up   
-            //The code that ensures that the king cannot move to the locations that are going to be added needs to ensure the king can move and take a piece that is next to the king. 
-            //Also, code is needed to ensure the king does/cannot move to a location that is threaten by a piece. 
-            //...
-            //how to do that... One way is to call this function, but with another locatin_ than maplocation and a new toAddToList. If it returns true, the king can move there, else that square is being threaten by a piece.  
-            //best place to do that? 
-            toLookFor = new string[] {"1", "2", "3", "5" }; //knights and pawns need different way of being checked. 
+            toLookFor = new string[][]
+            {//"2", "3", "5" 
+                new string[]{"2","5"},
+                new string[]{"2","5"},
+                new string[]{"2","3"},
+                new string[]{"2","3"},
+                new string[]{"2","5"},
+                new string[]{"2","5"},
+                new string[]{"2","3"},
+                new string[]{"2","3"}
+            }; //knights and pawns need different way of being checked. 
             QRBCheck(moveDirection, toLookFor);
-
+            //problem: if a square is checked that is not the king's and the code find the king, it will think that direction is fine even though there might be a hostile piece that can take the king on its current posistion and 
+            //the posistion that is being checked. Seems to have been fixed, require more testing.
             PawnCheck();
 
             KnightCheck();
 
-            if (checkLocations.Count != 0)
+            KingNear();
+
+            if (toAddToList.Count != 0)
                 return true;
             else
                 return false;
+
+            void KingNear()
+            {
+                if (!(location_[0] == mapLocation[0] && location_[1] == mapLocation[1]))
+                {
+                int[] placement_;
+                placement_ = new int[] { -1, -1 }; //left, up
+                Placement(placement_);
+                placement_ = new int[] { -1, 1 }; //left, down
+                Placement(placement_);
+                placement_ = new int[] { 1, -1 }; //right, up
+                Placement(placement_);
+                placement_ = new int[] { 1, 1 }; //right, down
+                Placement(placement_);
+                placement_ = new int[] { 0, -1 }; //up
+                Placement(placement_);
+                placement_ = new int[] { 0, 1 }; //down
+                Placement(placement_);
+                placement_ = new int[] { 1, 0}; //right
+                Placement(placement_);
+                placement_ = new int[] { -1, 0 }; //left
+                Placement(placement_);
+
+                void Placement(int[] direction_)
+                {
+                    int[] feltLocation = new int[] { (int)(direction_[0] + location_[0]), (int)(direction_[1] + location_[1]) };
+                    if (feltLocation[0] >= 0 && feltLocation[0] <= 7 && feltLocation[1] >= 0 && feltLocation[1] <= 7)
+                    {
+                        string feltID = MapMatrix.Map[feltLocation[0], feltLocation[1]];
+                        if (feltID != "")
+                        {
+                            string[] feltIDParts = feltID.Split(':');
+                            if (feltIDParts[0] != teamString)
+                            {
+                                if (feltIDParts[1] == "1")
+                                {
+                                    toAddToList.Add(new int[2] { feltLocation[0], feltLocation[1] });
+                                }
+                            }
+                        }
+                    }
+                }
+                }
+            }
 
             void KnightCheck()
             { //two in one direction, one in another direction
@@ -735,7 +847,7 @@ namespace Chess
                 placement_ = new int[] { 1, 2 }; //right, 2 down
                 Placement(placement_);
 
-                void Placement(int[] direction_) //at some point, just change all of the uint variables, related to the map, to int
+                void Placement(int[] direction_)
                 { //could rewrite this function to take a jaggered array and operate on it instead of calling the function multiple times. 
                     int[] feltLocation = new int[] { (int)(direction_[0] + location_[0]), (int)(direction_[1] + location_[1]) };
                     if (feltLocation[0] >= 0 && feltLocation[0] <= 7 && feltLocation[1] >= 0 && feltLocation[1] <= 7)
@@ -790,15 +902,16 @@ namespace Chess
             }
 
 
-            void QRBCheck(sbyte[,] directions, string[] checkpiecesToCheckFor) 
+            void QRBCheck(sbyte[,] directions, string[][] checkpiecesToCheckFor) 
             { //can be used to check for queens, rocks and bishops. Need other functions for knights and pawns.
                 //consider coding it such that it can work with a sbyte[,] and go through multiple directions in a single call.
                 //should the checkPiecesToCheckFor also be altered or is it fine 
                 for (int i = 0; i < directions.GetLength(0); i++) 
                 {
-
+                    //need to alter this one. Rock and Bishop are considered to have the same movement as the queen. Maybe, let it take a jaggered checkpiecesToCheckFor
                     int[] checkLocation = new int[2] { location_[0], location_[1] };
                     sbyte[] directions_ = new sbyte[2] { directions[i,0], directions[i,1] };
+                    string[] piecesToCheckFor = checkpiecesToCheckFor[i];
                     if ((checkLocation[0] + directions_[0] >= 0 && checkLocation[0] + directions_[0] <= 7 && checkLocation[1] + directions_[1] >= 0 && checkLocation[1] + directions_[1] <= 7)) 
                     {
 
@@ -811,7 +924,7 @@ namespace Chess
                                 string[] IDstrings = feltID.Split(':');
                                 if (IDstrings[0] != teamString) //checks if it is hostile or not 
                                 {
-                                    foreach (string pieceNumber in checkpiecesToCheckFor) //loops to it find the hostile one
+                                    foreach (string pieceNumber in piecesToCheckFor) //loops to it find the hostile one
                                     {
                                         if (IDstrings[1] == pieceNumber) //checks if the hostile piece is one of the chess pieces that can threaten the current location. 
                                         {
@@ -823,7 +936,8 @@ namespace Chess
                                 }
                                 else
                                 {
-                                    break;
+                                    if(feltID != ID)
+                                        break;
                                 }
                             }
                             directions_[0] += directions[i,0];
@@ -908,8 +1022,7 @@ namespace Chess
                                     }
                                     //the second square is the end location of the king
                                     //the first square is the end location of the rock
-                                }
-                                //need to ensure that the end locations of the king and of the rock are not under threat.  
+                                } 
                             } while (chepie.GetMapLocation[0] != currentFeltLocation[0]);
                             if(isEmptyRow)
                             {
@@ -924,6 +1037,61 @@ namespace Chess
                 }
             }
         }
+
+        ///// <summary>
+        ///// Allows the chesspiece to move. Any square under treat cannot be selected 
+        ///// </summary>
+        //protected override void Move()
+        //{
+        //    oldMapLocation = null;
+        //    bool hasSelected = false;
+        //    EndLocations();
+        //    //List<int[,]> newLocations = new List<int[,]>();
+        //    //foreach (int[] loc_ in checkLocations) //the current checkLocations is the square of the king. 
+        //    //{
+        //    //    int[,] checker = new int[,] { { loc_[0], loc_[1] } };
+        //    //    foreach (int[,] endLoc_ in possibleEndLocations)
+        //    //    {
+        //    //        if(!(endLoc_[0, 0] == checker[0, 0] && endLoc_[0, 1] == checker[0, 1]))
+        //    //        { 
+        //    //            newLocations.Add(endLoc_);
+        //    //        }
+        //    //    }
+        //    //}
+        //    //possibleEndLocations = newLocations;
+
+        //    if (possibleEndLocations.Count != 0)
+        //    {
+        //        DisplayPossibleMove();
+        //        int[] cursorLocation = GetMapLocation;
+        //        do
+        //        {
+        //            bool selected = FeltMove(cursorLocation);
+        //            if (selected)
+        //            {
+        //                foreach (int[,] loc in possibleEndLocations)
+        //                {
+        //                    int[] endloc_ = new int[2] { loc[0, 0], loc[1, 0] };
+        //                    if (endloc_[0] == cursorLocation[0] && endloc_[1] == cursorLocation[1])
+        //                    {
+        //                        couldMove = true;
+        //                        oldMapLocation = new int[2] { mapLocation[0], mapLocation[1] };
+        //                        TakeEnemyPiece(cursorLocation);
+        //                        mapLocation = new int[2] { cursorLocation[0], cursorLocation[1] };
+        //                        hasSelected = true;
+        //                        break;
+        //                    }
+        //                }
+        //            }
+        //        } while (!hasSelected);
+        //        NoneDisplayPossibleMove();
+        //        possibleEndLocations.Clear();
+        //    }
+        //    else
+        //    {
+        //        couldMove = false;
+        //    }
+        //}
 
         /// <summary>
         /// Selects a rock using 
@@ -1227,15 +1395,63 @@ namespace Chess
         {
             if ((!team && mapLocation[1] == 7) || (team && mapLocation[1] == 0))
             {
-                Taken();
-                //how should the selection be designed? Text written below the board? Next to the board? How to select? Arrowkeys? Numberkeys? Written?
+                bool chosen = false;
+                string command = "Choose: ";
+                string answer = "";
+                //How to select? Arrowkeys? Numberkeys? Written?
                 DisplayPromotions();
+                Console.SetCursorPosition(Settings.PromotionWriteLocation[0], Settings.PromotionWriteLocation[1] + 1);
+                Console.Write(command);
+                do //not really happy with this, it does not fit the rest of the game. Consider other ways to do it.
+                {
+                    Console.SetCursorPosition(Settings.PromotionWriteLocation[0] + command.Length, Settings.PromotionWriteLocation[1] + 1);
+                    Console.Write("".PadLeft(answer.Length));
+                    Console.SetCursorPosition(Settings.PromotionWriteLocation[0] + command.Length, Settings.PromotionWriteLocation[1] + 1);
+                    answer = Console.ReadLine();
+                    foreach (string promotionKey in promotions.Keys)
+                    {
+                        if (promotionKey.ToLower() == answer.ToLower())
+                        {
+                            chosen = true;
+                            break;
+                        }
+                    }
+                } while (!chosen);
+                
+                answer = answer.ToLower();
+                Console.SetCursorPosition(0, Settings.PromotionWriteLocation[1]); //removes the written promotion text
+                Console.WriteLine("".PadLeft(Settings.WindowSize[0]));
+                Console.WriteLine("".PadLeft(Settings.WindowSize[0]));
+                Taken();
+                string[] IDParts = ID.Split(':');
+                string newID;
+                switch (answer)
+                {
+                    case "knight":
+                        IDParts[1] = "4";
+                        newID = String.Format("{0}:{1}:{2}P", IDParts[0], IDParts[1],IDParts[2]); //The P is to indicate that the piece used to be a pawn.
+                        ChessList.GetList(team).Add(new Knight(colour, team, mapLocation, newID));
+                        break;
 
-                //test code
-                ChessList.GetList(team).Add(new Queen(colour, team, mapLocation, GetID)); //the final version should update the ID to match the new chesspiece. This leaves a question for building up the ID, e.g. if the pawn is pawn number 1, team white,
-                //and it becomes a queen, it cannot be set as +:2:1 as the start queen is already that. 
-                //Since the last part of the ID is never used by anything else than in combination with the entire ID, maybe add a symbol after. The symbol could be the chesspiece type part of the ID, e.g. 2 for queen
-                //so it will becokme +:2:12
+                    case "bishop":
+                        IDParts[1] = "3";
+                        newID = String.Format("{0}:{1}:{2}P", IDParts[0], IDParts[1], IDParts[2]);
+                        ChessList.GetList(team).Add(new Bishop(colour, team, mapLocation, newID));
+                        break;
+
+                    case "rock":
+                        IDParts[1] = "5";
+                        newID = String.Format("{0}:{1}:{2}P", IDParts[0], IDParts[1], IDParts[2]);
+                        ChessList.GetList(team).Add(new Rock(colour, team, mapLocation, newID));
+                        break;
+
+                    case "queen":
+                        IDParts[1] = "2";
+                        newID = String.Format("{0}:{1}:{2}P", IDParts[0], IDParts[1], IDParts[2]);
+                        ChessList.GetList(team).Add(new Queen(colour, team, mapLocation, newID));
+                        break;
+
+                }
             }
 
         }
@@ -1245,7 +1461,13 @@ namespace Chess
         /// </summary>
         private void DisplayPromotions()
         { //writes to a location what chesspieces it can be promoted too.
-
+            string promotionsString = "";
+            foreach (string key in promotions.Keys)
+            {
+                promotionsString += key + " ";
+            }
+            Console.SetCursorPosition(Settings.PromotionWriteLocation[0], Settings.PromotionWriteLocation[1]);
+            Console.Write(promotionsString);
         }
 
     }
@@ -1308,7 +1530,6 @@ namespace Chess
                     if ((loc[0] + mapLocation[0] > 7 || loc[0] + mapLocation[0] < 0) || (loc[1] + mapLocation[1] > 7 || loc[1] + mapLocation[1] < 0))
                     {
                         break;
-                        //Solucation might not work as intended as it the current values cannot go negative and if posistion is 0 - 1 it will reach the max value. This will be caugt, but consider a different approach. 
                     }
                     string feltID = MapMatrix.Map[loc[0] + mapLocation[0], mapLocation[1] + loc[1]];
                     if (feltID == "")
